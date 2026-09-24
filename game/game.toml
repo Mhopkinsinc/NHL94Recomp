@@ -1,0 +1,101 @@
+# game.toml — NHL Hockey '94 (Electronic Arts, 1993). USA/Europe NTSC, 1 MB ROM.
+# 68000, flat $000000-$0FFFFF, identity-mapped. Battery SRAM declared in the
+# header ("RA" $F8 $20, odd bytes $200001-$203FFF) — the runner maps it from the
+# header automatically, so GameSpec.sram_start/sram_end stay 0.
+#
+# ROM identity: header "NHL Hockey '94", serial GM T-50656 -00, region "UE",
+# CRC32 9438F5DD, size 0x100000. Vectors (from $000000):
+#   SSP   $00FFFFF6   (R_StackSP; RunGame at $0076B8 later sets sp=$FFFE)
+#   Entry $00000200   (SetupGame)
+#   H-int $00015E6C   (ExpReturn — a bare RTE, no HBlank work)
+#   V-int $000076B2   (VBlankInt — see below)
+#
+# Discovery posture: NHL 94 HAS a byte-perfect disassembly (MarkeyJester, 2016,
+# asm68k syntax; see docs/DISASSEMBLY.md). Discovery is driven by its labels
+# and code-address oracle below, plus the heuristic finder. Every address in
+# this file was read from the reassembled listing (PRINCIPLES #16), never from
+# dispatch_misses.toml alone.
+
+[game]
+output_prefix = "nhl94"
+
+# Disassembly evidence (PRINCIPLES #16), generated from the byte-verified
+# asm68k listing by tools/nhl94_disassembly.py (see docs/DISASSEMBLY.md):
+#   annotations     - human-named code labels -> readable generated C
+#   code_addrs_file - every instruction start; gates data-as-code promotion and
+#                     lets the recompiler resume callers past inline JSR
+#                     arguments (EA's `jsr Print; dc.b "text"` idiom)
+#   discovery_files - sub_/named labels as entries, loc_ labels as CFG seeds,
+#                     plus register-indexed dispatch tables read from the ROM
+annotations      = "annotations_from_disasm.csv"
+code_addrs_file  = "nhl94.code_addrs.txt"
+discovery_files  = ["nhl94.disasm_labels.toml", "nhl94.disasm_jumptables.toml"]
+# No PC-indexed (d8,PC,Xn) jump tables exist in this ROM; its dispatch tables
+# are register-indexed and declared in nhl94.disasm_jumptables.toml. The
+# auto-walk is therefore a no-op here and stays off as for the Sonic titles.
+jump_table_autodiscovery = false
+
+# ---------------------------------------------------------------------------
+# Per-game RAM layout. The three stack fields are LOAD-BEARING and use the
+# reset SSP from the vector table. The Sonic-shaped tracking fields are
+# cosmetic (boot_smoke / telemetry only):
+#   vint_runcount -> $FFB03E, the word incremented once per VBlank by the
+#                    default V-blank routine sub_15E4C (`addq.w #1,($FFFFB03E).w`).
+#   vint_routine  -> $FFB03A, the longword pointer VBlankInt dispatches through.
+#   game_mode / player_object are not yet identified in the disasm; left 0.
+# ---------------------------------------------------------------------------
+[ram_layout]
+game_mode      = 0x000000
+vint_runcount  = 0xFFB03E
+vint_routine   = 0xFFB03A
+plc_pending    = 0x000000     # no Sonic-style PLC system
+initial_ssp    = 0xFFFFF6     # reset SSP (LOAD-BEARING)
+vbla_stack     = 0xFFFFF6     # V-int handler stack base (LOAD-BEARING)
+intr_stack     = 0x000000     # 0 = handlers push on the LIVE A7 (hardware). RunGame
+                              # sets sp=$FFFE, so the main stack owns the reset-SSP
+                              # region; a relocated handler stack there would sit on
+                              # top of live main-program return slots.
+player_object  = 0x000000
+level_modes    = []
+
+# ---------------------------------------------------------------------------
+# VBlankInt ($0076B2) is `move.l ($FFFFB03A).w,-(sp); rts` — an indirect jump
+# through a RAM-held routine pointer. The listing shows exactly four routines
+# ever stored there; they are seeded here so each is a callable root:
+#   sub_15E4C  default frame routine (installed by sub_17A18 and WaitVBlank)
+#   sub_15D9A  installed at $016B8E / $016C78
+#   sub_17692  installed at $01733E
+#   sub_1A148  installed at $01A050 (sound driver setup)
+# The recompiler must treat the push-then-RTS idiom as a computed jump for the
+# handler to work (bring-up step 3); seeding the targets is necessary either way.
+# ---------------------------------------------------------------------------
+[functions]
+extra = [
+  0x000200,   # SetupGame (reset entry)
+  0x0076B2,   # VBlankInt (IRQ6)
+  0x015E6C,   # ExpReturn (IRQ4 and unused vectors — bare RTE)
+  0x015E4C, 0x015D9A, 0x017692, 0x01A148,   # V-blank routines (see above)
+]
+late_extra = []
+blacklist = []
+
+# ---------------------------------------------------------------------------
+# Inline-argument callees: the text printer family is called as
+#     jsr <printer> ; dc.w <total length> ; dc.b <control bytes / text>
+# and steps the return address past the block (`move.l a1,4(sp)`). The word
+# after the call is the block's total byte length, so the caller resumes at
+# ret + word. Declaring them makes every continuation static even where the
+# disassembly mis-decoded the inline bytes as instructions (e.g. $007FC4,
+# $0F84F6); the runtime return-slot check still governs execution.
+# ---------------------------------------------------------------------------
+[[inline_args]]
+callee = 0x011B92   # sub_11B92: print inline string (bit 3 of $C2F8 selects font)
+length = "word"
+
+[[inline_args]]
+callee = 0x011A36   # sub_11A36: print inline string via sub_11A48
+length = "word"
+
+[[inline_args]]
+callee = 0x011DE2   # sub_11DE2: print inline string via sub_11DF4 (big glyphs)
+length = "word"

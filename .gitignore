@@ -1,0 +1,32 @@
+# Private ROM — never committed. Place it at game/NHL94.bin.
+*.bin
+*.srm
+*.sav
+
+# Build trees and generated C (regenerated from the ROM on every build).
+build/
+build-*/
+**/generated/
+
+# Runtime diagnostics written next to the executable.
+**/dispatch_misses.toml
+**/dispatch_misses.log
+**/interp_fallbacks.log
+**/interior_label_misses.log
+**/floor_coverage.toml
+**/floor_coverage.txt
+**/*.flog
+*.log
+
+# Local disassembly build products (listings are regenerated into a temp dir).
+*.lst
+Listings.asm
+
+# IDE / tooling.
+.vs/
+**/__pycache__/
+*.user
+*.suo
+
+# Release zips built by _package_release.bat.
+*.zip
