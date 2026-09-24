@@ -60,6 +60,25 @@ since the earlier status below:
 Owner verified keyboard input, sound and a human-played game (2026-09-23).
 Not yet verified: timing against hardware, Sonic baselines after the engine changes.
 
+## Fix 2026-09-24: quickload corrupted the game (save states disabled)
+
+Release test: gamepad shoulder taps (the runner's quicksave / quickload on a
+3-button pad) produced a burst of interior-label misses to garbage addresses
+(`$900000`, `$190000`, ...) at one frame and the game fell over. The saved
+`native_save_1.bin` held sane registers, so the save was fine; the load is
+the problem. `runner_load_state_file` replaces WRAM and the 68K registers and
+then restarts the game fiber at `resume_main_loop_pc`. NHL 94 defines none,
+so the fiber stayed parked where it was, deep inside nested screen
+subroutines, while its guest stack had been replaced: the next return-slot
+check read a foreign value and dispatched into it. Sonic can restart at a flat
+game-mode loop; NHL 94 has no such single loop top.
+
+Fix in `game/nhl94_spec.c`: `state_unavailable_reason` returns a message, so
+both quicksave and quickload print `[SAVE]/[LOAD] unavailable: ...` and do
+nothing. Proper support needs a resume trampoline that restarts the fiber at
+the parked PC and re-walks the restored guest stack when the restarted
+routine returns; that is an engine feature, not a game one.
+
 ## Fix 2026-09-23: Edit Lines > "Set Original lines" interior-label miss
 
 First native-default run: selecting "Set Original lines" in Edit Lines logged

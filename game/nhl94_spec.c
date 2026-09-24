@@ -29,6 +29,20 @@ static void nhl94_call_entry_point(void) { recomp_call_addr(0x000200u); }
 static void nhl94_call_vblank(void)      { recomp_call_addr(0x0076B2u); }
 static void nhl94_call_hblank(void)      { recomp_call_addr(0x015E6Cu); }
 
+/* Save states are refused until this game has a resume point. The runner's
+ * quickload replaces WRAM and the 68K registers and then restarts the game
+ * fiber at resume_main_loop_pc; with none defined it leaves the fiber parked
+ * wherever it was, deep inside NHL 94's nested screen subroutines, so the
+ * restored guest stack no longer matches the native call chain and the next
+ * return dispatches into garbage (owner report 2026-09-24: gamepad shoulder
+ * quickload, interior-label misses to $900000-style addresses). Unlike the
+ * Sonic titles there is no flat game-mode dispatcher to re-enter; a correct
+ * resume needs a trampoline that re-walks the restored guest stack. Until
+ * then both quicksave and quickload print this reason and do nothing. */
+static const char *nhl94_state_unavailable(void) {
+    return "NHL 94 has no save-state resume point yet (quicksave/quickload disabled)";
+}
+
 const GameSpec g_game_spec = {
     .display_name           = "NHL Hockey '94",
     .short_name             = "NHL94",
@@ -59,6 +73,7 @@ const GameSpec g_game_spec = {
     .call_hblank            = nhl94_call_hblank,
     .resume_main_loop_pc    = 0u,
     .save_resume_pc         = NULL,
+    .state_unavailable_reason = nhl94_state_unavailable,
     .dispatch_main_loop_pc  = 0u,
     .call_periodic          = NULL,
 
