@@ -60,6 +60,26 @@ since the earlier status below:
 Owner verified keyboard input, sound and a human-played game (2026-09-23).
 Not yet verified: timing against hardware, Sonic baselines after the engine changes.
 
+## Fix 2026-09-24: player energy drained immediately (HV counter)
+
+Owner report: with line changes on, every skater's energy bar emptied within
+seconds. The drain lives at `$10D26`: it reads the VDP HV counter
+(`move.w ($C00008).l,d0`), masks `and.w #$7F`, and only subtracts `$21` from
+the player's energy word (`$32(a2,d1.w)` in the team struct at `$C6CE` /
+`$CA32`, read and written via `sub_1575A` / `sub_1577A`) when the low seven
+bits are zero: a one-in-128 gate per call. The runner's `gvdp_read_hv_counter`
+returned a constant H byte (`$00` or `$80`), so the gate passed on every
+call. NHL 94 reads the HV counter as an entropy source in about twenty
+places (`and.w #3`, `#1`, `#2`, `#$7F`), so more than fatigue was affected.
+
+Engine fix: `gvdp_read_hv_counter_at` derives the H byte from the 68K's cycle
+position within the current scanline (`glue_line_cycle_position`: chunk
+budget drained so far plus instructions since the last drain, modulo 488),
+mapped onto the hardware's 211 (H40) or 171 (H32) distinct values with the
+`$B6 -> $E4` / `$93 -> $E9` discontinuity, and the V byte gets the `$EA ->
+$E5` wrap. Measured with `--mem-write-log 0xFFC700-0xFFC717` over a
+6000-frame attract run: energy-store writes fell from 619 frames to 45.
+
 ## Fix 2026-09-24: quickload corrupted the game (save states disabled)
 
 Release test: gamepad shoulder taps (the runner's quicksave / quickload on a
