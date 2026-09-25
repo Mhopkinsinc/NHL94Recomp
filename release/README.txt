@@ -18,7 +18,11 @@ Running
 Keep SDL2.dll next to the executable. Battery-backed save data (user records,
 team lines, player cards) is written to nhl94.srm next to the ROM.
 
-Controls: keyboard by default; SDL-compatible gamepads are detected at start.
+Controls: keyboard (arrows, Z/X/C = A/B/C, Return = Start) and any
+SDL-compatible gamepad, both active for player 1. Edit settings.ini next to
+the executable to change bindings, enable player 2, or set the window size;
+the file documents every value. Hotkeys: Tab or Back/Select held = turbo,
+F11 = fullscreen, Esc = quit.
 
 License
 -------

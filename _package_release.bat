@@ -24,7 +24,7 @@ if defined GENESIS_RECOMP_ROOT set "ENGINE=%GENESIS_RECOMP_ROOT%"
 
 python "%ENGINE%\tools\package_release.py" ^
     --exe     "%EXE%" ^
-    --extra   "%HERE%build-release\Release\SDL2.dll" ^
+    --extra   "%HERE%build-release\Release\SDL2.dll" "%HERE%release\settings.ini" ^
     --license "%HERE%LICENSE" ^
     --notices "%ENGINE%\THIRD-PARTY-LICENSES.md" ^
     --readme  "%HERE%release\README.txt" ^
