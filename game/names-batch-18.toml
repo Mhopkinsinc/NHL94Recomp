@@ -1,0 +1,86 @@
+# Names batch 18 - see docs/names/names-batch-18.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-18.toml
+
+[[name]]
+addr = 0x016226
+name = "EmitCrowdSections"
+confidence = 0.6
+evidence = "showcrowd: for up to four crowd sections (d2 & $F, capped at 3) starting at d3 emits each section's visible sprites with ai_EmitCrowdSprites; caller showcrowd"
+
+[[name]]
+addr = 0x01A430
+name = "ReadPad2Hardware"
+confidence = 0.7
+evidence = "port-2 twin of ai_ReadPad1Hardware: requests the Z80 bus (with the reset retry), writes $3C to $A10005 (TH high) and joins the port-1 reader's body at loc_1A498 with a0 = $A10003 to pack and remap the buttons; caller ReadJoyData"
+
+[[name]]
+addr = 0x0F72DA
+name = "CopyBestSixIndexes"
+confidence = 0.6
+evidence = "copies the six player indexes (every other byte) from the rating-sorted pairs at $BF20 to a0 as word entries (best first); caller ai_BuildRatingsStartingSix"
+
+[[name]]
+addr = 0x0F72FA
+name = "CopyWorstSixIndexes"
+confidence = 0.6
+evidence = "copies the six player indexes from the sorted pairs at $BF20 in reverse order (starting at $BF2A, worst first) to a0 as word entries; caller ai_BuildRatingsStartingSix"
+
+[[name]]
+addr = 0x009BB4
+name = "PrintCrowdMeterValue"
+confidence = 0.5
+evidence = "crowd meter: prints sqrt(4 * d0) + $41 (sroot) as a 3-digit number followed by the inline ' dB' string; caller loc_9A84 (crowd meter display)"
+
+[[name]]
+addr = 0x012D0E
+name = "PrintTeamNameAndScore"
+confidence = 0.7
+evidence = "PrintScores1: prints team a2's name (record +$1E data, name via the +4 offset) then its score $C(a2) as a 2-digit number at column $1C; caller PrintScores1"
+
+[[name]]
+addr = 0x01721C
+name = "LoadTeamPaletteLine"
+confidence = 0.7
+evidence = "SetTeamColors: copies eight longs (one 32-byte CRAM line) from team a0's palette block (data offset +2, plus d1) into the palette buffer at $BD68 + d1; caller SetTeamColors"
+
+[[name]]
+addr = 0x0175D8
+name = "BlinkAndWaitFrame"
+confidence = 0.6
+evidence = "PlayoffScreen: when the fade counter $BD26 is negative toggles palette entry $BD6A with $EE (blinking the cursor colour) and reloads $BD26 = $18, then waits until vcount ($B03E) differs from oldvcount ($B040) and stores the new value; caller PlayoffScreen"
+
+[[name]]
+addr = 0x01821A
+name = "BigNumAdd"
+confidence = 0.8
+evidence = "adds the 32-bit d0 to the low end of the five-word number at a3 and ripples the carry through the upper words (dbcc loop); caller ai_BigNumMulAdd"
+
+[[name]]
+addr = 0x018A6E
+name = "ShowCheckedPlayerMessage"
+confidence = 0.5
+evidence = "UpdatePA: takes TempPlOffset ($C470); a negative value selects the away record (index in the low byte), then calls sub_18A90 with the player index and team record (the message builder for the last check/hit); caller UpdatePA"
+
+[[name]]
+addr = 0x0F7B0A
+name = "WrapOptionValue"
+confidence = 0.6
+evidence = "GameSetUp_3 helper: d3 = value + step d2 wrapped into the range d4..d5 (below d4 wraps to d5, at or above d5 wraps to d4 - 1... i.e. cycles the option value); caller GameSetUp_3"
+
+[[name]]
+addr = 0x0F9FC0
+name = "CacheAttributeCounts"
+confidence = 0.6
+evidence = "stores ai_CountRatingNibbles of the home and away records in $D448/$D44A for the record updates; caller ai_UpdateGameRecords"
+
+[[name]]
+addr = 0x0F9FEA
+name = "CacheRosterSizes"
+confidence = 0.6
+evidence = "stores ai_CountRosterPlayers of the home and away records in $D44C/$D44E for the record updates; caller ai_UpdateGameRecords"
+
+[[name]]
+addr = 0x0FAC3E
+name = "PrintRecordsTeamName"
+confidence = 0.6
+evidence = "records screen: at row d1 prints the selected team's name (home, or away when $D4F6) through sub_FAC78; caller ai_PrintRecordsScreen"

@@ -9370,8 +9370,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9B4A" END="0x9BB3" />
             <TYPEINFO_CMT>sub_9B4A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9BB4">
+        <FUNCTION ENTRY_POINT="0x9BB4" NAME="ai_PrintCrowdMeterValue">
             <ADDRESS_RANGE START="0x9BB4" END="0x9BD7" />
+            <REGULAR_CMT>[AI 0.5] crowd meter: prints sqrt(4 * d0) + $41 (sroot) as a 3-digit number followed by the inline ' dB' string; caller loc_9A84 (crowd meter display)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9BB4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9BD8" NAME="ai_SetupStatsScreenVideo">
@@ -10583,8 +10584,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x12C04" END="0x12D0D" />
             <TYPEINFO_CMT>PrintScores1</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12D0E">
+        <FUNCTION ENTRY_POINT="0x12D0E" NAME="ai_PrintTeamNameAndScore">
             <ADDRESS_RANGE START="0x12D0E" END="0x12D2F" />
+            <REGULAR_CMT>[AI 0.7] PrintScores1: prints team a2's name (record +$1E data, name via the +4 offset) then its score $C(a2) as a 2-digit number at column $1C; caller PrintScores1</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12D0E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12D30" NAME="ai_PrintTeamScoreBlock">
@@ -11003,8 +11005,9 @@ d6 = link counter</REGULAR_CMT>
             <ADDRESS_RANGE START="0x161D0" END="0x16225" />
             <TYPEINFO_CMT>showcrowd</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16226">
+        <FUNCTION ENTRY_POINT="0x16226" NAME="ai_EmitCrowdSections">
             <ADDRESS_RANGE START="0x16226" END="0x16245" />
+            <REGULAR_CMT>[AI 0.6] showcrowd: for up to four crowd sections (d2 &amp; $F, capped at 3) starting at d3 emits each section's visible sprites with ai_EmitCrowdSprites; caller showcrowd</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16226</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16246" NAME="ai_EmitCrowdSprites">
@@ -11182,8 +11185,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1720C" END="0x1721B" />
             <TYPEINFO_CMT>SetTeamColors</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1721C">
+        <FUNCTION ENTRY_POINT="0x1721C" NAME="ai_LoadTeamPaletteLine">
             <ADDRESS_RANGE START="0x1721C" END="0x17235" />
+            <REGULAR_CMT>[AI 0.7] SetTeamColors: copies eight longs (one 32-byte CRAM line) from team a0's palette block (data offset +2, plus d1) into the palette buffer at $BD68 + d1; caller SetTeamColors</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1721C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17236" NAME="PeriodOver">
@@ -11204,8 +11208,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] PlayoffScreen: applies the scroll velocity PlayerScrollCtr ($D5B0) to the bracket offset $D5AC, clamped to +-$70 per round (gamelevel, at most 3 rounds), publishes the shifted offset in $B8AE when within $40..$200, and stops the velocity once the offset is a multiple of $70 (a round column); caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17572</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x175D8">
+        <FUNCTION ENTRY_POINT="0x175D8" NAME="ai_BlinkAndWaitFrame">
             <ADDRESS_RANGE START="0x175D8" END="0x175FB" />
+            <REGULAR_CMT>[AI 0.6] PlayoffScreen: when the fade counter $BD26 is negative toggles palette entry $BD6A with $EE (blinking the cursor colour) and reloads $BD26 = $18, then waits until vcount ($B03E) differs from oldvcount ($B040) and stores the new value; caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_175D8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x175FC" NAME="ai_PrintSeriesScore">
@@ -11318,8 +11323,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] zeroes the five words at a3; callers sub_180FC (before saving an empty password) and ai_EncodePlayoffPassword</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1820E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1821A">
+        <FUNCTION ENTRY_POINT="0x1821A" NAME="ai_BigNumAdd">
             <ADDRESS_RANGE START="0x1821A" END="0x18235" />
+            <REGULAR_CMT>[AI 0.8] adds the 32-bit d0 to the low end of the five-word number at a3 and ripples the carry through the upper words (dbcc loop); caller ai_BigNumMulAdd</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1821A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18236" NAME="ai_BigNumMul">
@@ -11379,8 +11385,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x18A56" END="0x18A6D" />
             <TYPEINFO_CMT>box</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18A6E">
+        <FUNCTION ENTRY_POINT="0x18A6E" NAME="ai_ShowCheckedPlayerMessage">
             <ADDRESS_RANGE START="0x18A6E" END="0x18A8F" />
+            <REGULAR_CMT>[AI 0.5] UpdatePA: takes TempPlOffset ($C470); a negative value selects the away record (index in the low byte), then calls sub_18A90 with the player index and team record (the message builder for the last check/hit); caller UpdatePA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18A6E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18A90" NAME="getname">
@@ -11512,8 +11519,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A406" END="0x1A42F" />
             <TYPEINFO_CMT>sub_1A406</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A430">
+        <FUNCTION ENTRY_POINT="0x1A430" NAME="ai_ReadPad2Hardware">
             <ADDRESS_RANGE START="0x1A430" END="0x1A463" />
+            <REGULAR_CMT>[AI 0.7] port-2 twin of ai_ReadPad1Hardware: requests the Z80 bus (with the reset retry), writes $3C to $A10005 (TH high) and joins the port-1 reader's body at loc_1A498 with a0 = $A10003 to pack and remap the buttons; caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A430</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A464">
@@ -11684,12 +11692,14 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] ticker helper: entry $BF58 of the away worst-first list $BF60 with a1 = the away record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F72AA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF72DA">
+        <FUNCTION ENTRY_POINT="0xF72DA" NAME="ai_CopyBestSixIndexes">
             <ADDRESS_RANGE START="0xF72DA" END="0xF72F9" />
+            <REGULAR_CMT>[AI 0.6] copies the six player indexes (every other byte) from the rating-sorted pairs at $BF20 to a0 as word entries (best first); caller ai_BuildRatingsStartingSix</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F72DA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF72FA">
+        <FUNCTION ENTRY_POINT="0xF72FA" NAME="ai_CopyWorstSixIndexes">
             <ADDRESS_RANGE START="0xF72FA" END="0xF7317" />
+            <REGULAR_CMT>[AI 0.6] copies the six player indexes from the sorted pairs at $BF20 in reverse order (starting at $BF2A, worst first) to a0 as word entries; caller ai_BuildRatingsStartingSix</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F72FA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF7318" NAME="ai_ComputeTeamAdvantage">
@@ -11737,8 +11747,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7942" END="0xF7B09" />
             <TYPEINFO_CMT>GameSetUp_3</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7B0A">
+        <FUNCTION ENTRY_POINT="0xF7B0A" NAME="ai_WrapOptionValue">
             <ADDRESS_RANGE START="0xF7B0A" END="0xF7B1F" />
+            <REGULAR_CMT>[AI 0.6] GameSetUp_3 helper: d3 = value + step d2 wrapped into the range d4..d5 (below d4 wraps to d5, at or above d5 wraps to d4 - 1... i.e. cycles the option value); caller GameSetUp_3</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7B0A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF7B20" NAME="ai_RedrawSetupValues">
@@ -11927,12 +11938,14 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] for the 26 roster slots of team a2 compares each player's game total (goals from column +$B4, or for the goalie slots saves = +$E8 shots minus +$B4 goals against) with his stored record byte (ReadRecordField) and, when beaten, writes the new value with the two user ids ($D043/$D045, swapped for the away team) and the opponent team d6 through WriteRecordField; caller ai_UpdateGameRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9F50</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9FC0">
+        <FUNCTION ENTRY_POINT="0xF9FC0" NAME="ai_CacheAttributeCounts">
             <ADDRESS_RANGE START="0xF9FC0" END="0xF9FE9" />
+            <REGULAR_CMT>[AI 0.6] stores ai_CountRatingNibbles of the home and away records in $D448/$D44A for the record updates; caller ai_UpdateGameRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9FC0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9FEA">
+        <FUNCTION ENTRY_POINT="0xF9FEA" NAME="ai_CacheRosterSizes">
             <ADDRESS_RANGE START="0xF9FEA" END="0xFA013" />
+            <REGULAR_CMT>[AI 0.6] stores ai_CountRosterPlayers of the home and away records in $D44C/$D44E for the record updates; caller ai_UpdateGameRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9FEA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA014" NAME="ai_BuildUserNameString">
@@ -11999,8 +12012,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] at (d0,d1) prints 'Team' and 'Rating' then the overall rating of the home or away team (ai_GetRecordsTeam logic on $D4F6) from ai_GetTeamOverallRating as a 2-digit number; caller loc_FA550 (records screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FABDC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAC3E">
+        <FUNCTION ENTRY_POINT="0xFAC3E" NAME="ai_PrintRecordsTeamName">
             <ADDRESS_RANGE START="0xFAC3E" END="0xFAC65" />
+            <REGULAR_CMT>[AI 0.6] records screen: at row d1 prints the selected team's name (home, or away when $D4F6) through sub_FAC78; caller ai_PrintRecordsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAC3E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAC78">
