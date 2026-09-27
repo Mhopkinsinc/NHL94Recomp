@@ -77,7 +77,9 @@ python tools/nhl94_names.py dossier                # evidence per unnamed routin
 python tools/nhl94_names.py review game/names-batch-NN.toml   # reviewer doc -> docs/names/names-batch-NN.md
 python tools/nhl94_names.py apply game/names-batch-NN.toml    # write ai_ names into nhl94.xml
 python tools/nhl94_names.py accept 0x11738 ...     # drop the prefix once a human agrees
+python tools/nhl94_names.py rename F9BE2 NewName --why "..."   # replace a wrong name (human or ai_), old name kept in the comment
 python tools/nhl94_names.py export-idc             # optional: IDC to push ai_ names into IDA
+sh tools/_batch_cycle.sh NN "commit subject"       # apply + review + dossier + CSV + commit + push, then dump the next candidates
 python tools/nhl94_disassembly.py --rom game/NHL94.bin --reuse   # regenerate the CSV
 ```
 
@@ -90,4 +92,16 @@ human name. The XML edits are minimal text changes (a `NAME` attribute and a
 reads the file. Batches live in `game/names-batch-NN.toml`, each with a
 reviewer document in `docs/names/`; the dossier is regenerated and committed
 with every batch so the remaining work is visible in the repository.
+
+Status (2026-09-27): the first pass is complete. All 703 functions in the
+IDA export carry a name: 329 human, 4 imported from the 2016 listing
+(`[listing]` comments) and 374 `ai_` proposals across batches 1-26
+(`game/names-batch-01.toml` .. `names-batch-26.toml`, review documents in
+`docs/names/`). None of the `ai_` names has been accepted yet; the intended
+next step is a human review pass over the batch documents, accepting or
+renaming as it goes. Later batches corrected earlier guesses when a
+subsystem became clear (password codec, player photos, setup-screen photo
+rotation, 4-Way Play pad readers, replay ring); each correction is noted in
+the batch file that made it. One human name was corrected with `rename`
+(`clrCrowdRAM?` -> `ReadTeamRecord`).
 
