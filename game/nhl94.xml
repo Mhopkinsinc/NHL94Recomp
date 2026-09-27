@@ -9285,8 +9285,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8FB8" END="0x901F" />
             <TYPEINFO_CMT>sub_8FB8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9020">
+        <FUNCTION ENTRY_POINT="0x9020" NAME="ai_PrintSummaryRowAbove">
             <ADDRESS_RANGE START="0x9020" END="0x904B" />
+            <REGULAR_CMT>[AI 0.5] twin of ai_PrintSummaryRowAt: prints ScoreSum entry (d0 high word) * 6 at the row VertLineScrolling/8 - 3 (mod 32), i.e. the entry scrolling in at the top of the summary list; caller sub_8FB8</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9020</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x904C" NAME="ai_PrintSummaryRowAt">
@@ -9308,8 +9309,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] same shape as ai_PrintScrollArrows for the scoring-summary list: chooses one of the four strings at word_9400 from VertLineScrolling against $D5B2 and prints it at column 4 row 9; caller sub_8FB8 (summary page handler)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_93C4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9428">
+        <FUNCTION ENTRY_POINT="0x9428" NAME="ai_ShowPlayoffStats">
             <ADDRESS_RANGE START="0x9428" END="0x9459" />
+            <REGULAR_CMT>[AI 0.6] PeriodOver: unpacks the playoff stats (ai_UnpackPlayoffStats), selects the team record whose id $28 matches the user's playoff team byte $CEF4[potreeteam] (home, else away) and shows the stats screen with d7 = 1 ('Playoff  Stats'); caller PeriodOver</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9428</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x945C" NAME="ai_PrintStatsScreen">
@@ -9492,8 +9494,9 @@ d4 = controller 0/2</REGULAR_CMT>
             <REPEATABLE_CMT>B button</REPEATABLE_CMT>
             <TYPEINFO_CMT>doinput</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xB5D8">
+        <FUNCTION ENTRY_POINT="0xB5D8" NAME="ai_ClampChaseDelta">
             <ADDRESS_RANGE START="0xB5D8" END="0xB601" />
+            <REGULAR_CMT>[AI 0.4] doinput helper: clears d0 when the player a3 is the puck carrier (puckc equals $52(a3)), clamps the offset d1 to -$103..$103 and subtracts d3; byte-identical to ai_ClampChaseDeltaGoalie at $DB3E; caller doinput</REGULAR_CMT>
             <TYPEINFO_CMT>sub_B5D8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xB86A" NAME="getGoalieSCnum">
@@ -9754,8 +9757,9 @@ a3 = goalie</REGULAR_CMT>
             <REGULAR_CMT>a3 = goalie</REGULAR_CMT>
             <TYPEINFO_CMT>assgoaliecpu</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xDB3E">
+        <FUNCTION ENTRY_POINT="0xDB3E" NAME="ai_ClampChaseDeltaGoalie">
             <ADDRESS_RANGE START="0xDB3E" END="0xDB67" />
+            <REGULAR_CMT>[AI 0.4] assgoaliecpu helper, byte-identical to ai_ClampChaseDelta ($B5D8): clears d0 when the goalie a3 has the puck, clamps d1 to -$103..$103 and subtracts d3; caller assgoaliecpu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_DB3E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xDB68" NAME="ai_GoalieTurnToward">
@@ -9884,8 +9888,9 @@ a3 = player</REGULAR_CMT>
             <REGULAR_CMT>this is where the action starts</REGULAR_CMT>
             <TYPEINFO_CMT>puckfaceoff</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF590">
+        <FUNCTION ENTRY_POINT="0xF590" NAME="ai_CpuLineChangeAtFaceoff">
             <ADDRESS_RANGE START="0xF590" END="0xF5C5" />
+            <REGULAR_CMT>[AI 0.6] puckfaceoff: with line changes enabled (OptLine = 0) and team d0 not controlled by a human (cont1team/cont2team, bypassed by $C2FC bit 4), picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and sets $C304 = $2710; caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F590</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF5C6" NAME="ai_AssignFaceoffPlayer">
@@ -10630,8 +10635,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x13056" END="0x13067" />
             <TYPEINFO_CMT>sub_13056</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x13068">
+        <FUNCTION ENTRY_POINT="0x13068" NAME="ai_SelectSpecialTeamsLine">
             <ADDRESS_RANGE START="0x13068" END="0x13097" />
+            <REGULAR_CMT>[AI 0.6] sub_13056 helper: refills the energy (ai_ResetLineEnergy), sets team a3's line $16 to 0, and with automatic lines (OptLine = 0) picks line 3 when a3 has more skaters than a2 (power play) or line 5 when fewer (penalty kill); caller sub_13056</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13068</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x13098">
@@ -10709,8 +10715,9 @@ a3 = team struct on PP</REGULAR_CMT>
 d0 = iterator</REGULAR_CMT>
             <TYPEINFO_CMT>Adda1Offset</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1351C">
+        <FUNCTION ENTRY_POINT="0x1351C" NAME="ai_PlayFinishedSeriesHighlights">
             <ADDRESS_RANGE START="0x1351C" END="0x1354B" />
+            <REGULAR_CMT>[AI 0.6] Intermission: for every series record from the current one down (sub_1828A gives the count) that is not finished (bit 2 of +$E) and has its pending flag bit 1 set, clears the flag and plays it as a highlight with ai_PlayHighlightFromGame; caller Intermission</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1351C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1354C" NAME="ai_PlayHighlightFromGame">
@@ -11182,8 +11189,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17336" END="0x17541" />
             <TYPEINFO_CMT>PlayoffScreen</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17542">
+        <FUNCTION ENTRY_POINT="0x17542" NAME="ai_PlayoffScreenInput">
             <ADDRESS_RANGE START="0x17542" END="0x17571" />
+            <REGULAR_CMT>[AI 0.7] PlayoffScreen: reads both pads (sub_11340 | sub_11358); Start leaves via loc_175D4, Right sets the bracket scroll velocity PlayerScrollCtr to -2, Left to +2, then falls into ai_ScrollPlayoffBracket; caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17542</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17572" NAME="ai_ScrollPlayoffBracket">
@@ -11195,8 +11203,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x175D8" END="0x175FB" />
             <TYPEINFO_CMT>sub_175D8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x175FC">
+        <FUNCTION ENTRY_POINT="0x175FC" NAME="ai_PrintSeriesScore">
             <ADDRESS_RANGE START="0x175FC" END="0x17625" />
+            <REGULAR_CMT>[AI 0.8] builds 'W-L' in $BFA4 from the series record a2's win counts +4 and +6 (single digits, '-' between) and prints it; caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_175FC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17626" NAME="ai_DrawPlayoffTreeBitmap">
@@ -12017,8 +12026,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] walks back from the end of the length-prefixed string at a2, replacing trailing $20 bytes with 0 and decrementing the length word, then rounds the length up to even; only called from BuildUserNameString</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAF66</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAF8C">
+        <FUNCTION ENTRY_POINT="0xFAF8C" NAME="ai_SelectRecordsPlayer">
             <ADDRESS_RANGE START="0xFAF8C" END="0xFAFB9" />
+            <REGULAR_CMT>[AI 0.5] records screen: takes entry $D4F4 - 1 of the starters/bench list for the selected side ($D4FA home, $D514 away by $D4F6, built by ai_SplitRosterByLineup) and stores the player index in $D52E; caller loc_FAEBC</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAF8C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAFBA">
@@ -12050,8 +12060,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB722" END="0xFB74F" />
             <TYPEINFO_CMT>sub_FB722</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB750">
+        <FUNCTION ENTRY_POINT="0xFB750" NAME="ai_CharToEntryIndex">
             <ADDRESS_RANGE START="0xFB750" END="0xFB779" />
+            <REGULAR_CMT>[AI 0.8] returns d0 = the index of character d0 in the name-entry alphabet 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' (30 when absent); caller sub_FB722 (name entry)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB750</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB77A">
@@ -12205,8 +12216,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] PeriodOver's MATCHUPS screen: reads the user names, rates both starting sixes, installs sub_15E4C as the V-blank routine, prepares both team records (sub_F70A2), loads the setup tiles (unk_A9A18), font (ai_LoadFontTiles), frame tiles (unk_55B86) and prints the 'MATCHUPS' / 'ADVANTAGE:' headers before the ratings and ticker routines; caller PeriodOver</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCC76</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCF86">
+        <FUNCTION ENTRY_POINT="0xFCF86" NAME="ai_ChangeRatingsPosition">
             <ADDRESS_RANGE START="0xFCF86" END="0xFCFB7" />
+            <REGULAR_CMT>[AI 0.7] matchups screen: moves the per-position comparison $D598 by d0 with wrap-around in 0..6, restarts the hold timer $D5A8 = $10E, then reselects the players, redraws the pictures and reprints the ratings (ai_SelectRatingsPlayers, ai_DrawRatingsPictures, ai_PrintTeamRatingsScreen); caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCF86</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCFB8">
@@ -12411,8 +12423,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] puckfaceoff: draws a random index 0..7 into the table unk_FECE6 and returns its word in d0, unless the faceoff location fox/foy ($BF94/$BF96) lies within -$C0..$C0 of centre, which forces d0 = 6 (the centre-ice case); caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FECAA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFECF8">
+        <FUNCTION ENTRY_POINT="0xFECF8" NAME="ai_NopShortHandedCheck">
             <ADDRESS_RANGE START="0xFECF8" END="0xFED29" />
+            <REGULAR_CMT>[AI 0.5] puckfaceoff: works out which team has fewer skaters ($24 of the home/away records) and compares its id $28 with $13, but the bne targets the very next instruction, so the routine has no effect beyond restoring registers; looks like a disabled team-specific check left in the shipped ROM; caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FECF8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFED2A" NAME="ai_BuildPlayoffCursorSprites">
@@ -12473,8 +12486,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] newTitleScreen helper: erases a 32x6 area at the row derived from Vscroll (Vscroll/8 + $1C, mod 32) and prints the length-prefixed lines at a1 centred (column $11 - length/2), one per row, until a line with a negative length; caller newTitleScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF2C8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF318">
+        <FUNCTION ENTRY_POINT="0xFF318" NAME="ai_TitleWaitFrame">
             <ADDRESS_RANGE START="0xFF318" END="0xFF347" />
+            <REGULAR_CMT>[AI 0.5] newTitleScreen: waits for the next V-blank (vcount change), decrements the title timer $B8B2 by 2 (floor 0), reads the pad with sub_112BC and, when Start (bit 7) is pressed, discards its caller's return address so control leaves the title loop; caller newTitleScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF318</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF3B0" NAME="ai_InitTitleScrollTable">

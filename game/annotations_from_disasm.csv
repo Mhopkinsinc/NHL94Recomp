@@ -42,9 +42,11 @@
 008BA6,ai_DrawEditLinesHeader,
 008D4E,getNameandAttrib,
 008E40,DispAttribValue,"mult by 100 dec"
+009020,ai_PrintSummaryRowAbove,
 00904C,ai_PrintSummaryRowAt,
 00907C,ai_PrintScoringSummaryRow,
 0093C4,ai_PrintSummaryScrollArrows,
+009428,ai_ShowPlayoffStats,
 00945C,ai_PrintStatsScreen,
 00961A,ai_PrintPlayerStatsList,
 009744,ai_PrintPlayerStatRow,
@@ -67,6 +69,7 @@
 00AFB6,freezewindow,
 00AFCA,checkwindow,
 00B0E8,doinput,"B button"
+00B5D8,ai_ClampChaseDelta,
 00B86A,getGoalieSCnum,
 00B8F0,fightinput,"controller processing for fighting"
 00B8F2,SetLCmode,
@@ -116,6 +119,7 @@
 00D294,asscentero,"pfalock"
 00D3C6,assgoaliectrl,"is player joystick controlled?"
 00D51C,assgoaliecpu,"is goalie joystick controlled?"
+00DB3E,ai_ClampChaseDeltaGoalie,
 00DB68,ai_GoalieTurnToward,
 00DBBA,goaliesave,"puckcross x frames into d0"
 00DD2E,assgoalietopuck,
@@ -140,6 +144,7 @@
 00F2F4,ai_GoalieFreezePuck,
 00F37C,ai_EndShootoutAttempt,
 00F3E4,puckfaceoff,
+00F590,ai_CpuLineChangeAtFaceoff,
 00F5C6,ai_AssignFaceoffPlayer,
 00F6AA,ChkGoalies,"check if clock running"
 00F712,ReturnGoalies,
@@ -263,6 +268,7 @@
 012EF6,ai_AverageOnIceEnergy,
 012F30,ChkShotStat,"check if clock stopped"
 013040,loadTeamStruct,
+013068,ai_SelectSpecialTeamsLine,
 0130BE,ai_ResetLineEnergy,
 0130E6,Intermission,
 0131F4,InitScores,
@@ -277,6 +283,7 @@
 0134E4,ai_TickerAreaSetup,
 013508,ai_PrintNextString,
 013510,Adda1Offset,
+01351C,ai_PlayFinishedSeriesHighlights,
 01354C,ai_PlayHighlightFromGame,
 01381E,VDP_ReadHVCounter,
 0138AC,checkcoll,
@@ -352,7 +359,9 @@
 01720C,SetTeamColors,
 017236,PeriodOver,
 017336,PlayoffScreen,
+017542,ai_PlayoffScreenInput,
 017572,ai_ScrollPlayoffBracket,
+0175FC,ai_PrintSeriesScore,
 017626,ai_DrawPlayoffTreeBitmap,
 017652,ai_DrawPlayoffRoundLabel,
 017730,ai_RunTickerMessage,
@@ -485,7 +494,9 @@
 0FAE26,ai_GetPlayerPhoto,
 0FAF50,ai_GetRecordsTeam,
 0FAF66,ai_TrimTrailingSpaces,
+0FAF8C,ai_SelectRecordsPlayer,
 0FAFE4,ai_SplitRosterByLineup,
+0FB750,ai_CharToEntryIndex,
 0FB89E,ai_RedrawUserListRow,
 0FB91A,ai_PrintNameEntryField,
 0FB992,ai_CopyUserNameDashed,
@@ -497,6 +508,7 @@
 0FC5AE,ai_PrintShootoutWinner,
 0FCB9A,ai_BuildCrowdRecordText,
 0FCC76,ai_MatchupsScreen,
+0FCF86,ai_ChangeRatingsPosition,
 0FCFDC,ai_PrintRatingsSpacer,
 0FD084,ai_DrawRatingsPictures,
 0FD14A,ai_LoadPlayerPhoto,
@@ -532,6 +544,7 @@
 0FEC98,getFgtbyte,"clear d0"
 0FECA2,chkFgtBit1,
 0FECAA,ai_PickFaceoffSpot,
+0FECF8,ai_NopShortHandedCheck,
 0FED2A,ai_BuildPlayoffCursorSprites,
 0FED70,HiScoreScreen,
 0FEEC8,ai_BuildPlayedByString,
@@ -541,6 +554,7 @@
 0FEFF0,ai_ClearOneTimer,
 0FF042,newTitleScreen,
 0FF2C8,ai_PrintTitleTextBlock,
+0FF318,ai_TitleWaitFrame,
 0FF3B0,ai_InitTitleScrollTable,
 0FF7E2,ai_StartPowerPlaySong,
 0FF88E,ai_ClearPenaltyState,

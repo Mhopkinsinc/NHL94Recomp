@@ -1,0 +1,86 @@
+# Names batch 16 - see docs/names/names-batch-16.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-16.toml
+
+[[name]]
+addr = 0x009020
+name = "PrintSummaryRowAbove"
+confidence = 0.5
+evidence = "twin of ai_PrintSummaryRowAt: prints ScoreSum entry (d0 high word) * 6 at the row VertLineScrolling/8 - 3 (mod 32), i.e. the entry scrolling in at the top of the summary list; caller sub_8FB8"
+
+[[name]]
+addr = 0x009428
+name = "ShowPlayoffStats"
+confidence = 0.6
+evidence = "PeriodOver: unpacks the playoff stats (ai_UnpackPlayoffStats), selects the team record whose id $28 matches the user's playoff team byte $CEF4[potreeteam] (home, else away) and shows the stats screen with d7 = 1 ('Playoff  Stats'); caller PeriodOver"
+
+[[name]]
+addr = 0x00F590
+name = "CpuLineChangeAtFaceoff"
+confidence = 0.6
+evidence = "puckfaceoff: with line changes enabled (OptLine = 0) and team d0 not controlled by a human (cont1team/cont2team, bypassed by $C2FC bit 4), picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and sets $C304 = $2710; caller puckfaceoff"
+
+[[name]]
+addr = 0x01351C
+name = "PlayFinishedSeriesHighlights"
+confidence = 0.6
+evidence = "Intermission: for every series record from the current one down (sub_1828A gives the count) that is not finished (bit 2 of +$E) and has its pending flag bit 1 set, clears the flag and plays it as a highlight with ai_PlayHighlightFromGame; caller Intermission"
+
+[[name]]
+addr = 0x0FCF86
+name = "ChangeRatingsPosition"
+confidence = 0.7
+evidence = "matchups screen: moves the per-position comparison $D598 by d0 with wrap-around in 0..6, restarts the hold timer $D5A8 = $10E, then reselects the players, redraws the pictures and reprints the ratings (ai_SelectRatingsPlayers, ai_DrawRatingsPictures, ai_PrintTeamRatingsScreen); caller ai_MatchupsScreen"
+
+[[name]]
+addr = 0x0FF318
+name = "TitleWaitFrame"
+confidence = 0.5
+evidence = "newTitleScreen: waits for the next V-blank (vcount change), decrements the title timer $B8B2 by 2 (floor 0), reads the pad with sub_112BC and, when Start (bit 7) is pressed, discards its caller's return address so control leaves the title loop; caller newTitleScreen"
+
+[[name]]
+addr = 0x00B5D8
+name = "ClampChaseDelta"
+confidence = 0.4
+evidence = "doinput helper: clears d0 when the player a3 is the puck carrier (puckc equals $52(a3)), clamps the offset d1 to -$103..$103 and subtracts d3; byte-identical to ai_ClampChaseDeltaGoalie at $DB3E; caller doinput"
+
+[[name]]
+addr = 0x00DB3E
+name = "ClampChaseDeltaGoalie"
+confidence = 0.4
+evidence = "assgoaliecpu helper, byte-identical to ai_ClampChaseDelta ($B5D8): clears d0 when the goalie a3 has the puck, clamps d1 to -$103..$103 and subtracts d3; caller assgoaliecpu"
+
+[[name]]
+addr = 0x013068
+name = "SelectSpecialTeamsLine"
+confidence = 0.6
+evidence = "sub_13056 helper: refills the energy (ai_ResetLineEnergy), sets team a3's line $16 to 0, and with automatic lines (OptLine = 0) picks line 3 when a3 has more skaters than a2 (power play) or line 5 when fewer (penalty kill); caller sub_13056"
+
+[[name]]
+addr = 0x017542
+name = "PlayoffScreenInput"
+confidence = 0.7
+evidence = "PlayoffScreen: reads both pads (sub_11340 | sub_11358); Start leaves via loc_175D4, Right sets the bracket scroll velocity PlayerScrollCtr to -2, Left to +2, then falls into ai_ScrollPlayoffBracket; caller PlayoffScreen"
+
+[[name]]
+addr = 0x0175FC
+name = "PrintSeriesScore"
+confidence = 0.8
+evidence = "builds 'W-L' in $BFA4 from the series record a2's win counts +4 and +6 (single digits, '-' between) and prints it; caller PlayoffScreen"
+
+[[name]]
+addr = 0x0FAF8C
+name = "SelectRecordsPlayer"
+confidence = 0.5
+evidence = "records screen: takes entry $D4F4 - 1 of the starters/bench list for the selected side ($D4FA home, $D514 away by $D4F6, built by ai_SplitRosterByLineup) and stores the player index in $D52E; caller loc_FAEBC"
+
+[[name]]
+addr = 0x0FB750
+name = "CharToEntryIndex"
+confidence = 0.8
+evidence = "returns d0 = the index of character d0 in the name-entry alphabet 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' (30 when absent); caller sub_FB722 (name entry)"
+
+[[name]]
+addr = 0x0FECF8
+name = "NopShortHandedCheck"
+confidence = 0.5
+evidence = "puckfaceoff: works out which team has fewer skaters ($24 of the home/away records) and compares its id $28 with $13, but the bne targets the very next instruction, so the routine has no effect beyond restoring registers; looks like a disabled team-specific check left in the shipped ROM; caller puckfaceoff"
