@@ -341,7 +341,8 @@
 0F8BA0,setSlotBit,"clears Slot Bit"
 0F997A,ai_CopyLenString,
 0F998E,ai_NumberToDecimalText,
-0F9B94,ai_SaveRecordField,
+0F9B94,ai_ReadRecordField,
+0F9BDA,ai_WriteRecordField,
 0F9BE2,clrCrowdRAM?,
 0FA934,nullsub_6,
 0FA9F8,CalcAttrib,"push a6 to stack"
