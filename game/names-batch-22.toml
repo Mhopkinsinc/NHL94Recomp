@@ -1,0 +1,74 @@
+# Names batch 22 - see docs/names/names-batch-22.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-22.toml
+
+[[name]]
+addr = 0x0FB4C4
+name = "PrintNameEntryHelp"
+confidence = 0.7
+evidence = "name-entry screen: erases the 22x7 help area at column 1 row $14 and, toggling $D6C5 bit 0 each call, alternately prints the letter grid (the alphabet 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' laid out five per row from column $19) or the instructions 'D-Pad to a letter.', 'C to select letter.', 'A to go back.', 'B to cancel.', 'START when done.'"
+
+[[name]]
+addr = 0x0F98C6
+name = "BuildPlayerRecordText"
+confidence = 0.6
+evidence = "builds the 'Record: N goal(s)/save(s)' text for a player in the string at a1: copies the 'Record' label word_F9950, reads the record value with ai_ReadPlayerRecordValue (an empty string when 0), converts it (NumberToDecimalText) and appends 'goal'/'goals' (word_F995A/word_F996A) or 'save'/'saves' (word_F9972) by the goalie flag and count"
+
+[[name]]
+addr = 0x01ABAA
+name = "SetChannelVolume"
+confidence = 0.5
+evidence = "sound driver: volume = 2(a2) * the track's volume entry 4(a3, channel*8) / 128; for FM channels (byte 3 < $60) maps it through the attenuation table byte_1ABF0 ($1A, $18, $16 ... descending) and stores it in $D187[channel] with the update bits $D184/$D180"
+
+[[name]]
+addr = 0x009588
+name = "ScrollStatsList"
+confidence = 0.6
+evidence = "stats screen scroll step: applies PlayerScrollCtr to VertLineScrolling within 0..$D5B2; at every 16-pixel boundary redraws the arrows (ai_PrintScrollArrows) and stops, and when leaving a boundary pre-draws the row entering from above (ai_PrintStatRowFromScroll at $E) or below (ai_PrintStatRowFromScrollPlus6 at 2); finally writes the plane vertical scroll (VSRAM, -$68 + offset)"
+
+[[name]]
+addr = 0x008FB8
+name = "ScrollSummaryList"
+confidence = 0.6
+evidence = "scoring-summary scroll step with a 32-pixel row pitch: updates VertLineScrolling to d0, redraws the arrows (ai_PrintSummaryScrollArrows) at a boundary, pre-draws the row entering from above (ai_PrintSummaryRowAbove at $1E) or below (ai_PrintSummaryRowAt at 2), and writes the vertical scroll (-$50 + offset)"
+
+[[name]]
+addr = 0x008B1C
+name = "ScrollEditLinesPages"
+confidence = 0.6
+evidence = "edit-lines page scroll with a 128-pixel pitch: updates VertLineScrolling to d0, stops the velocity at a boundary, pre-draws the page entering from above (ai_ShowEditLinesPage at $7E) or below (ai_ShowEditLinesPageNext at 2), and writes the vertical scroll (-$70 + offset)"
+
+[[name]]
+addr = 0x0FACF0
+name = "PrintGoalsAssistsBox"
+confidence = 0.7
+evidence = "records screen: at (d1,d2) prints 'Goals' and 'Assists' with the player d0's season totals from the selected team's +$B4 (goals) and +$CE (assists) columns (ai_GetRecordsTeam, NumberToDecimalText)"
+
+[[name]]
+addr = 0x008566
+name = "RefreshEditLinesRows"
+confidence = 0.5
+evidence = "edit-lines refresh: derives the row-visibility mask from unk_85E7 by the cursor $D5B8 (shifted one entry with OptLine), redraws the layout (ai_PrintEditLinesLayout) when the mask changes ($C012), reprints each visible line with ai_PrintLineRoster for mask bits 6..0, then the header at column 8"
+
+[[name]]
+addr = 0x0FAC90
+name = "BuildJerseyNumberText"
+confidence = 0.6
+evidence = "walks the selected team's roster (home, or away by $D4F6) to player d0 and writes his jersey number (the BCD byte after the name; a leading zero shown as a space) as a 4-byte string at a1"
+
+[[name]]
+addr = 0x0FF3F8
+name = "ScrollTitleLines"
+confidence = 0.5
+evidence = "title screen: every time the $BF14 countdown expires walks the $E0 per-line scroll words built by ai_InitTitleScrollTable ($B04A..): lines above $8F move by Hscroll and reset to 0 when they leave the $FC00 band, the others move back toward 0"
+
+[[name]]
+addr = 0x0FA2C0
+name = "PrintRecordsPage"
+confidence = 0.7
+evidence = "records page: loads the selected team's logo palette from word_F8BF4 (+$26) into $BD4A, starts a fade, erases the 40x21 body at row 7 and, depending on the first word of the record list a0, prints the 'Records' / 'This Game' sections through ai_PrintRecordsScreen"
+
+[[name]]
+addr = 0x0FA8AC
+name = "PrintOverallRatingBox"
+confidence = 0.7
+evidence = "records screen: at (d1,d2) prints 'Overall' and 'Rating' then the selected team's rating (sub_FA9F8 summed over the attribute mask dword_19420, or dword_19582 for the per-position view) as a percentage via sub_FEF7C and NumberToDecimalText"

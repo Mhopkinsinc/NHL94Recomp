@@ -9221,8 +9221,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x84CE" END="0x8565" />
             <TYPEINFO_CMT>PrintAttribHeader</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8566">
+        <FUNCTION ENTRY_POINT="0x8566" NAME="ai_RefreshEditLinesRows">
             <ADDRESS_RANGE START="0x8566" END="0x85E5" />
+            <REGULAR_CMT>[AI 0.5] edit-lines refresh: derives the row-visibility mask from unk_85E7 by the cursor $D5B8 (shifted one entry with OptLine), redraws the layout (ai_PrintEditLinesLayout) when the mask changes ($C012), reprints each visible line with ai_PrintLineRoster for mask bits 6..0, then the header at column 8</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8566</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x85EE" NAME="ai_PrintLineRoster">
@@ -9256,8 +9257,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8B04" END="0x8B1B" />
             <TYPEINFO_CMT>sub_8B04</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8B1C">
+        <FUNCTION ENTRY_POINT="0x8B1C" NAME="ai_ScrollEditLinesPages">
             <ADDRESS_RANGE START="0x8B1C" END="0x8B7D" />
+            <REGULAR_CMT>[AI 0.6] edit-lines page scroll with a 128-pixel pitch: updates VertLineScrolling to d0, stops the velocity at a boundary, pre-draws the page entering from above (ai_ShowEditLinesPage at $7E) or below (ai_ShowEditLinesPageNext at 2), and writes the vertical scroll (-$70 + offset)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8B1C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8B84" NAME="ai_ShowEditLinesPage">
@@ -9289,8 +9291,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8FA0" END="0x8FB7" />
             <TYPEINFO_CMT>sub_8FA0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8FB8">
+        <FUNCTION ENTRY_POINT="0x8FB8" NAME="ai_ScrollSummaryList">
             <ADDRESS_RANGE START="0x8FB8" END="0x901F" />
+            <REGULAR_CMT>[AI 0.6] scoring-summary scroll step with a 32-pixel row pitch: updates VertLineScrolling to d0, redraws the arrows (ai_PrintSummaryScrollArrows) at a boundary, pre-draws the row entering from above (ai_PrintSummaryRowAbove at $1E) or below (ai_PrintSummaryRowAt at 2), and writes the vertical scroll (-$50 + offset)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8FB8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9020" NAME="ai_PrintSummaryRowAbove">
@@ -9328,8 +9331,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] stats screen frame: ai_SetupStatsScreenVideo, clears the scroll/selection counters, draws the 30x6 header box, prints 'Playoff  Stats' (d7 != 0, from sub_9428) or 'Player  Stats' with the 'Switch^Teams' hint, then the list via ai_PrintPlayerStatsList; callers sub_9428 and the player-stats menu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_945C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9588">
+        <FUNCTION ENTRY_POINT="0x9588" NAME="ai_ScrollStatsList">
             <ADDRESS_RANGE START="0x9588" END="0x9603" />
+            <REGULAR_CMT>[AI 0.6] stats screen scroll step: applies PlayerScrollCtr to VertLineScrolling within 0..$D5B2; at every 16-pixel boundary redraws the arrows (ai_PrintScrollArrows) and stops, and when leaving a boundary pre-draws the row entering from above (ai_PrintStatRowFromScroll at $E) or below (ai_PrintStatRowFromScrollPlus6 at 2); finally writes the plane vertical scroll (VSRAM, -$68 + offset)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9588</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9604" NAME="ai_PrintStatRowFromScroll">
@@ -11598,8 +11602,9 @@ d0 = start of data</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] sound driver: converts the note byte 1(a2) into octave and semitone (word_1A890 table), scales by the channel's pitch entry in (a3) and the instrument's detune from unk_2C248, and for FM channels (byte 3 &lt; $60) stores the frequency word in $D18E[channel] with the update bits $D185/$D180, while for PSG channels with bit 0 of +6 set writes the attenuation byte straight to Z80 RAM $8E under bus request</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A7D8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1ABAA">
+        <FUNCTION ENTRY_POINT="0x1ABAA" NAME="ai_SetChannelVolume">
             <ADDRESS_RANGE START="0x1ABAA" END="0x1AC2F" />
+            <REGULAR_CMT>[AI 0.5] sound driver: volume = 2(a2) * the track's volume entry 4(a3, channel*8) / 128; for FM channels (byte 3 &lt; $60) maps it through the attenuation table byte_1ABF0 ($1A, $18, $16 ... descending) and stores it in $D187[channel] with the update bits $D184/$D180</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1ABAA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1ACC2" NAME="Z80_LoadROM">
@@ -11879,8 +11884,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>sets bit 5 of C2F8 if puck carrier is in the slot</REGULAR_CMT>
             <TYPEINFO_CMT>setSlotBit</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF98C6">
+        <FUNCTION ENTRY_POINT="0xF98C6" NAME="ai_BuildPlayerRecordText">
             <ADDRESS_RANGE START="0xF98C6" END="0xF994F" />
+            <REGULAR_CMT>[AI 0.6] builds the 'Record: N goal(s)/save(s)' text for a player in the string at a1: copies the 'Record' label word_F9950, reads the record value with ai_ReadPlayerRecordValue (an empty string when 0), converts it (NumberToDecimalText) and appends 'goal'/'goals' (word_F995A/word_F996A) or 'save'/'saves' (word_F9972) by the goalie flag and count</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F98C6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF997A" NAME="ai_CopyLenString">
@@ -11995,8 +12001,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFA2A2" END="0xFA2BF" />
             <TYPEINFO_CMT>sub_FA2A2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA2C0">
+        <FUNCTION ENTRY_POINT="0xFA2C0" NAME="ai_PrintRecordsPage">
             <ADDRESS_RANGE START="0xFA2C0" END="0xFA32F" />
+            <REGULAR_CMT>[AI 0.7] records page: loads the selected team's logo palette from word_F8BF4 (+$26) into $BD4A, starts a fade, erases the 40x21 body at row 7 and, depending on the first word of the record list a0, prints the 'Records' / 'This Game' sections through ai_PrintRecordsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA2C0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA550" NAME="ai_PrintRecordsScreen">
@@ -12029,8 +12036,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] d0 = team index, a1 = destination string: looks up the team record via the table at $30E, follows its +4 offset to the team name string and appends it with appstring; callers sub_F9B2A and sub_FA75C (user records text)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA880</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA8AC">
+        <FUNCTION ENTRY_POINT="0xFA8AC" NAME="ai_PrintOverallRatingBox">
             <ADDRESS_RANGE START="0xFA8AC" END="0xFA933" />
+            <REGULAR_CMT>[AI 0.7] records screen: at (d1,d2) prints 'Overall' and 'Rating' then the selected team's rating (sub_FA9F8 summed over the attribute mask dword_19420, or dword_19582 for the per-position view) as a percentage via sub_FEF7C and NumberToDecimalText</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA8AC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA934">
@@ -12061,12 +12069,14 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] prints the length-prefixed string a0 centred on column $14 (printx = $14 - (length - 2) / 2); caller ai_PrintRecordsTeamName</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAC78</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAC90">
+        <FUNCTION ENTRY_POINT="0xFAC90" NAME="ai_BuildJerseyNumberText">
             <ADDRESS_RANGE START="0xFAC90" END="0xFACEF" />
+            <REGULAR_CMT>[AI 0.6] walks the selected team's roster (home, or away by $D4F6) to player d0 and writes his jersey number (the BCD byte after the name; a leading zero shown as a space) as a 4-byte string at a1</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAC90</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFACF0">
+        <FUNCTION ENTRY_POINT="0xFACF0" NAME="ai_PrintGoalsAssistsBox">
             <ADDRESS_RANGE START="0xFACF0" END="0xFAD83" />
+            <REGULAR_CMT>[AI 0.7] records screen: at (d1,d2) prints 'Goals' and 'Assists' with the player d0's season totals from the selected team's +$B4 (goals) and +$CE (assists) columns (ai_GetRecordsTeam, NumberToDecimalText)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FACF0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAD84">
@@ -12107,8 +12117,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] a0 = team record, a1 = output: for the 26 roster indexes writes those that appear in the six-entry lineup list at team data offset +6 to a1 (starters) and the rest to a1+6 (bench); sub_FAFBA calls it for the home and away teams into $D4FA and $D514; caller sub_FAFBA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAFE4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB4C4">
+        <FUNCTION ENTRY_POINT="0xFB4C4" NAME="ai_PrintNameEntryHelp">
             <ADDRESS_RANGE START="0xFB4C4" END="0xFB5BB" />
+            <REGULAR_CMT>[AI 0.7] name-entry screen: erases the 22x7 help area at column 1 row $14 and, toggling $D6C5 bit 0 each call, alternately prints the letter grid (the alphabet 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' laid out five per row from column $19) or the instructions 'D-Pad to a letter.', 'C to select letter.', 'A to go back.', 'B to cancel.', 'START when done.'</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB4C4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB634">
@@ -12575,8 +12586,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.4] newTitleScreen: sets Hscroll = $14 and $BF14 = $50, then fills the object area at $B04A with a table of 81 longs alternating $FD80/$FD7F (decrementing every other entry) followed by 97 longs counting up from $100 in steps of 4; the values feed the title screen's per-line scroll effect; caller newTitleScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF3B0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF3F8">
+        <FUNCTION ENTRY_POINT="0xFF3F8" NAME="ai_ScrollTitleLines">
             <ADDRESS_RANGE START="0xFF3F8" END="0xFF461" />
+            <REGULAR_CMT>[AI 0.5] title screen: every time the $BF14 countdown expires walks the $E0 per-line scroll words built by ai_InitTitleScrollTable ($B04A..): lines above $8F move by Hscroll and reset to 0 when they leave the $FC00 band, the others move back toward 0</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF3F8</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x1" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
