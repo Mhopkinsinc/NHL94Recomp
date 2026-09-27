@@ -28,10 +28,13 @@
 007B30,clockcont,"#gmclock"
 007C58,demoread,
 007CF8,PauseMode,
+008078,ai_DrawTeamBannerTiles,
 0080BA,vcountwait,
 0084CE,PrintAttribHeader,
 008D4E,getNameandAttrib,
 008E40,DispAttribValue,"mult by 100 dec"
+009744,ai_PrintPlayerStatRow,
+009F40,ai_CountRatingNibbles,
 00A41E,getpzjoy,
 00A67C,RevReplayAdj,"check if reverse angle replay"
 00A68C,SetRCords,
@@ -66,6 +69,7 @@
 00C2F2,doshot,
 00C566,shotdiradj,"check if shooting one timer"
 00C644,shotdirmath,"sub puckx from post X"
+00C656,ai_SetPlayerBE78Bits,
 00C67A,check4bench,
 00C710,assbench,
 00C882,assben,
@@ -157,6 +161,7 @@
 0112AA,waitjoy,
 0112BC,orjoy,"check for 4-way play?"
 0112F0,nodiag,
+011318,ai_PadAutoRepeat,
 011340,ReadJoy1,
 011358,ReadJoy2,
 011370,ReadJoy3,
@@ -292,6 +297,8 @@
 017D80,MakeTree,
 017E42,FigureJoy,
 018032,OptionRNG,
+01803E,ai_RandomizeDemoSetup,
+01826C,ai_RandomMod,
 01828A,GetShifter,
 0182A2,AddPOStats,
 018A56,box,
@@ -309,10 +316,12 @@
 01A244,ReadSRAM,
 01A264,AllSndOff,
 01A294,p_initfx,
+01A304,ai_StopSound30,
 01A370,ReadJoyData,
 01A4EE,ai_Z80_ResetAndRequestBus,
 01A50A,MusicVB,
 01A574,Z80_WriteVolume,
+01A64C,ai_ReleaseSoundChannel,
 01A66E,Z80_ClearFlagUnknown,
 01A74E,Unk_PCMSampleWrite,
 01ACC2,Z80_LoadROM,
@@ -344,11 +353,14 @@
 0F9B94,ai_ReadRecordField,
 0F9BDA,ai_WriteRecordField,
 0F9BE2,clrCrowdRAM?,
+0FA014,ai_BuildUserNameString,
 0FA934,nullsub_6,
 0FA9F8,CalcAttrib,"push a6 to stack"
+0FAF66,ai_TrimTrailingSpaces,
 0FE14C,updatePPTeamTime,"check if PP"
 0FE556,ChooseSong,
 0FE71C,PSandSOpassdir,
+0FE98A,ai_Unpack3BitRatings,
 0FEC98,getFgtbyte,"clear d0"
 0FECA2,chkFgtBit1,
 0FED70,HiScoreScreen,

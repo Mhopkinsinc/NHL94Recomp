@@ -1,0 +1,75 @@
+# Names batch 2 - AI proposals for unnamed routines (see docs/names/names-batch-02.md).
+# Apply: python tools/nhl94_names.py apply game/names-batch-02.toml
+# Nothing here is accepted yet; all names land in nhl94.xml with the ai_ prefix.
+
+[[name]]
+addr = 0x011318
+name = "PadAutoRepeat"
+confidence = 0.8
+evidence = "after nodiag, implements menu key auto-repeat: d3 = held pad, d2 = previous; a fresh press loads the repeat timer $B042 with $F, otherwise the timer counts down and on expiry reloads 4 and returns d1 = d3 (repeated press); callers GameSetUp_2, PauseMode, waitxsr"
+
+[[name]]
+addr = 0x01826C
+name = "RandomMod"
+confidence = 0.7
+evidence = "5-word seed at (a3): divides each word by d0 carrying the remainder through, returns the final remainder in d0 (0..d0-1) and leaves the quotients as the new seed; only called by sub_1803E with moduli 5, 8, $10, $20, $4000"
+
+[[name]]
+addr = 0x01803E
+name = "RandomizeDemoSetup"
+confidence = 0.6
+evidence = "saves the 5-word seed at (a3), draws random values with RandomMod into the eight $10-byte option blocks below $CED6 (fields +4/+6, flag bit 2 when the draw is 4), then $CEF2, pojoy (forced to 4 unless FourWayPlay when it lands on 1 or 2), potreeteam, gamelevel, bosgames, postarts, and restores the seed; callers GameSetUp, sub_17CA0, sub_180FC"
+
+[[name]]
+addr = 0x01A304
+name = "StopSound30"
+confidence = 0.6
+evidence = "with interrupts masked, searches the 8-slot active-sound table $D3D4 (6 bytes each) for the sound-table pointer stored at off_2C708, which is entry $30 of the sound list off_2C648; if found, marks the slot -1, clears $D182/$D186, releases the six $D3A4 channels owned by that slot via sub_1A64C, resets their volume bytes at $D187 to $7F and calls Z80_WriteVolume. p_initfx calls it before starting any sound >= $30; other callers DoGameFrame, Stop4Pen, checkgoal, clockcont"
+
+[[name]]
+addr = 0x01A64C
+name = "ReleaseSoundChannel"
+confidence = 0.5
+evidence = "a2 = 8-byte channel record in $D3A4: clears the active bit 0 of +6; if it was set and the note/type byte +3 is below $60, sets the channel's bit (+4) in the pending-update mask $D182 and flags $D180, otherwise jumps to Z80_ClearFlagUnknown; only called from StopSound30"
+
+[[name]]
+addr = 0x008078
+name = "DrawTeamBannerTiles"
+confidence = 0.6
+evidence = "copies a 2-row x 11-tile name-table block from the buffer at $C334+d0 to (printx,printy) via xyVmMap, with $BF78 bit 2 held during the copy and printx advanced by 11; the buffer is filled at $16D20 from asset off_ABA14 for the home team ($C330) at offset 0 and the away team ($C332) at offset $2C, and every caller passes d0 = 0 or $2C"
+
+[[name]]
+addr = 0x009744
+name = "PrintPlayerStatRow"
+confidence = 0.6
+evidence = "edit-lines/roster screen row: a4 = Satt+d3 (player slot), sets printy from d3, erases the 40-column row, returns if the slot byte is negative, prints the jersey/slot number and the player name (sub_18B26), then either the five attribute values (loc_9872 per attribute, the DispAttribCtr-selected one in palette $C000) or, when DispAttribCtr is negative, two stat counters (sub_988E) and their percentage with a '%' suffix; callers sub_9604, sub_960E, loc_961A"
+
+[[name]]
+addr = 0x009F40
+name = "CountRatingNibbles"
+confidence = 0.5
+evidence = "a2 = player record, $1E(a2) = pointer to the player's data block; adds the word at +$A, takes the word there and counts how many left shifts by 4 it survives before becoming zero (1..4), returned in d0; used by loc_9872 (attribute lookup for PrintPlayerStatRow) as an upper bound and by sub_9F5C which adds it to a nibble of the next field"
+
+[[name]]
+addr = 0x00C656
+name = "SetPlayerBE78Bits"
+confidence = 0.4
+evidence = "writes the 2-bit value $52(a3) of player object a3 into the packed word $BE78 at bit position 2*(d4+2) (d4 = player index, -2 for the goalie slot); $52(a3) is set to $F by asspenalty and compared against $F and $C in the puck-handling code, so it is a per-player state code; callers asspenalty, doinput, updateplayers"
+
+[[name]]
+addr = 0x0FA014
+name = "BuildUserNameString"
+confidence = 0.6
+evidence = "when d2 != 0 copies the 12-byte user-name entry $D45A + d2*12 into the string at a1 (length word $E, zero bytes shown as spaces) and, if $C2F8 bit 7 is set, trims trailing spaces with sub_FAF66; when d2 == 0 copies the empty default string word_FA07C instead; callers are the user-records screens sub_F9AE4, sub_F9B2A, sub_FA75C, sub_FC136"
+
+[[name]]
+addr = 0x0FAF66
+name = "TrimTrailingSpaces"
+confidence = 0.8
+evidence = "walks back from the end of the length-prefixed string at a2, replacing trailing $20 bytes with 0 and decrementing the length word, then rounds the length up to even; only called from BuildUserNameString"
+
+[[name]]
+addr = 0x0FE98A
+name = "Unpack3BitRatings"
+confidence = 0.5
+evidence = "reads a count word from (a2) into $DA1E, then for count*8 records takes 3 packed bytes, splits them into eight 3-bit fields and stores each as a nibble equal to field+5 in a longword written after the count at $DA1E; $DEA0 is scratch; callers loc_F8868, loc_FAEBC, sub_FD14A (SRAM/records screens), so this looks like the decoder for compactly stored custom ratings"

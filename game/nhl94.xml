@@ -9176,8 +9176,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8008" END="0x804F" />
             <TYPEINFO_CMT>sub_8008</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8078">
+        <FUNCTION ENTRY_POINT="0x8078" NAME="ai_DrawTeamBannerTiles">
             <ADDRESS_RANGE START="0x8078" END="0x80B9" />
+            <REGULAR_CMT>[AI 0.6] copies a 2-row x 11-tile name-table block from the buffer at $C334+d0 to (printx,printy) via xyVmMap, with $BF78 bit 2 held during the copy and printx advanced by 11; the buffer is filled at $16D20 from asset off_ABA14 for the home team ($C330) at offset 0 and the away team ($C332) at offset $2C, and every caller passes d0 = 0 or $2C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8078</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x80BA" NAME="vcountwait">
@@ -9319,8 +9320,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x961A" END="0x9743" />
             <TYPEINFO_CMT>sub_961A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9744">
+        <FUNCTION ENTRY_POINT="0x9744" NAME="ai_PrintPlayerStatRow">
             <ADDRESS_RANGE START="0x9744" END="0x9871" />
+            <REGULAR_CMT>[AI 0.6] edit-lines/roster screen row: a4 = Satt+d3 (player slot), sets printy from d3, erases the 40-column row, returns if the slot byte is negative, prints the jersey/slot number and the player name (sub_18B26), then either the five attribute values (loc_9872 per attribute, the DispAttribCtr-selected one in palette $C000) or, when DispAttribCtr is negative, two stat counters (sub_988E) and their percentage with a '%' suffix; callers sub_9604, sub_960E, loc_961A</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9744</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9872">
@@ -9359,8 +9361,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9CDC" END="0x9D79" />
             <TYPEINFO_CMT>sub_9CDC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9F40">
+        <FUNCTION ENTRY_POINT="0x9F40" NAME="ai_CountRatingNibbles">
             <ADDRESS_RANGE START="0x9F40" END="0x9F5B" />
+            <REGULAR_CMT>[AI 0.5] a2 = player record, $1E(a2) = pointer to the player's data block; adds the word at +$A, takes the word there and counts how many left shifts by 4 it survives before becoming zero (1..4), returned in d0; used by loc_9872 (attribute lookup for PrintPlayerStatRow) as an upper bound and by sub_9F5C which adds it to a nibble of the next field</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9F40</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9F5C">
@@ -9614,8 +9617,9 @@ d4 = goalline
 </REGULAR_CMT>
             <TYPEINFO_CMT>shotdirmath</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xC656">
+        <FUNCTION ENTRY_POINT="0xC656" NAME="ai_SetPlayerBE78Bits">
             <ADDRESS_RANGE START="0xC656" END="0xC679" />
+            <REGULAR_CMT>[AI 0.4] writes the 2-bit value $52(a3) of player object a3 into the packed word $BE78 at bit position 2*(d4+2) (d4 = player index, -2 for the goalie slot); $52(a3) is set to $F by asspenalty and compared against $F and $C in the puck-handling code, so it is a per-player state code; callers asspenalty, doinput, updateplayers</REGULAR_CMT>
             <REGULAR_CMT>copy info into pad cont so graphics know which player/number</REGULAR_CMT>
             <TYPEINFO_CMT>sub_C656</TYPEINFO_CMT>
         </FUNCTION>
@@ -10153,8 +10157,9 @@ return d1 = new button presses</REGULAR_CMT>
             <REGULAR_CMT>eliminate diagonal direction presses on d0</REGULAR_CMT>
             <TYPEINFO_CMT>nodiag</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11318">
+        <FUNCTION ENTRY_POINT="0x11318" NAME="ai_PadAutoRepeat">
             <ADDRESS_RANGE START="0x11318" END="0x1133F" />
+            <REGULAR_CMT>[AI 0.8] after nodiag, implements menu key auto-repeat: d3 = held pad, d2 = previous; a fresh press loads the repeat timer $B042 with $F, otherwise the timer counts down and on expiry reloads 4 and returns d1 = d3 (repeated press); callers GameSetUp_2, PauseMode, waitxsr</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11318</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11340" NAME="ReadJoy1">
@@ -11201,8 +11206,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>calls randomd0 when changing options</REGULAR_CMT>
             <TYPEINFO_CMT>OptionRNG</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1803E">
+        <FUNCTION ENTRY_POINT="0x1803E" NAME="ai_RandomizeDemoSetup">
             <ADDRESS_RANGE START="0x1803E" END="0x180FB" />
+            <REGULAR_CMT>[AI 0.6] saves the 5-word seed at (a3), draws random values with RandomMod into the eight $10-byte option blocks below $CED6 (fields +4/+6, flag bit 2 when the draw is 4), then $CEF2, pojoy (forced to 4 unless FourWayPlay when it lands on 1 or 2), potreeteam, gamelevel, bosgames, postarts, and restores the seed; callers GameSetUp, sub_17CA0, sub_180FC</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1803E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x180FC">
@@ -11229,8 +11235,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x18236" END="0x1826B" />
             <TYPEINFO_CMT>sub_18236</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1826C">
+        <FUNCTION ENTRY_POINT="0x1826C" NAME="ai_RandomMod">
             <ADDRESS_RANGE START="0x1826C" END="0x18289" />
+            <REGULAR_CMT>[AI 0.7] 5-word seed at (a3): divides each word by d0 carrying the remainder through, returns the final remainder in d0 (0..d0-1) and leaves the quotients as the new seed; only called by sub_1803E with moduli 5, 8, $10, $20, $4000</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1826C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1828A" NAME="GetShifter">
@@ -11380,8 +11387,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A294" END="0x1A303" />
             <TYPEINFO_CMT>p_initfx</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A304">
+        <FUNCTION ENTRY_POINT="0x1A304" NAME="ai_StopSound30">
             <ADDRESS_RANGE START="0x1A304" END="0x1A36F" />
+            <REGULAR_CMT>[AI 0.6] with interrupts masked, searches the 8-slot active-sound table $D3D4 (6 bytes each) for the sound-table pointer stored at off_2C708, which is entry $30 of the sound list off_2C648; if found, marks the slot -1, clears $D182/$D186, releases the six $D3A4 channels owned by that slot via sub_1A64C, resets their volume bytes at $D187 to $7F and calls Z80_WriteVolume. p_initfx calls it before starting any sound &gt;= $30; other callers DoGameFrame, Stop4Pen, checkgoal, clockcont</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A304</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A370" NAME="ReadJoyData">
@@ -11430,8 +11438,9 @@ d0 = start of data</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A5C0</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x1" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A64C">
+        <FUNCTION ENTRY_POINT="0x1A64C" NAME="ai_ReleaseSoundChannel">
             <ADDRESS_RANGE START="0x1A64C" END="0x1A66D" />
+            <REGULAR_CMT>[AI 0.5] a2 = 8-byte channel record in $D3A4: clears the active bit 0 of +6; if it was set and the note/type byte +3 is below $60, sets the channel's bit (+4) in the pending-update mask $D182 and flags $D180, otherwise jumps to Z80_ClearFlagUnknown; only called from StopSound30</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A64C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A66E">
@@ -11780,8 +11789,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF9FEA" END="0xFA013" />
             <TYPEINFO_CMT>sub_F9FEA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA014">
+        <FUNCTION ENTRY_POINT="0xFA014" NAME="ai_BuildUserNameString">
             <ADDRESS_RANGE START="0xFA014" END="0xFA07B" />
+            <REGULAR_CMT>[AI 0.6] when d2 != 0 copies the 12-byte user-name entry $D45A + d2*12 into the string at a1 (length word $E, zero bytes shown as spaces) and, if $C2F8 bit 7 is set, trims trailing spaces with sub_FAF66; when d2 == 0 copies the empty default string word_FA07C instead; callers are the user-records screens sub_F9AE4, sub_F9B2A, sub_FA75C, sub_FC136</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA014</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA2A2">
@@ -11869,8 +11879,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFAF50" END="0xFAF65" />
             <TYPEINFO_CMT>sub_FAF50</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAF66">
+        <FUNCTION ENTRY_POINT="0xFAF66" NAME="ai_TrimTrailingSpaces">
             <ADDRESS_RANGE START="0xFAF66" END="0xFAF8B" />
+            <REGULAR_CMT>[AI 0.8] walks back from the end of the length-prefixed string at a2, replacing trailing $20 bytes with 0 and decrementing the length word, then rounds the length up to even; only called from BuildUserNameString</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAF66</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAF8C">
@@ -12189,8 +12200,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE8EC" END="0xFE989" />
             <TYPEINFO_CMT>sub_FE8EC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE98A">
+        <FUNCTION ENTRY_POINT="0xFE98A" NAME="ai_Unpack3BitRatings">
             <ADDRESS_RANGE START="0xFE98A" END="0xFEA51" />
+            <REGULAR_CMT>[AI 0.5] reads a count word from (a2) into $DA1E, then for count*8 records takes 3 packed bytes, splits them into eight 3-bit fields and stores each as a nibble equal to field+5 in a longword written after the count at $DA1E; $DEA0 is scratch; callers loc_F8868, loc_FAEBC, sub_FD14A (SRAM/records screens), so this looks like the decoder for compactly stored custom ratings</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE98A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEA52">
