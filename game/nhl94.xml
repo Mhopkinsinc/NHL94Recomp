@@ -9339,8 +9339,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] d0 = player, d1 = attribute column: returns d2 = 0 when the column is not below ai_CountRatingNibbles for the team, otherwise tail-calls sub_988E to fetch the value; callers ai_PrintPlayerStatRow and loc_961A</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9872</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x988E">
+        <FUNCTION ENTRY_POINT="0x988E" NAME="ai_GetPlayerStatValue">
             <ADDRESS_RANGE START="0x988E" END="0x98CD" />
+            <REGULAR_CMT>[AI 0.6] d0 = player index, d1 = stat column: for the regular stats (d7 = 0) reads the column's one or two byte offsets from unk_98FA and returns the sum of those roster bytes of team a2 in d2; for playoff stats (d7 != 0) sums two entries through sub_98CE and halves the result; caller ai_PrintPlayerStatRow</REGULAR_CMT>
             <TYPEINFO_CMT>sub_988E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x98CE">
@@ -10405,8 +10406,9 @@ yy = y coord to print at</REGULAR_CMT>
             <ADDRESS_RANGE START="0x11DF4" END="0x11E8D" />
             <TYPEINFO_CMT>printbig</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11E8E">
+        <FUNCTION ENTRY_POINT="0x11E8E" NAME="ai_PrintBigChar">
             <ADDRESS_RANGE START="0x11E8E" END="0x11ED9" />
+            <REGULAR_CMT>[AI 0.7] printbig helper: maps the character d0 - $20 through unk_1916A to a glyph index (negative = single-tile glyph), then writes the glyph's tiles from the big-font map off_A9A10 in two rows through sub_11EDA (VRAM name table at $B004 + $B02E), advancing d4; caller printbig</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11E8E</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x20" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
@@ -10504,8 +10506,9 @@ d0 = animation (pen number)</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] prints 22 spaces at column 5, row $B with attribute $BF, i.e. blanks the in-game message line; callers UpdatePA and prefmes</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12828</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1284A">
+        <FUNCTION ENTRY_POINT="0x1284A" NAME="ai_EndPenaltyOnGoal">
             <ADDRESS_RANGE START="0x1284A" END="0x128A3" />
+            <REGULAR_CMT>[AI 0.7] checkgoal: when the scored-on team a1 has fewer skaters than the scoring team a2, removes the first minor from its penalized list $9A(a1) (entries with status bit 6, majors, are skipped), clears the player's status word, shifts the list (sub_1298C), sets DelayedPen bit 0, bumps a1's active count and the power-play goal counter 2(a2), and marks both team update bits; clears the penalty message buffer (clrPenBuf) when a1 already has 6 skaters; caller checkgoal</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1284A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x128A4" NAME="clrPenBuf">
@@ -10527,8 +10530,9 @@ still WIP</REGULAR_CMT>
             <REGULAR_CMT>attack time of possession stat update</REGULAR_CMT>
             <TYPEINFO_CMT>chkatop</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x129D2">
+        <FUNCTION ENTRY_POINT="0x129D2" NAME="ai_ReleasePenalizedPlayer">
             <ADDRESS_RANGE START="0x129D2" END="0x12A2D" />
+            <REGULAR_CMT>[AI 0.7] updatepentime: finds the first object of team a2 whose slot $34 is negative (in the box), increments the active count $24, gives him the position from the priority list off_19286 (skipping the goalie entry when $26 says no goalie), reactivates him with sub_15A88/sub_15AA4, flags $63 bit 2 and marks both team update bits ($C6FE/$CA62 bit 0); caller updatepentime</REGULAR_CMT>
             <TYPEINFO_CMT>sub_129D2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12A2E" NAME="CalcPenTime">
@@ -10578,12 +10582,14 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x12DDE" END="0x12E11" />
             <TYPEINFO_CMT>sub_12DDE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12E12">
+        <FUNCTION ENTRY_POINT="0x12E12" NAME="ai_PrintPenaltyRow">
             <ADDRESS_RANGE START="0x12E12" END="0x12E65" />
+            <REGULAR_CMT>[AI 0.6] penalty list line (only while printy &lt;= $A): takes player d0's line-status word $66(a2,d0) &amp; $7FF as the remaining time, finds his roster record (name part + 8 bytes) to print the jersey number (sub_18BDC into $BFA6), then the time with PushTime, and moves to the next row; caller sub_12DDE, which walks the penalized list $9A(a2)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12E12</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12E66">
+        <FUNCTION ENTRY_POINT="0x12E66" NAME="ai_DrawLineEnergyBar">
             <ADDRESS_RANGE START="0x12E66" END="0x12EB3" />
+            <REGULAR_CMT>[AI 0.7] line change menu: computes the line's energy with sub_12EB4, scales it to 0..15 (energy / $100, capped) and draws row 15 - value of the bar bitmap unk_AB920 (one tile row) with dobitmap at tile base $B016 in palette $8000; caller ai_PrintLineChangeMenu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12E66</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12EB4" NAME="getlinee">
@@ -11134,8 +11140,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17190" END="0x171BD" />
             <TYPEINFO_CMT>sub_17190</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x171BE">
+        <FUNCTION ENTRY_POINT="0x171BE" NAME="ai_InitTeamRecord">
             <ADDRESS_RANGE START="0x171BE" END="0x1720B" />
+            <REGULAR_CMT>[AI 0.7] d0 = team id, a2 = team record: stores the id at +$28 and the team data pointer (table $30E) at +$1E, then copies the line table from data offset +6 into +$16A: with OptLine set the 8-byte goalie entry plus 12 longs, otherwise the 14 longs after it; caller sub_17190 (team initialisation)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_171BE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1720C" NAME="SetTeamColors">
@@ -11311,8 +11318,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x185E0" END="0x1861F" />
             <TYPEINFO_CMT>sub_185E0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18620">
+        <FUNCTION ENTRY_POINT="0x18620" NAME="ai_ScoreAllPlayersForStars">
             <ADDRESS_RANGE START="0x18620" END="0x1867D" />
+            <REGULAR_CMT>[AI 0.7] scores every home and away player with ai_ScorePlayerForStars into the long array at $CF36 (period length from ClockLength plus d2), then, when the game ended in period 3 (gsp) with a non-zero margin, forces the game-winning-goal scorer (ScoreSum entry ChkCnt + ScoreSumbytes, +$1A for the away team) to $7FFFFFFF so he is the first star; caller ai_StarsOfTheGameScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18620</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1867E" NAME="ai_ScorePlayerForStars">
@@ -11320,8 +11328,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] computes a player's star-of-the-game value into (a4): base = team score difference (d3), then for skaters goals (+$B4 column) * $2AF8, assists (+$CE) * $2774, shots (+$E8) * 10 (* 100 more for a losing side) plus the +$136 rating; for the goalie slot (index above the attribute count) awards $7D00 when the save percentage is high and $124F8 more for a shutout; caller sub_18620 (from ai_StarsOfTheGameScreen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1867E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x187B8">
+        <FUNCTION ENTRY_POINT="0x187B8" NAME="ai_ShowGoalBanner">
             <ADDRESS_RANGE START="0x187B8" END="0x1881D" />
+            <REGULAR_CMT>[AI 0.7] chkprogress: sets $C2FA bit 7 and, in shootout mode (bit 0), jumps to loc_FC320; otherwise clears the message timer (sub_1277A with -1), draws a 27x8 box at column 3 row 2, prints 'GOAL!' in the big font from word_18884, then the scorer (BA_Sktr_SCnum object's roster byte $66) of BA_Team and the 'Assist by:' lines; 'PENALTY SHOT!' is the shootout variant; caller chkprogress</REGULAR_CMT>
             <TYPEINFO_CMT>sub_187B8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18A56" NAME="box">
@@ -12205,8 +12214,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFD4C0" END="0xFD4C9" />
             <TYPEINFO_CMT>sub_FD4C0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD4CA">
+        <FUNCTION ENTRY_POINT="0xFD4CA" NAME="ai_AnimateAdvantageBar">
             <ADDRESS_RANGE START="0xFD4CA" END="0xFD547" />
+            <REGULAR_CMT>[AI 0.7] matchups screen: every 7 frames ($D5A6) advances the bar step $D5A4 (0..5) and prints, at column $13 row $16, the string step of off_FD548 (home overall $D5A0 above away $D5A2), off_FD560 (away ahead) or word_FD5A8 (equal); the strings are the ']', ']]', ']]]' / '[' bracket segments that grow toward the stronger team; caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD4CA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD5AE">
@@ -12231,8 +12241,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] setvideo hook: when a tile animation is active ($D6B4 &gt;= 0 with an asset in $D6BA) and no menu/pause/replay flag is set ($C2F4 bit 4, $C2EE bit 3, $C2EC bit 7), takes the sprite list of the current frame $D6AE from the asset's second block and appends the sprites inside the camera window (Hpos/Vpos) to the sprite table, using the same window and record layout as ai_EmitCrowdSprites; caller setvideo</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD78A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD89A">
+        <FUNCTION ENTRY_POINT="0xFD89A" NAME="ai_PrintRatingsPlayerName">
             <ADDRESS_RANGE START="0xFD89A" END="0xFD8EB" />
+            <REGULAR_CMT>[AI 0.6] per-position ratings entry: stores the player index in $DEE8, formats 'NN Surname' (ai_FormatPlayerNumberName), drops trailing zero bytes from the length, shifts printx left so the text ends before column $29, prints it and draws the best/worst icon (ai_DrawBestWorstPlayerIcon); caller ai_PrintTeamRatingsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD89A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE14C" NAME="updatePPTeamTime">
@@ -12409,8 +12420,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFF042" END="0xFF2C7" />
             <TYPEINFO_CMT>newTitleScreen</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF2C8">
+        <FUNCTION ENTRY_POINT="0xFF2C8" NAME="ai_PrintTitleTextBlock">
             <ADDRESS_RANGE START="0xFF2C8" END="0xFF317" />
+            <REGULAR_CMT>[AI 0.5] newTitleScreen helper: erases a 32x6 area at the row derived from Vscroll (Vscroll/8 + $1C, mod 32) and prints the length-prefixed lines at a1 centred (column $11 - length/2), one per row, until a line with a negative length; caller newTitleScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF2C8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF318">

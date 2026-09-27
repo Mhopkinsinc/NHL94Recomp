@@ -44,6 +44,7 @@
 00961A,ai_PrintPlayerStatsList,
 009744,ai_PrintPlayerStatRow,
 009872,ai_GetPlayerAttributeChecked,
+00988E,ai_GetPlayerStatValue,
 0099C6,ai_PrintScrollArrows,
 009BD8,ai_SetupStatsScreenVideo,
 009CDC,ai_LoadRinkGraphics,
@@ -212,6 +213,7 @@
 011D9E,appstring,
 011DE2,ai_PrintBigInline,
 011DF4,printbig,
+011E8E,ai_PrintBigChar,
 011F04,ai_LoadFontTiles,
 011F12,ai_LoadFrameTiles,
 011F2C,AddPenalty,"checks if no whistle gmclock(gmode)"
@@ -228,15 +230,19 @@
 0126F8,PushRef,
 01277A,prefmes,
 012828,ai_ClearMessageLine,
+01284A,ai_EndPenaltyOnGoal,
 0128A4,clrPenBuf,"1F = 31 decimal"
 0128B2,updatepentime,"clear pen timer flag"
 01299C,chkatop,
+0129D2,ai_ReleasePenalizedPlayer,
 012A2E,CalcPenTime,
 012A7C,updatepwrplay,
 012B40,ClrHor,
 012B94,SetHor,
 012C04,PrintScores1,
 012D70,ai_DrawHudPanel,
+012E12,ai_PrintPenaltyRow,
+012E66,ai_DrawLineEnergyBar,
 012EB4,getlinee,
 012F30,ChkShotStat,"check if clock stopped"
 013040,loadTeamStruct,
@@ -321,6 +327,7 @@
 01702E,SprSort,
 0170B0,resetplstuff,
 017102,clearTeamStats,
+0171BE,ai_InitTeamRecord,
 01720C,SetTeamColors,
 017236,PeriodOver,
 017336,PlayoffScreen,
@@ -346,7 +353,9 @@
 01833A,ai_UnpackPlayoffStats,
 018380,ai_AdvancePlayoffSeries,
 01850A,ai_StarsOfTheGameScreen,
+018620,ai_ScoreAllPlayersForStars,
 01867E,ai_ScorePlayerForStars,
+0187B8,ai_ShowGoalBanner,
 018A56,box,
 018A90,getname,"push to stack"
 018AE8,ai_FormatPlayerInitialSurname,
@@ -453,8 +462,10 @@
 0FD1FE,ai_PrintTeamRatingsScreen,
 0FD46C,ai_SelectRatingsPlayers,
 0FD492,ai_GetLineupPlayerForPosition,
+0FD4CA,ai_AnimateAdvantageBar,
 0FD618,ai_ShootoutWinnersCelebrate,
 0FD78A,ai_EmitAnimationSprites,
+0FD89A,ai_PrintRatingsPlayerName,
 0FE14C,updatePPTeamTime,"check if PP"
 0FE172,ai_GetTeamOverallRating,
 0FE2C8,ai_UpdateTileAnimation,
@@ -481,6 +492,7 @@
 0FEFCC,ReadGoaliePulled,
 0FEFF0,ai_ClearOneTimer,
 0FF042,newTitleScreen,
+0FF2C8,ai_PrintTitleTextBlock,
 0FF7E2,ai_StartPowerPlaySong,
 0FF8C8,clrTmPdst,"19 = 25 decimal (max roster size)"
 0FF8DE,ai_DrawBestWorstPlayerIcon,

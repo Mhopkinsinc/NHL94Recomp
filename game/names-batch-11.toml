@@ -1,0 +1,84 @@
+# Names batch 11 - see docs/names/names-batch-11.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-11.toml
+
+# ---- matchups / ratings screens ----------------------------------------------------
+
+[[name]]
+addr = 0x0FD4CA
+name = "AnimateAdvantageBar"
+confidence = 0.7
+evidence = "matchups screen: every 7 frames ($D5A6) advances the bar step $D5A4 (0..5) and prints, at column $13 row $16, the string step of off_FD548 (home overall $D5A0 above away $D5A2), off_FD560 (away ahead) or word_FD5A8 (equal); the strings are the ']', ']]', ']]]' / '[' bracket segments that grow toward the stronger team; caller ai_MatchupsScreen"
+
+[[name]]
+addr = 0x0FD89A
+name = "PrintRatingsPlayerName"
+confidence = 0.6
+evidence = "per-position ratings entry: stores the player index in $DEE8, formats 'NN Surname' (ai_FormatPlayerNumberName), drops trailing zero bytes from the length, shifts printx left so the text ends before column $29, prints it and draws the best/worst icon (ai_DrawBestWorstPlayerIcon); caller ai_PrintTeamRatingsScreen"
+
+# ---- stats -------------------------------------------------------------------------------
+
+[[name]]
+addr = 0x00988E
+name = "GetPlayerStatValue"
+confidence = 0.6
+evidence = "d0 = player index, d1 = stat column: for the regular stats (d7 = 0) reads the column's one or two byte offsets from unk_98FA and returns the sum of those roster bytes of team a2 in d2; for playoff stats (d7 != 0) sums two entries through sub_98CE and halves the result; caller ai_PrintPlayerStatRow"
+
+[[name]]
+addr = 0x018620
+name = "ScoreAllPlayersForStars"
+confidence = 0.7
+evidence = "scores every home and away player with ai_ScorePlayerForStars into the long array at $CF36 (period length from ClockLength plus d2), then, when the game ended in period 3 (gsp) with a non-zero margin, forces the game-winning-goal scorer (ScoreSum entry ChkCnt + ScoreSumbytes, +$1A for the away team) to $7FFFFFFF so he is the first star; caller ai_StarsOfTheGameScreen"
+
+# ---- penalties ------------------------------------------------------------------------------
+
+[[name]]
+addr = 0x012E12
+name = "PrintPenaltyRow"
+confidence = 0.6
+evidence = "penalty list line (only while printy <= $A): takes player d0's line-status word $66(a2,d0) & $7FF as the remaining time, finds his roster record (name part + 8 bytes) to print the jersey number (sub_18BDC into $BFA6), then the time with PushTime, and moves to the next row; caller sub_12DDE, which walks the penalized list $9A(a2)"
+
+[[name]]
+addr = 0x0129D2
+name = "ReleasePenalizedPlayer"
+confidence = 0.7
+evidence = "updatepentime: finds the first object of team a2 whose slot $34 is negative (in the box), increments the active count $24, gives him the position from the priority list off_19286 (skipping the goalie entry when $26 says no goalie), reactivates him with sub_15A88/sub_15AA4, flags $63 bit 2 and marks both team update bits ($C6FE/$CA62 bit 0); caller updatepentime"
+
+[[name]]
+addr = 0x01284A
+name = "EndPenaltyOnGoal"
+confidence = 0.7
+evidence = "checkgoal: when the scored-on team a1 has fewer skaters than the scoring team a2, removes the first minor from its penalized list $9A(a1) (entries with status bit 6, majors, are skipped), clears the player's status word, shifts the list (sub_1298C), sets DelayedPen bit 0, bumps a1's active count and the power-play goal counter 2(a2), and marks both team update bits; clears the penalty message buffer (clrPenBuf) when a1 already has 6 skaters; caller checkgoal"
+
+# ---- line change / team setup ----------------------------------------------------------------
+
+[[name]]
+addr = 0x012E66
+name = "DrawLineEnergyBar"
+confidence = 0.7
+evidence = "line change menu: computes the line's energy with sub_12EB4, scales it to 0..15 (energy / $100, capped) and draws row 15 - value of the bar bitmap unk_AB920 (one tile row) with dobitmap at tile base $B016 in palette $8000; caller ai_PrintLineChangeMenu"
+
+[[name]]
+addr = 0x0171BE
+name = "InitTeamRecord"
+confidence = 0.7
+evidence = "d0 = team id, a2 = team record: stores the id at +$28 and the team data pointer (table $30E) at +$1E, then copies the line table from data offset +6 into +$16A: with OptLine set the 8-byte goalie entry plus 12 longs, otherwise the 14 longs after it; caller sub_17190 (team initialisation)"
+
+# ---- goal banner / title screen / fonts ----------------------------------------------------
+
+[[name]]
+addr = 0x0187B8
+name = "ShowGoalBanner"
+confidence = 0.7
+evidence = "chkprogress: sets $C2FA bit 7 and, in shootout mode (bit 0), jumps to loc_FC320; otherwise clears the message timer (sub_1277A with -1), draws a 27x8 box at column 3 row 2, prints 'GOAL!' in the big font from word_18884, then the scorer (BA_Sktr_SCnum object's roster byte $66) of BA_Team and the 'Assist by:' lines; 'PENALTY SHOT!' is the shootout variant; caller chkprogress"
+
+[[name]]
+addr = 0x0FF2C8
+name = "PrintTitleTextBlock"
+confidence = 0.5
+evidence = "newTitleScreen helper: erases a 32x6 area at the row derived from Vscroll (Vscroll/8 + $1C, mod 32) and prints the length-prefixed lines at a1 centred (column $11 - length/2), one per row, until a line with a negative length; caller newTitleScreen"
+
+[[name]]
+addr = 0x011E8E
+name = "PrintBigChar"
+confidence = 0.7
+evidence = "printbig helper: maps the character d0 - $20 through unk_1916A to a glyph index (negative = single-tile glyph), then writes the glyph's tiles from the big-font map off_A9A10 in two rows through sub_11EDA (VRAM name table at $B004 + $B02E), advancing d4; caller printbig"
