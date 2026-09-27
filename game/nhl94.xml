@@ -9158,8 +9158,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x7E36" END="0x7E45" />
             <TYPEINFO_CMT>sub_7E36</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x7E46">
+        <FUNCTION ENTRY_POINT="0x7E46" NAME="ai_RedrawPauseMenu">
             <ADDRESS_RANGE START="0x7E46" END="0x7E71" />
+            <REGULAR_CMT>[AI 0.7] runs the menu's refresh handler $CF28 (installed with the item list by sub_7E36), positions via ai_SetPauseMenuColumn, draws the 22x6 box and the items with ai_PrintScrollingMenu, and starts a short palette fade ($BD26 = $18); caller ai_PauseMenuInput</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7E46</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x7E72" NAME="ai_SetPauseMenuColumn">
@@ -9204,8 +9205,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x81F2" END="0x824F" />
             <TYPEINFO_CMT>sub_81F2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8250">
+        <FUNCTION ENTRY_POINT="0x8250" NAME="ai_PrintTeamNameAndNumber">
             <ADDRESS_RANGE START="0x8250" END="0x827F" />
+            <REGULAR_CMT>[AI 0.6] prints team d0's name (team table $30E, name at +4) at column 6 and the 2-digit value d1 at column $18 on the same row; caller sub_81F2 (edit-lines team header)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8250</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8280" NAME="ai_PrintSelectPlayerArrows">
@@ -10389,8 +10391,9 @@ xx = x coord to print at
 yy = y coord to print at</REGULAR_CMT>
             <TYPEINFO_CMT>print</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11C72">
+        <FUNCTION ENTRY_POINT="0x11C72" NAME="ai_PrintPeriodAndTime">
             <ADDRESS_RANGE START="0x11C72" END="0x11C91" />
+            <REGULAR_CMT>[AI 0.7] d0 = packed (period &lt;&lt; 16 | time*4): prints the period label from the table off_11C92 (entry = period), moves two columns right and prints the time (time / 4) with PushTime; caller ai_PrintScoringSummaryRow</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11C72</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11CA2" NAME="PushTime">
@@ -10594,8 +10597,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] unless sflags2 bit 5 is set, positions at column 1 row $19 (inline attribute string) and draws the second bitmap of asset unk_B3530 with dobitmap at tile base $B020 (the rink tile base), a2 = the team table $30A; callers PrintScores1 and updatepwrplay, i.e. the in-game scoreboard panel</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12D70</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12DA6">
+        <FUNCTION ENTRY_POINT="0x12DA6" NAME="ai_PrintPenaltyBoxes">
             <ADDRESS_RANGE START="0x12DA6" END="0x12DDD" />
+            <REGULAR_CMT>[AI 0.7] SetHor: sets $BF78 bit 3, refreshes the scoreboard (PrintScores1) and prints the home penalty list at column $14 row 8 and the away list at column 5 row 8 with ai_PrintPenaltyList; caller SetHor</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12DA6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12DDE" NAME="ai_PrintPenaltyList">
@@ -11164,8 +11168,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17102" END="0x1718F" />
             <TYPEINFO_CMT>clearTeamStats</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17190">
+        <FUNCTION ENTRY_POINT="0x17190" NAME="ai_InitBothTeamRecords">
             <ADDRESS_RANGE START="0x17190" END="0x171BD" />
+            <REGULAR_CMT>[AI 0.7] initialises the home record ($C6CE, objects from $B04A) for HomeTeam and the away record ($CA32, objects from $B34A) for VisTeam through ai_InitTeamRecord; caller ai_RefreshSetupTeamLogos</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17190</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x171BE" NAME="ai_InitTeamRecord">
@@ -11245,8 +11250,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] sub_F7B20 helper: in playoff state 0 or 4 copies Opt1Team/Opt2Team into HomeTeam/VisTeam, then for the away and home teams loads the logo palette from word_F8BF4 (64 bytes per team: +$26 away, +2 home) into $BD4E/$BD4A, draws the logo bitmap from off_AFE12 with sub_17B78 at tile bases $D43A and 2, calls sub_17190 and starts a palette fade ($BD26 = $64); caller sub_F7B20</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17AF4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17B78">
+        <FUNCTION ENTRY_POINT="0x17B78" NAME="ai_DrawSetupLogoBitmap">
             <ADDRESS_RANGE START="0x17B78" END="0x17B97" />
+            <REGULAR_CMT>[AI 0.6] draws logo d1 of the asset off_AFE12 (row = 2*d1 in its second block) as a 2-row bitmap at column 0 with dobitmap, tile base d4; caller ai_RefreshSetupTeamLogos (once per team)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17B78</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17C72" NAME="LoadDefMenuOptions">
@@ -11437,8 +11443,9 @@ d0 = offset of player on roster</REGULAR_CMT>
             <ADDRESS_RANGE START="0x18C4C" END="0x18CA3" />
             <TYPEINFO_CMT>DivBy0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18CDC">
+        <FUNCTION ENTRY_POINT="0x18CDC" NAME="ai_LongToHexText">
             <ADDRESS_RANGE START="0x18CDC" END="0x18CFB" />
+            <REGULAR_CMT>[AI 0.8] writes the 8 hexadecimal digits of d0 (most significant first, 'A'..'F' via the +7 adjustment) to a0; caller DivBy0, the exception screen that prints register values</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18CDC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A050" NAME="InitSaveRAM">
@@ -11647,12 +11654,14 @@ a3 = sortcord of player
 d3 = attribute value</REGULAR_CMT>
             <TYPEINFO_CMT>AttributeCalc</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7144">
+        <FUNCTION ENTRY_POINT="0xF7144" NAME="ai_NextHomeBestPlayer">
             <ADDRESS_RANGE START="0xF7144" END="0xF7171" />
+            <REGULAR_CMT>[AI 0.5] ticker helper: returns d1 = entry $BF56 of the home best-first list $BF5E and a1 = the home record, advancing the cursor $BF56 while it is negative; one of four near-identical accessors (with ai_NextAwayBestPlayer, ai_NextHomeWorstPlayer, ai_NextAwayWorstPlayer) over the lists built by ai_BuildRatingsStartingSix; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7144</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7172">
+        <FUNCTION ENTRY_POINT="0xF7172" NAME="ai_NextAwayBestPlayer">
             <ADDRESS_RANGE START="0xF7172" END="0xF719F" />
+            <REGULAR_CMT>[AI 0.5] ticker helper: entry $BF54 of the away best-first list $BF5C with a1 = the away record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7172</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF71A2" NAME="ai_BuildRatingsStartingSix">
@@ -11665,12 +11674,14 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] a0 = team record: takes the six player indexes listed at team data offset +6, and for each sums attribute nibbles 3..$F of its 16-byte row in the rating table at team+$1A2 (skipping 9 and $D), writing (index-1, sum) byte pairs to $BF20, then bubble-sorts the six pairs by sum descending; callers ai_BuildRatingsStartingSix and ai_SumStartingSixRatings</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F71F0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF727C">
+        <FUNCTION ENTRY_POINT="0xF727C" NAME="ai_NextHomeWorstPlayer">
             <ADDRESS_RANGE START="0xF727C" END="0xF72A9" />
+            <REGULAR_CMT>[AI 0.5] ticker helper: entry $BF5A of the home worst-first list $BF62 with a1 = the home record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F727C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF72AA">
+        <FUNCTION ENTRY_POINT="0xF72AA" NAME="ai_NextAwayWorstPlayer">
             <ADDRESS_RANGE START="0xF72AA" END="0xF72D7" />
+            <REGULAR_CMT>[AI 0.5] ticker helper: entry $BF58 of the away worst-first list $BF60 with a1 = the away record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F72AA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF72DA">
@@ -11951,8 +11962,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFA6E8" END="0xFA6F5" />
             <TYPEINFO_CMT>sub_FA6E8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA708">
+        <FUNCTION ENTRY_POINT="0xFA708" NAME="ai_PrintSaveRecordLine">
             <ADDRESS_RANGE START="0xFA708" END="0xFA733" />
+            <REGULAR_CMT>[AI 0.6] goalie twin of ai_PrintGoalRecordLine: chooses ' Saves ' / ' Save ' (word_FA734) or ' Saves by' / ' Save by' (word_FA746) by d3 and d2, stores the label pointer in $BF18 and joins the shared record-line printer at loc_FA7B0; caller ai_PrintRecordsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA708</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA75C" NAME="ai_PrintGoalRecordLine">
@@ -12221,8 +12233,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] matchups screen: moves the per-position comparison $D598 by d0 with wrap-around in 0..6, restarts the hold timer $D5A8 = $10E, then reselects the players, redraws the pictures and reprints the ratings (ai_SelectRatingsPlayers, ai_DrawRatingsPictures, ai_PrintTeamRatingsScreen); caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCF86</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCFB8">
+        <FUNCTION ENTRY_POINT="0xFCFB8" NAME="ai_PrintTeamOverallRating">
             <ADDRESS_RANGE START="0xFCFB8" END="0xFCFDB" />
+            <REGULAR_CMT>[AI 0.7] ratings screen: prints the spacer (ai_PrintRatingsSpacer) then team a0's overall rating (ai_GetTeamOverallRating) as a 2-digit number, returning it in d0 for the $D5A0/$D5A2 comparison; caller ai_PrintTeamRatingsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCFB8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCFDC" NAME="ai_PrintRatingsSpacer">
@@ -12312,8 +12325,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] returns d0 = byte unk_FE18E[$28(a2)] where +$28 is the team id in the team record; the table starts $33, $4C, $49, $4B, $4E, $43 (51, 76, 73, 75, 78, 67), the overall team ratings printed as a number by sub_FABDC ('Team Rating') and by sub_FCFB8 on the ratings screen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE172</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE1AA">
+        <FUNCTION ENTRY_POINT="0xFE1AA" NAME="ai_LimitTwoPlayerSpeedBoost">
             <ADDRESS_RANGE START="0xFE1AA" END="0xFE1D7" />
+            <REGULAR_CMT>[AI 0.4] doinput helper: when a second controller has a team (cont2team) and the player a3 is not the puck carrier, or in any case when cont2team is unset, caps $C31A at 2; caller doinput</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE1AA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE2C8" NAME="ai_UpdateTileAnimation">

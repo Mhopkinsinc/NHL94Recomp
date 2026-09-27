@@ -1,0 +1,86 @@
+# Names batch 17 - see docs/names/names-batch-17.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-17.toml
+
+[[name]]
+addr = 0x008250
+name = "PrintTeamNameAndNumber"
+confidence = 0.6
+evidence = "prints team d0's name (team table $30E, name at +4) at column 6 and the 2-digit value d1 at column $18 on the same row; caller sub_81F2 (edit-lines team header)"
+
+[[name]]
+addr = 0x012DA6
+name = "PrintPenaltyBoxes"
+confidence = 0.7
+evidence = "SetHor: sets $BF78 bit 3, refreshes the scoreboard (PrintScores1) and prints the home penalty list at column $14 row 8 and the away list at column 5 row 8 with ai_PrintPenaltyList; caller SetHor"
+
+[[name]]
+addr = 0x017190
+name = "InitBothTeamRecords"
+confidence = 0.7
+evidence = "initialises the home record ($C6CE, objects from $B04A) for HomeTeam and the away record ($CA32, objects from $B34A) for VisTeam through ai_InitTeamRecord; caller ai_RefreshSetupTeamLogos"
+
+[[name]]
+addr = 0x017B78
+name = "DrawSetupLogoBitmap"
+confidence = 0.6
+evidence = "draws logo d1 of the asset off_AFE12 (row = 2*d1 in its second block) as a 2-row bitmap at column 0 with dobitmap, tile base d4; caller ai_RefreshSetupTeamLogos (once per team)"
+
+[[name]]
+addr = 0x018CDC
+name = "LongToHexText"
+confidence = 0.8
+evidence = "writes the 8 hexadecimal digits of d0 (most significant first, 'A'..'F' via the +7 adjustment) to a0; caller DivBy0, the exception screen that prints register values"
+
+[[name]]
+addr = 0x0F7144
+name = "NextHomeBestPlayer"
+confidence = 0.5
+evidence = "ticker helper: returns d1 = entry $BF56 of the home best-first list $BF5E and a1 = the home record, advancing the cursor $BF56 while it is negative; one of four near-identical accessors (with ai_NextAwayBestPlayer, ai_NextHomeWorstPlayer, ai_NextAwayWorstPlayer) over the lists built by ai_BuildRatingsStartingSix; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0F7172
+name = "NextAwayBestPlayer"
+confidence = 0.5
+evidence = "ticker helper: entry $BF54 of the away best-first list $BF5C with a1 = the away record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0F727C
+name = "NextHomeWorstPlayer"
+confidence = 0.5
+evidence = "ticker helper: entry $BF5A of the home worst-first list $BF62 with a1 = the home record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0F72AA
+name = "NextAwayWorstPlayer"
+confidence = 0.5
+evidence = "ticker helper: entry $BF58 of the away worst-first list $BF60 with a1 = the away record; see ai_NextHomeBestPlayer; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0FA708
+name = "PrintSaveRecordLine"
+confidence = 0.6
+evidence = "goalie twin of ai_PrintGoalRecordLine: chooses ' Saves ' / ' Save ' (word_FA734) or ' Saves by' / ' Save by' (word_FA746) by d3 and d2, stores the label pointer in $BF18 and joins the shared record-line printer at loc_FA7B0; caller ai_PrintRecordsScreen"
+
+[[name]]
+addr = 0x0FCFB8
+name = "PrintTeamOverallRating"
+confidence = 0.7
+evidence = "ratings screen: prints the spacer (ai_PrintRatingsSpacer) then team a0's overall rating (ai_GetTeamOverallRating) as a 2-digit number, returning it in d0 for the $D5A0/$D5A2 comparison; caller ai_PrintTeamRatingsScreen"
+
+[[name]]
+addr = 0x0FE1AA
+name = "LimitTwoPlayerSpeedBoost"
+confidence = 0.4
+evidence = "doinput helper: when a second controller has a team (cont2team) and the player a3 is not the puck carrier, or in any case when cont2team is unset, caps $C31A at 2; caller doinput"
+
+[[name]]
+addr = 0x007E46
+name = "RedrawPauseMenu"
+confidence = 0.7
+evidence = "runs the menu's refresh handler $CF28 (installed with the item list by sub_7E36), positions via ai_SetPauseMenuColumn, draws the 22x6 box and the items with ai_PrintScrollingMenu, and starts a short palette fade ($BD26 = $18); caller ai_PauseMenuInput"
+
+[[name]]
+addr = 0x011C72
+name = "PrintPeriodAndTime"
+confidence = 0.7
+evidence = "d0 = packed (period << 16 | time*4): prints the period label from the table off_11C92 (entry = period), moves two columns right and prints the time (time / 4) with PushTime; caller ai_PrintScoringSummaryRow"
