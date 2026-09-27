@@ -1,0 +1,86 @@
+# Names batch 20 - see docs/names/names-batch-20.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-20.toml
+
+[[name]]
+addr = 0x008774
+name = "EraseEditLinesBody"
+confidence = 0.6
+evidence = "sets attribute $BE at (0,0) and erases a 40x10 area with eraser; caller loc_86F8 (edit-lines screen)"
+
+[[name]]
+addr = 0x0FCA04
+name = "EraseStatsBody"
+confidence = 0.6
+evidence = "byte-identical to ai_EraseEditLinesBody: attribute $BE at (0,0) then a 40x10 erase; caller loc_FC986 (records/stats screen)"
+
+[[name]]
+addr = 0x00A600
+name = "AdvanceLowRamRecord"
+confidence = 0.3
+evidence = "advances a4 by $62 bytes and, on reaching $AF54, wraps it to $FF0000 (the low RAM area that ai_SnapshotGameState also uses), i.e. steps through a ring of $62-byte records; caller sub_A528 (game init)"
+
+[[name]]
+addr = 0x013056
+name = "SelectSpecialTeamsLinesBoth"
+confidence = 0.6
+evidence = "Intermission: after sub_15A24 runs ai_SelectSpecialTeamsLine for the home team against the away record and, after swapping a2/a3, for the away team; caller Intermission"
+
+[[name]]
+addr = 0x016384
+name = "PrintClockLabel"
+confidence = 0.5
+evidence = "showclock: prints string d0 of the label table off_16396; caller showclock"
+
+[[name]]
+addr = 0x007E36
+name = "InstallPauseMenu"
+confidence = 0.8
+evidence = "stores the item list a0 in $CF24 and the refresh handler a1 in $CF28, and resets the cursor $CF20 and scroll $CF22 for ai_PrintScrollingMenu / ai_PauseMenuInput; caller PauseMode"
+
+[[name]]
+addr = 0x009604
+name = "PrintStatRowFromScroll"
+confidence = 0.5
+evidence = "prints the player stat row for slot VertLineScrolling / 16 with ai_PrintPlayerStatRow; caller sub_9588"
+
+[[name]]
+addr = 0x00960E
+name = "PrintStatRowFromScrollPlus6"
+confidence = 0.5
+evidence = "prints the player stat row for slot VertLineScrolling / 16 + 6 with ai_PrintPlayerStatRow; caller sub_9588"
+
+[[name]]
+addr = 0x0F780C
+name = "SetupCursorBoxDefault"
+confidence = 0.5
+evidence = "ai_MoveSetupCursor helper: positions at column $10 row $E (attribute $FF) and returns the default cursor box size d0 = $17, d1 = $D; caller ai_MoveSetupCursor"
+
+[[name]]
+addr = 0x011F20
+name = "LoadPlayoffTiles"
+confidence = 0.5
+evidence = "loads asset unk_ABA1C at tile 2 with LoadAsset; caller PlayoffScreen (ai_DrawPlayoffRoundLabel draws its labels at tile base 2)"
+
+[[name]]
+addr = 0x0134D8
+name = "EraseTickerArea"
+confidence = 0.7
+evidence = "Intermission: positions with ai_TickerAreaSetup and erases the returned $1A x 5 area; caller Intermission"
+
+[[name]]
+addr = 0x016CC4
+name = "LoadHudTiles"
+confidence = 0.5
+evidence = "loads asset unk_AB928 at tile base $B016, the base that ai_DrawLineEnergyBar (bitmap unk_AB920, same family) and the playoff cursor sprites use; caller ai_LoadRinkGraphics"
+
+[[name]]
+addr = 0x016CD2
+name = "LoadCrowdSpriteTiles"
+confidence = 0.5
+evidence = "loads asset unk_A4B5C at tile base $B01A, the base ai_EmitCrowdSprites adds to every crowd sprite tile; caller ai_LoadRinkGraphics"
+
+[[name]]
+addr = 0x016CE0
+name = "LoadPauseMenuTiles"
+confidence = 0.5
+evidence = "loads asset unk_5CF6C at tile base ExtraChars ($B026); caller PauseMode"

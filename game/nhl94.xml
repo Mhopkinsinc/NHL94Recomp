@@ -9155,8 +9155,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] returns a2 = home team record $C6CE when the pausing controller's team selection (cont2team when sflags bit 1, else cont1team) equals 1, otherwise the away record (+$364); callers PauseMode and loc_7E88 (pause menu)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7E0E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x7E36">
+        <FUNCTION ENTRY_POINT="0x7E36" NAME="ai_InstallPauseMenu">
             <ADDRESS_RANGE START="0x7E36" END="0x7E45" />
+            <REGULAR_CMT>[AI 0.8] stores the item list a0 in $CF24 and the refresh handler a1 in $CF28, and resets the cursor $CF20 and scroll $CF22 for ai_PrintScrollingMenu / ai_PauseMenuInput; caller PauseMode</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7E36</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x7E46" NAME="ai_RedrawPauseMenu">
@@ -9237,8 +9238,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x86F8" END="0x8773" />
             <TYPEINFO_CMT>sub_86F8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8774">
+        <FUNCTION ENTRY_POINT="0x8774" NAME="ai_EraseEditLinesBody">
             <ADDRESS_RANGE START="0x8774" END="0x878D" />
+            <REGULAR_CMT>[AI 0.6] sets attribute $BE at (0,0) and erases a 40x10 area with eraser; caller loc_86F8 (edit-lines screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8774</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x878E">
@@ -9329,12 +9331,14 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9588" END="0x9603" />
             <TYPEINFO_CMT>sub_9588</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9604">
+        <FUNCTION ENTRY_POINT="0x9604" NAME="ai_PrintStatRowFromScroll">
             <ADDRESS_RANGE START="0x9604" END="0x960D" />
+            <REGULAR_CMT>[AI 0.5] prints the player stat row for slot VertLineScrolling / 16 with ai_PrintPlayerStatRow; caller sub_9588</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9604</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x960E">
+        <FUNCTION ENTRY_POINT="0x960E" NAME="ai_PrintStatRowFromScrollPlus6">
             <ADDRESS_RANGE START="0x960E" END="0x9619" />
+            <REGULAR_CMT>[AI 0.5] prints the player stat row for slot VertLineScrolling / 16 + 6 with ai_PrintPlayerStatRow; caller sub_9588</REGULAR_CMT>
             <TYPEINFO_CMT>sub_960E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x961A" NAME="ai_PrintPlayerStatsList">
@@ -9442,8 +9446,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0xA528" END="0xA5FF" />
             <TYPEINFO_CMT>sub_A528</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xA600">
+        <FUNCTION ENTRY_POINT="0xA600" NAME="ai_AdvanceLowRamRecord">
             <ADDRESS_RANGE START="0xA600" END="0xA615" />
+            <REGULAR_CMT>[AI 0.3] advances a4 by $62 bytes and, on reaching $AF54, wraps it to $FF0000 (the low RAM area that ai_SnapshotGameState also uses), i.e. steps through a ring of $62-byte records; caller sub_A528 (game init)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_A600</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xA616" NAME="ai_CenterCameraOnObject">
@@ -10454,8 +10459,9 @@ yy = y coord to print at</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] stores d4 in $B01E and loads asset unk_55B86 there; $B01E is the tile base that the box drawer sub_119B8 (asset unk_55B7E, same family) and eraser add to their tiles, so unk_55B86 holds the menu frame/blank tiles; callers loc_9CDC and setupice (ai_MatchupsScreen loads the same asset inline)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11F12</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11F20">
+        <FUNCTION ENTRY_POINT="0x11F20" NAME="ai_LoadPlayoffTiles">
             <ADDRESS_RANGE START="0x11F20" END="0x11F2B" />
+            <REGULAR_CMT>[AI 0.5] loads asset unk_ABA1C at tile 2 with LoadAsset; caller PlayoffScreen (ai_DrawPlayoffRoundLabel draws its labels at tile base 2)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11F20</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11F2C" NAME="AddPenalty">
@@ -10642,8 +10648,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x13040" END="0x13055" />
             <TYPEINFO_CMT>loadTeamStruct</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x13056">
+        <FUNCTION ENTRY_POINT="0x13056" NAME="ai_SelectSpecialTeamsLinesBoth">
             <ADDRESS_RANGE START="0x13056" END="0x13067" />
+            <REGULAR_CMT>[AI 0.6] Intermission: after sub_15A24 runs ai_SelectSpecialTeamsLine for the home team against the away record and, after swapping a2/a3, for the away team; caller Intermission</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13056</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x13068" NAME="ai_SelectSpecialTeamsLine">
@@ -10706,8 +10713,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] NewTicker3pt2 helper: at the column passed on the stack and the next row prints team d0's name (team table $30E, name at +4) and, $15 columns to the right, the score d1 as a 2-digit number; caller NewTicker3pt2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13454</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x134D8">
+        <FUNCTION ENTRY_POINT="0x134D8" NAME="ai_EraseTickerArea">
             <ADDRESS_RANGE START="0x134D8" END="0x134E3" />
+            <REGULAR_CMT>[AI 0.7] Intermission: positions with ai_TickerAreaSetup and erases the returned $1A x 5 area; caller Intermission</REGULAR_CMT>
             <TYPEINFO_CMT>sub_134D8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x134E4" NAME="ai_TickerAreaSetup">
@@ -11027,8 +11035,9 @@ d6 = link counter</REGULAR_CMT>
             <ADDRESS_RANGE START="0x162FE" END="0x16383" />
             <TYPEINFO_CMT>showclock</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16384">
+        <FUNCTION ENTRY_POINT="0x16384" NAME="ai_PrintClockLabel">
             <ADDRESS_RANGE START="0x16384" END="0x16395" />
+            <REGULAR_CMT>[AI 0.5] showclock: prints string d0 of the label table off_16396; caller showclock</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16384</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16468">
@@ -11118,16 +11127,19 @@ output - d0=xscreen, d1=yscreen</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] loads asset unk_B3538 at the tile base $B020 via ai_LoadAssetInline with the inline nibble map $7123 $4567 $89AB $CDEF; same three callers as LoadRinkPalette (loc_9CDC, setupice, sub_16BAC) during rink setup</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16CAC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16CC4">
+        <FUNCTION ENTRY_POINT="0x16CC4" NAME="ai_LoadHudTiles">
             <ADDRESS_RANGE START="0x16CC4" END="0x16CD1" />
+            <REGULAR_CMT>[AI 0.5] loads asset unk_AB928 at tile base $B016, the base that ai_DrawLineEnergyBar (bitmap unk_AB920, same family) and the playoff cursor sprites use; caller ai_LoadRinkGraphics</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16CC4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16CD2">
+        <FUNCTION ENTRY_POINT="0x16CD2" NAME="ai_LoadCrowdSpriteTiles">
             <ADDRESS_RANGE START="0x16CD2" END="0x16CDF" />
+            <REGULAR_CMT>[AI 0.5] loads asset unk_A4B5C at tile base $B01A, the base ai_EmitCrowdSprites adds to every crowd sprite tile; caller ai_LoadRinkGraphics</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16CD2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16CE0">
+        <FUNCTION ENTRY_POINT="0x16CE0" NAME="ai_LoadPauseMenuTiles">
             <ADDRESS_RANGE START="0x16CE0" END="0x16CED" />
+            <REGULAR_CMT>[AI 0.5] loads asset unk_5CF6C at tile base ExtraChars ($B026); caller PauseMode</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16CE0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16CEE">
@@ -11741,8 +11753,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] GameSetUp cursor handling: d7 = cursor row, d0 = signed step; scrolls the menu offset $D422 (0..3, previous value in $D424, $C2F6 bit 2 flags a scroll) so the cursor stays within 5 rows of the window, skips row 6 outside playoff mode ($D048), then redraws the menu window from off_BEFB8 with dobitmap, positions via loc_F7864 and draws the cursor box with sub_119B8 in palette $6000; caller GameSetUp</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F76D4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF780C">
+        <FUNCTION ENTRY_POINT="0xF780C" NAME="ai_SetupCursorBoxDefault">
             <ADDRESS_RANGE START="0xF780C" END="0xF7821" />
+            <REGULAR_CMT>[AI 0.5] ai_MoveSetupCursor helper: positions at column $10 row $E (attribute $FF) and returns the default cursor box size d0 = $17, d1 = $D; caller ai_MoveSetupCursor</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F780C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF7864" NAME="ai_PositionSetupCursor">
@@ -12225,8 +12238,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFC986" END="0xFCA03" />
             <TYPEINFO_CMT>sub_FC986</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCA04">
+        <FUNCTION ENTRY_POINT="0xFCA04" NAME="ai_EraseStatsBody">
             <ADDRESS_RANGE START="0xFCA04" END="0xFCA1D" />
+            <REGULAR_CMT>[AI 0.6] byte-identical to ai_EraseEditLinesBody: attribute $BE at (0,0) then a 40x10 erase; caller loc_FC986 (records/stats screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCA04</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCA1E">
