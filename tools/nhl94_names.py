@@ -20,6 +20,8 @@ Commands
                               entries with source = "listing" are human names from the
                               2016 listing and are written without the ai_ prefix
   accept ADDR [ADDR...]       drop the ai_ prefix (human confirmed) for those entries
+  rename ADDR NAME --why ...  replace an existing (human or ai_) name; the old name is
+                              kept in a [renamed, was X] comment together with the reason
   export-idc [--out FILE]     IDC script that applies the XML's ai_ names in IDA, if wanted
 
 PROPOSALS.toml format (one table per routine):
@@ -381,6 +383,39 @@ def cmd_accept(args):
     return 0
 
 
+def cmd_rename(args):
+    text = read_xml()
+    addr = int(args.addr, 16)
+    new = args.name.strip()
+    if not re.match(r"^[A-Za-z_]\w*$", new):
+        sys.exit(f"bad identifier {new!r}")
+    m = next((mm for a, nn, mm in functions(text) if a == addr), None)
+    if m is None:
+        sys.exit(f"no FUNCTION at ${addr:06X}")
+    old = m.group(4) or f"sub_{addr:X}"
+    indent = m.group(1)
+    head = f'{indent}<FUNCTION ENTRY_POINT="0x{addr:X}" NAME="{new}">'
+    cmt = f"[renamed, was {old}] {args.why}".replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    if m.group(5) == "/":
+        text = text[: m.start()] + f"{head}\n{indent}    <REGULAR_CMT>{cmt}</REGULAR_CMT>\n{indent}</FUNCTION>" + text[m.end():]
+    else:
+        text = text[: m.start()] + head + text[m.end():]
+        start = text.index(head); end = text.index("</FUNCTION>", start)
+        body = text[start:end]
+        body = re.sub(r"\n\s*<REGULAR_CMT>\[(AI|listing|renamed)[^<]*</REGULAR_CMT>", "", body)
+        ins = body.find("/>", body.find("<ADDRESS_RANGE"))
+        if ins >= 0:
+            ins += 2
+            body = body[:ins] + f"\n{indent}    <REGULAR_CMT>{cmt}</REGULAR_CMT>" + body[ins:]
+        text = text[:start] + body + text[end:]
+    # the type-info comment and the SYMBOLS table carry the same name; keep them in step
+    text = text.replace(f"<TYPEINFO_CMT>{old}</TYPEINFO_CMT>", f"<TYPEINFO_CMT>{new}</TYPEINFO_CMT>")
+    text = re.sub(r'(<SYMBOL ADDRESS="0x%X" NAME=")%s(")' % (addr, re.escape(old)), r"\g<1>%s\g<2>" % new, text)
+    XML.write_text(text, encoding="utf-8", newline="\n")
+    print(f"renamed ${addr:06X}: {old} -> {new}")
+    return 0
+
+
 def cmd_export_idc(args):
     text = read_xml()
     lines = ["// Apply ai_ names from game/nhl94.xml in IDA (File > Script file).", "#include <idc.idc>", "static main() {"]
@@ -402,9 +437,10 @@ def main() -> int:
     r = sub.add_parser("review"); r.add_argument("proposals"); r.add_argument("--out")
     a = sub.add_parser("apply"); a.add_argument("proposals")
     c = sub.add_parser("accept"); c.add_argument("addrs", nargs="+")
+    rn = sub.add_parser("rename"); rn.add_argument("addr"); rn.add_argument("name"); rn.add_argument("--why", required=True)
     e = sub.add_parser("export-idc"); e.add_argument("--out")
     args = ap.parse_args()
-    return {"status": cmd_status, "dossier": cmd_dossier, "review": cmd_review, "apply": cmd_apply, "accept": cmd_accept, "export-idc": cmd_export_idc}[args.cmd](args)
+    return {"status": cmd_status, "dossier": cmd_dossier, "review": cmd_review, "apply": cmd_apply, "accept": cmd_accept, "rename": cmd_rename, "export-idc": cmd_export_idc}[args.cmd](args)
 
 
 if __name__ == "__main__":

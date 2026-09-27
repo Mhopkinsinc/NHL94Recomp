@@ -19,13 +19,13 @@ evidence = "reads the user's 16-byte record from SRAM $D20 + user*16 (sub_F9C20)
 addr = 0x0F9EAA
 name = "UpdateTeamRecords"
 confidence = 0.5
-evidence = "reads team d1's 16-byte record from SRAM $B60 + team*16 (clrCrowdRAM?) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords"
+evidence = "reads team d1's 16-byte record from SRAM $B60 + team*16 (ReadTeamRecord) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords"
 
 [[name]]
 addr = 0x0F9C18
 name = "WriteTeamRecord"
 confidence = 0.8
-evidence = "sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of clrCrowdRAM? (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords"
+evidence = "sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of ReadTeamRecord (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords"
 
 [[name]]
 addr = 0x0F9C20
@@ -37,7 +37,7 @@ evidence = "clears the write flag and transfers 16 bytes between SRAM $D20 + d1*
 addr = 0x0FA550
 name = "PrintRecordsScreen"
 confidence = 0.7
-evidence = "records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (clrCrowdRAM? with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0"
+evidence = "records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (ReadTeamRecord with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0"
 
 [[name]]
 addr = 0x0FA75C

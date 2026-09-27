@@ -1,0 +1,87 @@
+# Names batch 9 - see docs/names/names-batch-09.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-09.toml
+# Alongside this batch the human name clrCrowdRAM? ($F9BE2) was corrected to
+# ReadTeamRecord with `tools/nhl94_names.py rename` (the old name is kept in
+# the routine's comment).
+
+# ---- playoffs ------------------------------------------------------------------
+
+[[name]]
+addr = 0x0180FC
+name = "AdvancePlayoffsAfterGame"
+confidence = 0.7
+evidence = "PeriodOver hook for playoff mode ($D04A rounds left, $D048 state not 0 or 4): sets $D048/$D074 = 1, records the result (ai_AdvancePlayoffSeries), rebuilds the bracket (sub_17D80), then either encodes the new password into $D088 and saves it (ai_EncodePlayoffPassword, ai_SavePlayoffPassword; decoding $D176 back when $C2F0 bit 2 is set) or, when gamelevel is 4 or the series index $CEE6 is negative, clears the password and moves the state to 2 or 3 (final when bosgames is 7)"
+
+# ---- stats / edit-lines screens --------------------------------------------------
+
+[[name]]
+addr = 0x00945C
+name = "PrintStatsScreen"
+confidence = 0.7
+evidence = "stats screen frame: ai_SetupStatsScreenVideo, clears the scroll/selection counters, draws the 30x6 header box, prints 'Playoff  Stats' (d7 != 0, from sub_9428) or 'Player  Stats' with the 'Switch^Teams' hint, then the list via ai_PrintPlayerStatsList; callers sub_9428 and the player-stats menu"
+
+[[name]]
+addr = 0x0085EE
+name = "PrintLineRoster"
+confidence = 0.7
+evidence = "edit-lines screen: for line d5 prints the line name from word_191A6 plus ' Line' at the position from word_879E (shifted one entry when $D058 is set), then the line's player slots from the team's line table $16A(a2) (8 bytes per line) as padded surnames (ai_FormatPlayerSurnamePadded), highlighting the slot equal to the cursor $D5B8; caller loc_8566 (per-line refresh)"
+
+[[name]]
+addr = 0x0F99F2
+name = "ReadPlayerRecordValue"
+confidence = 0.5
+evidence = "d0 = team, d1 = player index: walks the team's roster to the player, reads his record field with ReadRecordField into (a0), returns d0 = the record's value byte and d1 = 1 when the player index is above the team's attribute-column count (the goalie slot) else 0; caller sub_F98C6 (prints 'Record ... goals/saves' lines)"
+
+[[name]]
+addr = 0x0F9F50
+name = "UpdateScorerRecords"
+confidence = 0.6
+evidence = "for the 26 roster slots of team a2 compares each player's game total (goals from column +$B4, or for the goalie slots saves = +$E8 shots minus +$B4 goals against) with his stored record byte (ReadRecordField) and, when beaten, writes the new value with the two user ids ($D043/$D045, swapped for the away team) and the opponent team d6 through WriteRecordField; caller ai_UpdateGameRecords"
+
+[[name]]
+addr = 0x0FA66E
+name = "DrawRecordsTeamLogo"
+confidence = 0.7
+evidence = "records screen: at (d0,d1) draws the 6x6 logo of the selected team (HomeTeam, or VisTeam when $D4F6 is set) from off_F86F2 through dobitmap at tile base $D450 with the unk_FF462 template, preserving the palette longs $BD4A/$BD4E; caller ai_PrintRecordsScreen (once per side)"
+
+# ---- shootout / penalty shot / power play ------------------------------------------
+
+[[name]]
+addr = 0x0FD618
+name = "ShootoutWinnersCelebrate"
+confidence = 0.5
+evidence = "called by sub_FC516 when the shootout is decided ($D595 bit 0, at least 5 rounds in $D578 and the round scores $D574/$D576 differ): sets $C2EE bit 2, $DED0 = $60, then for the five skaters of the team with the higher score (object block $B04A or +6*$80) sets slot $34 = 2, places them at x = 0 and y = Vpos +-$F0, starts animation 7 (sub_10658) and clears their state flags; caller sub_FC516"
+
+[[name]]
+addr = 0x01592C
+name = "SetupPenaltyShotPlayers"
+confidence = 0.7
+evidence = "puckpenshot: for the six players of team a2 ($22(a2) = first object): the shooter (state $52 equal to BA_Sktr_SCnum) gets slot $34 = 4 and the number byte from $D40B, the goalie (BA_Goalie_SCnum) keeps slot 0, both via sub_15A88 and get their line-status word $66(a2,idx) set to -1 (off the ice list) with sub_15AA4; everyone else is benched (bit 2 of $63, animation $20 via sub_10662); caller puckpenshot"
+
+[[name]]
+addr = 0x0FF7E2
+name = "StartPowerPlaySong"
+confidence = 0.6
+evidence = "puckfaceoff2 helper: compares the active skater counts $24 of the home and away records; when they differ (a power play) and the state bit $C2EE bit 6 changes, sets HmTeam = HomeTeam and SongIndex = 1 (home power play) or 4 (away) and calls ChooseSong, guarded by $C2EE bit 5 so the song starts once; skipped in $C2FA bit 1 mode; caller puckfaceoff2"
+
+# ---- gameplay ------------------------------------------------------------------------
+
+[[name]]
+addr = 0x0F6778
+name = "LaunchPass"
+confidence = 0.6
+evidence = "passmode: pass speed = sqrt(12 * $D418) (sroot) into puckvz, flight time = speed / 3, then sets puckvx/puckvy = (target $D414/$D416 - puckx/pucky) / time and flips the puck with puckflip; caller passmode after ai_ComputePassTarget"
+
+[[name]]
+addr = 0x0FE864
+name = "SteerToWaypoint"
+confidence = 0.5
+evidence = "asspuckc helper: returns the current waypoint ($DA16/$DA18, flipped for the player's side) in d0/d1 and, when the player object a3 is within $12 (or $A while moving, $28/$2A non-zero) of it in both axes, advances the script with ai_NextWaypoint; caller asspuckc"
+
+# ---- input ---------------------------------------------------------------------------
+
+[[name]]
+addr = 0x01A470
+name = "ReadPad1Hardware"
+confidence = 0.7
+evidence = "reads controller port 1 ($A10003) with the Z80 bus held (retrying with Z80_ResetAndRequestBus after $64 polls): TH low then high, packs Start/A from the first read and the directions/B/C from the second, remaps the direction nibble through byte_1A4DE and returns the inverted button byte in d0; caller ReadJoyData"

@@ -150,10 +150,10 @@ XML (or the proposals file and re-apply).
 
 ## `$0F9EAA` -> `ai_UpdateTeamRecords`  (confidence 0.5, 46 insns)
 
-**Evidence.** reads team d1's 16-byte record from SRAM $B60 + team*16 (clrCrowdRAM?) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords
+**Evidence.** reads team d1's 16-byte record from SRAM $B60 + team*16 (ReadTeamRecord) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords
 
 **Callers.** ai_UpdateGameRecords
-**Callees.** ai_WriteTeamRecord, clrCrowdRAM?
+**Callees.** ReadTeamRecord, ai_WriteTeamRecord
 **RAM.** CrowdPeak, HomeTeam
 
 ```
@@ -207,7 +207,7 @@ XML (or the proposals file and re-apply).
 
 ## `$0F9C18` -> `ai_WriteTeamRecord`  (confidence 0.8, 2 insns)
 
-**Evidence.** sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of clrCrowdRAM? (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords
+**Evidence.** sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of ReadTeamRecord (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords
 
 **Callers.** ai_UpdateTeamRecords
 **Callees.** loc_F9BE8
@@ -242,10 +242,10 @@ XML (or the proposals file and re-apply).
 
 ## `$0FA550` -> `ai_PrintRecordsScreen`  (confidence 0.7, 59 insns)
 
-**Evidence.** records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (clrCrowdRAM? with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0
+**Evidence.** records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (ReadTeamRecord with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0
 
 **Callers.** sub_FA2C0
-**Callees.** ai_PrintGoalRecordLine, ai_PrintTeamRatingBox, clrCrowdRAM?, loc_FA936, printz, printz2, sub_FA66E, sub_FA6E8, sub_FA708, sub_FAC3E
+**Callees.** ReadTeamRecord, ai_PrintGoalRecordLine, ai_PrintTeamRatingBox, loc_FA936, printz, printz2, sub_FA66E, sub_FA6E8, sub_FA708, sub_FAC3E
 **Strings.** Records | -----------
 **RAM.** HomeTeam, VisTeam, palcount, printx, printy
 

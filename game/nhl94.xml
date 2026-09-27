@@ -8775,7 +8775,7 @@ FFFF = none
         <SYMBOL ADDRESS="0xF8BD0" NAME=".checkpos" TYPE="local" />
         <SYMBOL ADDRESS="0xF8BEE" NAME=".restore" TYPE="local" />
         <SYMBOL ADDRESS="0xF8BF2" NAME=".ex" TYPE="local" />
-        <SYMBOL ADDRESS="0xF9BE2" NAME="clrCrowdRAM?" />
+        <SYMBOL ADDRESS="0xF9BE2" NAME="ReadTeamRecord" />
         <SYMBOL ADDRESS="0xFA934" NAME="nullsub_4" />
         <SYMBOL ADDRESS="0xFA9F8" NAME="CalcAttrib" />
         <SYMBOL ADDRESS="0xFAA18" NAME=".1" TYPE="local" />
@@ -9217,8 +9217,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8566" END="0x85E5" />
             <TYPEINFO_CMT>sub_8566</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x85EE">
+        <FUNCTION ENTRY_POINT="0x85EE" NAME="ai_PrintLineRoster">
             <ADDRESS_RANGE START="0x85EE" END="0x868B" />
+            <REGULAR_CMT>[AI 0.7] edit-lines screen: for line d5 prints the line name from word_191A6 plus ' Line' at the position from word_879E (shifted one entry when $D058 is set), then the line's player slots from the team's line table $16A(a2) (8 bytes per line) as padded surnames (ai_FormatPlayerSurnamePadded), highlighting the slot equal to the cursor $D5B8; caller loc_8566 (per-line refresh)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_85EE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x868C">
@@ -9305,8 +9306,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9428" END="0x9459" />
             <TYPEINFO_CMT>sub_9428</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x945C">
+        <FUNCTION ENTRY_POINT="0x945C" NAME="ai_PrintStatsScreen">
             <ADDRESS_RANGE START="0x945C" END="0x9539" />
+            <REGULAR_CMT>[AI 0.7] stats screen frame: ai_SetupStatsScreenVideo, clears the scroll/selection counters, draws the 30x6 header box, prints 'Playoff  Stats' (d7 != 0, from sub_9428) or 'Player  Stats' with the 'Switch^Teams' hint, then the list via ai_PrintPlayerStatsList; callers sub_9428 and the player-stats menu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_945C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9588">
@@ -10874,8 +10876,9 @@ a2 = team struct</REGULAR_CMT>
             <ADDRESS_RANGE START="0x158F2" END="0x1592B" />
             <TYPEINFO_CMT>findAvailablePlayer</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1592C">
+        <FUNCTION ENTRY_POINT="0x1592C" NAME="ai_SetupPenaltyShotPlayers">
             <ADDRESS_RANGE START="0x1592C" END="0x159A7" />
+            <REGULAR_CMT>[AI 0.7] puckpenshot: for the six players of team a2 ($22(a2) = first object): the shooter (state $52 equal to BA_Sktr_SCnum) gets slot $34 = 4 and the number byte from $D40B, the goalie (BA_Goalie_SCnum) keeps slot 0, both via sub_15A88 and get their line-status word $66(a2,idx) set to -1 (off the ice list) with sub_15AA4; everyone else is benched (bit 2 of $63, animation $20 via sub_10662); caller puckpenshot</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1592C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x159A8" NAME="forcepldata">
@@ -11240,8 +11243,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] a3 = five-word password value (sub_180FC passes the entry buffer $D176): saves it, then peels mixed-radix digits with BigNumDivMod into the eight playoff series records $CE66..$CED6 ($10 bytes each: wins at +4/+6 in base 5, bit 2 of +$E when a side reached 4), then $CEF2 (base $4000 check value), pojoy (base 8, forced to 4 unless FourWayPlay when 1 or 2), potreeteam ($10), gamelevel (4), bosgames (8), postarts ($20); restores the buffer. ai_EncodePlayoffPassword ($18192) is the exact inverse. Callers GameSetUp, sub_17CA0, sub_180FC</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1803E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x180FC">
+        <FUNCTION ENTRY_POINT="0x180FC" NAME="ai_AdvancePlayoffsAfterGame">
             <ADDRESS_RANGE START="0x180FC" END="0x18191" />
+            <REGULAR_CMT>[AI 0.7] PeriodOver hook for playoff mode ($D04A rounds left, $D048 state not 0 or 4): sets $D048/$D074 = 1, records the result (ai_AdvancePlayoffSeries), rebuilds the bracket (sub_17D80), then either encodes the new password into $D088 and saves it (ai_EncodePlayoffPassword, ai_SavePlayoffPassword; decoding $D176 back when $C2F0 bit 2 is set) or, when gamelevel is 4 or the series index $CEE6 is negative, clears the password and moves the state to 2 or 3 (final when bosgames is 7)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_180FC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18192" NAME="ai_EncodePlayoffPassword">
@@ -11456,8 +11460,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A464" END="0x1A46F" />
             <TYPEINFO_CMT>sub_1A464</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A470">
+        <FUNCTION ENTRY_POINT="0x1A470" NAME="ai_ReadPad1Hardware">
             <ADDRESS_RANGE START="0x1A470" END="0x1A4DD" />
+            <REGULAR_CMT>[AI 0.7] reads controller port 1 ($A10003) with the Z80 bus held (retrying with Z80_ResetAndRequestBus after $64 polls): TH low then high, packs Start/A from the first read and the directions/B/C from the second, remaps the direction nibble through byte_1A4DE and returns the inverted button byte in d0; caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A470</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A4EE" NAME="ai_Z80_ResetAndRequestBus">
@@ -11511,8 +11516,9 @@ d0 = start of data</REGULAR_CMT>
             <REGULAR_CMT>adjust puckvz to cause the puck to &quot;float&quot; for the shot on an empty net top shelf or over a pad stack when puck is down low</REGULAR_CMT>
             <TYPEINFO_CMT>puckvzadj</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF6778">
+        <FUNCTION ENTRY_POINT="0xF6778" NAME="ai_LaunchPass">
             <ADDRESS_RANGE START="0xF6778" END="0xF67E3" />
+            <REGULAR_CMT>[AI 0.6] passmode: pass speed = sqrt(12 * $D418) (sroot) into puckvz, flight time = speed / 3, then sets puckvx/puckvy = (target $D414/$D416 - puckx/pucky) / time and flips the puck with puckflip; caller passmode after ai_ComputePassTarget</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F6778</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF67E4" NAME="ai_ComputePassTarget">
@@ -11769,8 +11775,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] divu #100 / #10 chains on d0 writing ASCII digits ('0'+) into the string at a1+2 and counting them in d1; 5 callers in the records/stats screens</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F998E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF99F2">
+        <FUNCTION ENTRY_POINT="0xF99F2" NAME="ai_ReadPlayerRecordValue">
             <ADDRESS_RANGE START="0xF99F2" END="0xF9A63" />
+            <REGULAR_CMT>[AI 0.5] d0 = team, d1 = player index: walks the team's roster to the player, reads his record field with ReadRecordField into (a0), returns d0 = the record's value byte and d1 = 1 when the player index is above the team's attribute-column count (the goalie slot) else 0; caller sub_F98C6 (prints 'Record ... goals/saves' lines)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F99F2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9A64">
@@ -11799,13 +11806,14 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] sets bit 6 of $C2F8 and branches into ReadRecordField's body at loc_F9B9A, where the bit selects WriteSRAM over ReadSRAM; called from sub_F9F50 (records screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9BDA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9BE2" NAME="clrCrowdRAM?">
+        <FUNCTION ENTRY_POINT="0xF9BE2" NAME="ReadTeamRecord">
             <ADDRESS_RANGE START="0xF9BE2" END="0xF9C17" />
-            <TYPEINFO_CMT>clrCrowdRAM?</TYPEINFO_CMT>
+            <REGULAR_CMT>[renamed, was clrCrowdRAM?] clears the SRAM write flag then transfers 16 bytes between SRAM $B60 + d1*16 and a0: a team-record reader (its write twin ai_WriteTeamRecord sets the flag and jumps in), nothing to do with clearing crowd RAM</REGULAR_CMT>
+            <TYPEINFO_CMT>ReadTeamRecord</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9C18" NAME="ai_WriteTeamRecord">
             <ADDRESS_RANGE START="0xF9C18" END="0xF9C1F" />
-            <REGULAR_CMT>[AI 0.8] sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of clrCrowdRAM? (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.8] sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of ReadTeamRecord (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C18</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9C20" NAME="ai_ReadUserRecord">
@@ -11838,11 +11846,12 @@ d3 = attribute value</REGULAR_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9EAA" NAME="ai_UpdateTeamRecords">
             <ADDRESS_RANGE START="0xF9EAA" END="0xF9F4F" />
-            <REGULAR_CMT>[AI 0.5] reads team d1's 16-byte record from SRAM $B60 + team*16 (clrCrowdRAM?) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.5] reads team d1's 16-byte record from SRAM $B60 + team*16 (ReadTeamRecord) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9EAA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9F50">
+        <FUNCTION ENTRY_POINT="0xF9F50" NAME="ai_UpdateScorerRecords">
             <ADDRESS_RANGE START="0xF9F50" END="0xF9FBF" />
+            <REGULAR_CMT>[AI 0.6] for the 26 roster slots of team a2 compares each player's game total (goals from column +$B4, or for the goalie slots saves = +$E8 shots minus +$B4 goals against) with his stored record byte (ReadRecordField) and, when beaten, writes the new value with the two user ids ($D043/$D045, swapped for the away team) and the opponent team d6 through WriteRecordField; caller ai_UpdateGameRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9F50</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9FC0">
@@ -11868,11 +11877,12 @@ d3 = attribute value</REGULAR_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA550" NAME="ai_PrintRecordsScreen">
             <ADDRESS_RANGE START="0xFA550" END="0xFA66D" />
-            <REGULAR_CMT>[AI 0.7] records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (clrCrowdRAM? with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.7] records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (ReadTeamRecord with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA550</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA66E">
+        <FUNCTION ENTRY_POINT="0xFA66E" NAME="ai_DrawRecordsTeamLogo">
             <ADDRESS_RANGE START="0xFA66E" END="0xFA6E7" />
+            <REGULAR_CMT>[AI 0.7] records screen: at (d0,d1) draws the 6x6 logo of the selected team (HomeTeam, or VisTeam when $D4F6 is set) from off_F86F2 through dobitmap at tile base $D450 with the unk_FF462 template, preserving the palette longs $BD4A/$BD4E; caller ai_PrintRecordsScreen (once per side)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA66E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA6E8">
@@ -12196,8 +12206,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFD5F4" END="0xFD60D" />
             <TYPEINFO_CMT>sub_FD5F4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD618">
+        <FUNCTION ENTRY_POINT="0xFD618" NAME="ai_ShootoutWinnersCelebrate">
             <ADDRESS_RANGE START="0xFD618" END="0xFD6B3" />
+            <REGULAR_CMT>[AI 0.5] called by sub_FC516 when the shootout is decided ($D595 bit 0, at least 5 rounds in $D578 and the round scores $D574/$D576 differ): sets $C2EE bit 2, $DED0 = $60, then for the five skaters of the team with the higher score (object block $B04A or +6*$80) sets slot $34 = 2, places them at x = 0 and y = Vpos +-$F0, starts animation 7 (sub_10658) and clears their state flags; caller sub_FC516</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD618</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD73C">
@@ -12282,8 +12293,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.4] advances $DA14 and reads the next 8-byte entry of script off_FE788[$DA12]: relative x into $DA16 (negated when bit 0 of $76(a3) is set) and y into $DA18; an entry whose byte 4 is $80 ends the script, setting $C2FC bit 3 and copying its bytes 5..7 into $DA1D/$DA1A; sub_FE864 (from asspuckc) steers the player toward the point and calls this when within reach; callers ai_StartWaypointScript, sub_FE864</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE7FC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE864">
+        <FUNCTION ENTRY_POINT="0xFE864" NAME="ai_SteerToWaypoint">
             <ADDRESS_RANGE START="0xFE864" END="0xFE8EB" />
+            <REGULAR_CMT>[AI 0.5] asspuckc helper: returns the current waypoint ($DA16/$DA18, flipped for the player's side) in d0/d1 and, when the player object a3 is within $12 (or $A while moving, $28/$2A non-zero) of it in both axes, advances the script with ai_NextWaypoint; caller asspuckc</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE864</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE8EC" NAME="ai_WaypointScriptActive">
@@ -12402,8 +12414,9 @@ returns calculated value in d0</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF3F8</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x1" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF7E2">
+        <FUNCTION ENTRY_POINT="0xFF7E2" NAME="ai_StartPowerPlaySong">
             <ADDRESS_RANGE START="0xFF7E2" END="0xFF87B" />
+            <REGULAR_CMT>[AI 0.6] puckfaceoff2 helper: compares the active skater counts $24 of the home and away records; when they differ (a power play) and the state bit $C2EE bit 6 changes, sets HmTeam = HomeTeam and SongIndex = 1 (home power play) or 4 (away) and calls ChooseSong, guarded by $C2EE bit 5 so the song starts once; skipped in $C2FA bit 1 mode; caller puckfaceoff2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF7E2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF87C">
