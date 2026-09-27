@@ -9112,8 +9112,9 @@ FFFF = none
             <TYPEINFO_CMT>periodiceevents</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x7A34">
+        <FUNCTION ENTRY_POINT="0x7A34" NAME="ai_TriggerPeriodSong">
             <ADDRESS_RANGE START="0x7A34" END="0x7A75" />
+            <REGULAR_CMT>[AI 0.5] periodiceevents: in period 2 (gsp), unless $C2EA bit 4, once gameclock has counted down to the threshold in $B048 marks it done (-1), sets HmTeam = HomeTeam and SongIndex = 5, picks the song with ChooseSong and starts it via sub_11156 with $D6C8; caller periodiceevents</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7A34</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x7A76" NAME="UpdateCwdExcite">
@@ -9288,8 +9289,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9020" END="0x904B" />
             <TYPEINFO_CMT>sub_9020</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x904C">
+        <FUNCTION ENTRY_POINT="0x904C" NAME="ai_PrintSummaryRowAt">
             <ADDRESS_RANGE START="0x904C" END="0x907B" />
+            <REGULAR_CMT>[AI 0.6] scoring summary page: prints entry (d0 high word + 4) * 6 of ScoreSum at the row derived from VertLineScrolling (/8 + $10, mod 32) through ai_PrintScoringSummaryRow; caller sub_8FB8 (summary page handler, together with sub_9020 for row 30)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_904C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x907C" NAME="ai_PrintScoringSummaryRow">
@@ -10423,8 +10425,9 @@ yy = y coord to print at</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11E8E</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x20" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11EDA">
+        <FUNCTION ENTRY_POINT="0x11EDA" NAME="ai_WriteBigFontTile">
             <ADDRESS_RANGE START="0x11EDA" END="0x11F03" />
+            <REGULAR_CMT>[AI 0.7] ai_PrintBigChar helper: writes the name-table word d3 + d6 (tile plus attribute) at plane position (row d5 &lt;&lt; width-shift + column d4) * 2 in the plane described at $B004 + printm; caller ai_PrintBigChar</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11EDA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11F04" NAME="ai_LoadFontTiles">
@@ -10681,8 +10684,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x133B2" END="0x13453" />
             <TYPEINFO_CMT>NewTicker3pt2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x13454">
+        <FUNCTION ENTRY_POINT="0x13454" NAME="ai_PrintTickerTeamScore">
             <ADDRESS_RANGE START="0x13454" END="0x13487" />
+            <REGULAR_CMT>[AI 0.6] NewTicker3pt2 helper: at the column passed on the stack and the next row prints team d0's name (team table $30E, name at +4) and, $15 columns to the right, the score d1 as a 2-digit number; caller NewTicker3pt2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13454</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x134D8">
@@ -11040,8 +11044,9 @@ d6 = link counter</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] uppads helper: from the packed value d1 (tens digit in bits 4..7, units in bits 0..3, position code in bits 8..10) emits three sprite-tile entries at a5 via sub_1674A (tile pointer into Art_BoardText, size $10, x from $12(a0)): the two jersey digits (blank when the tens digit is 0 or the units are $F, narrowing 2(a0)) and the position letter from unk_1677A (' ', 'D', 'D', 'L', ...; suppressed by $C2FC bit 7); caller uppads (the jersey number / position labels over the players)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_166E6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1674A">
+        <FUNCTION ENTRY_POINT="0x1674A" NAME="ai_EmitLabelTile">
             <ADDRESS_RANGE START="0x1674A" END="0x16779" />
+            <REGULAR_CMT>[AI 0.6] ai_BuildPlayerLabelSprites helper: appends one entry (pointer to tile d2 of Art_BoardText, size $10, x = (d0 + $12(a0)) * 32) to the label list at a5; caller ai_BuildPlayerLabelSprites</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1674A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16782" NAME="addframe">
@@ -11194,8 +11199,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x175FC" END="0x17625" />
             <TYPEINFO_CMT>sub_175FC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17626">
+        <FUNCTION ENTRY_POINT="0x17626" NAME="ai_DrawPlayoffTreeBitmap">
             <ADDRESS_RANGE START="0x17626" END="0x17651" />
+            <REGULAR_CMT>[AI 0.6] PlayoffScreen: draws the bracket background bitmap unk_B3640 (2 columns x $17 rows) with dobitmap at tile base $B026; caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17626</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17652" NAME="ai_DrawPlayoffRoundLabel">
@@ -11252,8 +11258,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17D80" END="0x17E03" />
             <TYPEINFO_CMT>MakeTree</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17E04">
+        <FUNCTION ENTRY_POINT="0x17E04" NAME="ai_SetSeriesTeams">
             <ADDRESS_RANGE START="0x17E04" END="0x17E41" />
+            <REGULAR_CMT>[AI 0.6] MakeTree: copies the next two team bytes from a0 into the series record a1 (+1 and +3) and sets or clears the home-advantage bit 0 of +$E, with the order swapped when bosgames is 2, 3 or 5; caller MakeTree</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17E04</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17E42" NAME="FigureJoy">
@@ -11261,8 +11268,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>set contteams appropriately</REGULAR_CMT>
             <TYPEINFO_CMT>FigureJoy</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18002">
+        <FUNCTION ENTRY_POINT="0x18002" NAME="ai_SeedPlayoffBracket">
             <ADDRESS_RANGE START="0x18002" END="0x18031" />
+            <REGULAR_CMT>[AI 0.6] FigureJoy: sets the series index $CEE6 to -1, builds a bit mask of the two user teams (HomeTeam, VisTeam) in d3, then fills the eight series records at $CE66 ($10 bytes apart) with two teams each drawn by sub_18032 (random team not yet in the mask); caller FigureJoy</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18002</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18032" NAME="OptionRNG">
@@ -11695,8 +11703,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF780C" END="0xF7821" />
             <TYPEINFO_CMT>sub_F780C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7864">
+        <FUNCTION ENTRY_POINT="0xF7864" NAME="ai_PositionSetupCursor">
             <ADDRESS_RANGE START="0xF7864" END="0xF78A1" />
+            <REGULAR_CMT>[AI 0.6] ai_MoveSetupCursor helper: sets the print row to $E + cursor row d3 - 2*scroll ($D422) after the inline attribute string, and returns the cursor box size d0 = $17, d1 = 3 (5 for row 4 in playoff states 2 and 3, the taller 'Continue Playoffs' entry); caller ai_MoveSetupCursor</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7864</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF78A2" NAME="ai_RefreshSetupOptions">
@@ -12065,8 +12074,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB874" END="0xFB89D" />
             <TYPEINFO_CMT>sub_FB874</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB89E">
+        <FUNCTION ENTRY_POINT="0xFB89E" NAME="ai_RedrawUserListRow">
             <ADDRESS_RANGE START="0xFB89E" END="0xFB8DB" />
+            <REGULAR_CMT>[AI 0.4] user list screen: if a previous selection $D4EC exists, reprints that row (row 8 + index - 1) with the text at a1 and the following string at column $12 (restoring its unhighlighted look), then records the current selection $D4EA as the previous one; caller sub_FB874</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB89E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB8EC">
@@ -12213,8 +12223,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] team ratings screen pictures: when $D598 is zero draws the away ($C332) and home ($C330) team logos through ai_GetTeamLogoAsset + ai_DrawTeamLogo6x6 at tile bases $D432/$D430 and columns 2/$20, row $F; otherwise draws the selected away/home player photos ($D59E/$D59C) through ai_GetPlayerPhoto + sub_FD14A; sets the palette-fade counter $BD26 to $64; callers loc_FCC76, sub_FCF86</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD084</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD14A">
+        <FUNCTION ENTRY_POINT="0xFD14A" NAME="ai_LoadPlayerPhoto">
             <ADDRESS_RANGE START="0xFD14A" END="0xFD17D" />
+            <REGULAR_CMT>[AI 0.7] a0 = photo asset from ai_GetPlayerPhoto: resolves its two block offsets (using the generic blocks of off_C63F8 when the second offset is zero), decodes the tiles with ai_UnpackPhotoTiles into $DA1E and joins the 6x6 drawing tail at loc_FD1A4 shared with ai_DrawTeamLogo6x6; caller ai_DrawRatingsPictures</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD14A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD17E" NAME="ai_DrawTeamLogo6x6">
@@ -12251,8 +12262,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] matchups screen: every 7 frames ($D5A6) advances the bar step $D5A4 (0..5) and prints, at column $13 row $16, the string step of off_FD548 (home overall $D5A0 above away $D5A2), off_FD560 (away ahead) or word_FD5A8 (equal); the strings are the ']', ']]', ']]]' / '[' bracket segments that grow toward the stronger team; caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD4CA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD5AE">
+        <FUNCTION ENTRY_POINT="0xFD5AE" NAME="ai_GetTeamNameOrSide">
             <ADDRESS_RANGE START="0xFD5AE" END="0xFD5E3" />
+            <REGULAR_CMT>[AI 0.5] ticker helper: for team record a2 returns a1 = its name string unless the name entry is empty (length word 2), in which case it returns 'Home' (word_FD5E4) for the home record or 'Visitors' (word_FD5EA); caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD5AE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD5F4">
@@ -12394,8 +12406,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFECA2" END="0xFECA9" />
             <TYPEINFO_CMT>chkFgtBit1</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFECAA">
+        <FUNCTION ENTRY_POINT="0xFECAA" NAME="ai_PickFaceoffSpot">
             <ADDRESS_RANGE START="0xFECAA" END="0xFECE5" />
+            <REGULAR_CMT>[AI 0.5] puckfaceoff: draws a random index 0..7 into the table unk_FECE6 and returns its word in d0, unless the faceoff location fox/foy ($BF94/$BF96) lies within -$C0..$C0 of centre, which forces d0 = 6 (the centre-ice case); caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FECAA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFECF8">
@@ -12483,8 +12496,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFF87C" END="0xFF883" />
             <TYPEINFO_CMT>sub_FF87C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF88E">
+        <FUNCTION ENTRY_POINT="0xFF88E" NAME="ai_ClearPenaltyState">
             <ADDRESS_RANGE START="0xFF88E" END="0xFF8C7" />
+            <REGULAR_CMT>[AI 0.6] clockcont: clears the penalty timers Penaltytimer/Pencntdwn/PBnum ($C3EA/$C3E8/$C3E6) and the $44-byte penalty message buffer at $C3A4, then resets each team's penalty data with sub_FF8C8; caller clockcont</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF88E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF8C8" NAME="clrTmPdst">

@@ -1,0 +1,86 @@
+# Names batch 15 - see docs/names/names-batch-15.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-15.toml
+
+[[name]]
+addr = 0x018002
+name = "SeedPlayoffBracket"
+confidence = 0.6
+evidence = "FigureJoy: sets the series index $CEE6 to -1, builds a bit mask of the two user teams (HomeTeam, VisTeam) in d3, then fills the eight series records at $CE66 ($10 bytes apart) with two teams each drawn by sub_18032 (random team not yet in the mask); caller FigureJoy"
+
+[[name]]
+addr = 0x017E04
+name = "SetSeriesTeams"
+confidence = 0.6
+evidence = "MakeTree: copies the next two team bytes from a0 into the series record a1 (+1 and +3) and sets or clears the home-advantage bit 0 of +$E, with the order swapped when bosgames is 2, 3 or 5; caller MakeTree"
+
+[[name]]
+addr = 0x017626
+name = "DrawPlayoffTreeBitmap"
+confidence = 0.6
+evidence = "PlayoffScreen: draws the bracket background bitmap unk_B3640 (2 columns x $17 rows) with dobitmap at tile base $B026; caller PlayoffScreen"
+
+[[name]]
+addr = 0x0F7864
+name = "PositionSetupCursor"
+confidence = 0.6
+evidence = "ai_MoveSetupCursor helper: sets the print row to $E + cursor row d3 - 2*scroll ($D422) after the inline attribute string, and returns the cursor box size d0 = $17, d1 = 3 (5 for row 4 in playoff states 2 and 3, the taller 'Continue Playoffs' entry); caller ai_MoveSetupCursor"
+
+[[name]]
+addr = 0x0FD14A
+name = "LoadPlayerPhoto"
+confidence = 0.7
+evidence = "a0 = photo asset from ai_GetPlayerPhoto: resolves its two block offsets (using the generic blocks of off_C63F8 when the second offset is zero), decodes the tiles with ai_UnpackPhotoTiles into $DA1E and joins the 6x6 drawing tail at loc_FD1A4 shared with ai_DrawTeamLogo6x6; caller ai_DrawRatingsPictures"
+
+[[name]]
+addr = 0x007A34
+name = "TriggerPeriodSong"
+confidence = 0.5
+evidence = "periodiceevents: in period 2 (gsp), unless $C2EA bit 4, once gameclock has counted down to the threshold in $B048 marks it done (-1), sets HmTeam = HomeTeam and SongIndex = 5, picks the song with ChooseSong and starts it via sub_11156 with $D6C8; caller periodiceevents"
+
+[[name]]
+addr = 0x00904C
+name = "PrintSummaryRowAt"
+confidence = 0.6
+evidence = "scoring summary page: prints entry (d0 high word + 4) * 6 of ScoreSum at the row derived from VertLineScrolling (/8 + $10, mod 32) through ai_PrintScoringSummaryRow; caller sub_8FB8 (summary page handler, together with sub_9020 for row 30)"
+
+[[name]]
+addr = 0x011EDA
+name = "WriteBigFontTile"
+confidence = 0.7
+evidence = "ai_PrintBigChar helper: writes the name-table word d3 + d6 (tile plus attribute) at plane position (row d5 << width-shift + column d4) * 2 in the plane described at $B004 + printm; caller ai_PrintBigChar"
+
+[[name]]
+addr = 0x01674A
+name = "EmitLabelTile"
+confidence = 0.6
+evidence = "ai_BuildPlayerLabelSprites helper: appends one entry (pointer to tile d2 of Art_BoardText, size $10, x = (d0 + $12(a0)) * 32) to the label list at a5; caller ai_BuildPlayerLabelSprites"
+
+[[name]]
+addr = 0x013454
+name = "PrintTickerTeamScore"
+confidence = 0.6
+evidence = "NewTicker3pt2 helper: at the column passed on the stack and the next row prints team d0's name (team table $30E, name at +4) and, $15 columns to the right, the score d1 as a 2-digit number; caller NewTicker3pt2"
+
+[[name]]
+addr = 0x0FD5AE
+name = "GetTeamNameOrSide"
+confidence = 0.5
+evidence = "ticker helper: for team record a2 returns a1 = its name string unless the name entry is empty (length word 2), in which case it returns 'Home' (word_FD5E4) for the home record or 'Visitors' (word_FD5EA); caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0FB89E
+name = "RedrawUserListRow"
+confidence = 0.4
+evidence = "user list screen: if a previous selection $D4EC exists, reprints that row (row 8 + index - 1) with the text at a1 and the following string at column $12 (restoring its unhighlighted look), then records the current selection $D4EA as the previous one; caller sub_FB874"
+
+[[name]]
+addr = 0x0FECAA
+name = "PickFaceoffSpot"
+confidence = 0.5
+evidence = "puckfaceoff: draws a random index 0..7 into the table unk_FECE6 and returns its word in d0, unless the faceoff location fox/foy ($BF94/$BF96) lies within -$C0..$C0 of centre, which forces d0 = 6 (the centre-ice case); caller puckfaceoff"
+
+[[name]]
+addr = 0x0FF88E
+name = "ClearPenaltyState"
+confidence = 0.6
+evidence = "clockcont: clears the penalty timers Penaltytimer/Pencntdwn/PBnum ($C3EA/$C3E8/$C3E6) and the $44-byte penalty message buffer at $C3A4, then resets each team's penalty data with sub_FF8C8; caller clockcont"
