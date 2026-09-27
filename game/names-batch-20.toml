@@ -15,9 +15,9 @@ evidence = "byte-identical to ai_EraseEditLinesBody: attribute $BE at (0,0) then
 
 [[name]]
 addr = 0x00A600
-name = "AdvanceLowRamRecord"
-confidence = 0.3
-evidence = "advances a4 by $62 bytes and, on reaching $AF54, wraps it to $FF0000 (the low RAM area that ai_SnapshotGameState also uses), i.e. steps through a ring of $62-byte records; caller sub_A528 (game init)"
+name = "AdvanceReplayFrame"
+confidence = 0.5
+evidence = "advances a4 by one $62-byte replay frame and wraps it from $AF54 back to $FF0000: the low-RAM ring of recorded frames whose write pointer is recbpr ($B036); ai_ReinitRinkAndReplay compares the advanced pointer with recbpr to detect the ring wrapping (batch 21 corrected this from 'AdvanceLowRamRecord'); caller ai_ReinitRinkAndReplay"
 
 [[name]]
 addr = 0x013056

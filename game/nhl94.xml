@@ -9230,8 +9230,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] edit-lines screen: for line d5 prints the line name from word_191A6 plus ' Line' at the position from word_879E (shifted one entry when $D058 is set), then the line's player slots from the team's line table $16A(a2) (8 bytes per line) as padded surnames (ai_FormatPlayerSurnamePadded), highlighting the slot equal to the cursor $D5B8; caller loc_8566 (per-line refresh)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_85EE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x868C">
+        <FUNCTION ENTRY_POINT="0x868C" NAME="ai_PrintEditLinesLayout">
             <ADDRESS_RANGE START="0x868C" END="0x86F7" />
+            <REGULAR_CMT>[AI 0.4] prints one long inline control string (attribute/position codes with embedded tile data) that lays out the edit-lines screen furniture; caller loc_8566</REGULAR_CMT>
             <TYPEINFO_CMT>sub_868C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x86F8">
@@ -9442,13 +9443,14 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0xA4F6" END="0xA527" />
             <TYPEINFO_CMT>sub_A4F6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xA528">
+        <FUNCTION ENTRY_POINT="0xA528" NAME="ai_ReinitRinkAndReplay">
             <ADDRESS_RANGE START="0xA528" END="0xA5FF" />
+            <REGULAR_CMT>[AI 0.5] when $C2F4 bit 6 requests it: toggles bit 4, saves the camera, sub_10F5C, waits two frames, reloads the rink graphics (ai_LoadRinkGraphics), fades in with sub_15EC0, restores the camera, marks both nets' objects ($B64A, +$80) with +8 = 1, sub_A67C and ai_DrawRinkAuxBitmap; then handles the replay frame ring: advances the read pointer with ai_AdvanceReplayFrame and stops at recbpr ($B036), otherwise sub_A68C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_A528</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xA600" NAME="ai_AdvanceLowRamRecord">
+        <FUNCTION ENTRY_POINT="0xA600" NAME="ai_AdvanceReplayFrame">
             <ADDRESS_RANGE START="0xA600" END="0xA615" />
-            <REGULAR_CMT>[AI 0.3] advances a4 by $62 bytes and, on reaching $AF54, wraps it to $FF0000 (the low RAM area that ai_SnapshotGameState also uses), i.e. steps through a ring of $62-byte records; caller sub_A528 (game init)</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.5] advances a4 by one $62-byte replay frame and wraps it from $AF54 back to $FF0000: the low-RAM ring of recorded frames whose write pointer is recbpr ($B036); ai_ReinitRinkAndReplay compares the advanced pointer with recbpr to detect the ring wrapping (batch 21 corrected this from 'AdvanceLowRamRecord'); caller ai_ReinitRinkAndReplay</REGULAR_CMT>
             <TYPEINFO_CMT>sub_A600</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xA616" NAME="ai_CenterCameraOnObject">
@@ -9876,8 +9878,9 @@ a3 = player</REGULAR_CMT>
             <REGULAR_CMT>assignment for computer shooting</REGULAR_CMT>
             <TYPEINFO_CMT>assshoot</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xEE58">
+        <FUNCTION ENTRY_POINT="0xEE58" NAME="ai_PickBestAvailableSkater">
             <ADDRESS_RANGE START="0xEE58" END="0xEF91" />
+            <REGULAR_CMT>[AI 0.6] for BA_Team's roster walks the player records, skipping goalies (position nibble of byte 5 &lt;= 1) and anyone whose status $66 is not -2/-1 (not available), sums the rating nibbles of bytes 1, 2, 3, 5, 6, 7 and keeps the best (compared against $D40A), leaving the winner in BA_Skater_Offset / BA_Sktr_SCnum; the 'best available' skater used for penalty shots and shootouts</REGULAR_CMT>
             <TYPEINFO_CMT>sub_EE58</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xEF92" NAME="puckpenshot">
@@ -11113,8 +11116,9 @@ output - d0=xscreen, d1=yscreen</REGULAR_CMT>
             <ADDRESS_RANGE START="0x169FA" END="0x16BAB" />
             <TYPEINFO_CMT>setupice</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16BAC">
+        <FUNCTION ENTRY_POINT="0x16BAC" NAME="ai_InitRinkScreen">
             <ADDRESS_RANGE START="0x16BAC" END="0x16C95" />
+            <REGULAR_CMT>[AI 0.6] rink screen start: sub_10F32, resets the camera (Hpos/Vpos = 0, $BD1A = $7D0), loads the palettes (sub_16DA2, ai_LoadRinkPalette), flips every player's facing bit when $C2EA bit 1 (rink flipped), sub_1720C, resets the per-player indicator words $BE78..$BE86, loads the rink tiles, initialises six $1C-byte indicator records at $BDB4 with sub_167AA, sets the sprite list pointer $BD14, sub_15E82, a fade ($BD26 = $1C) and installs sub_15D9A as the V-blank routine before enabling interrupts</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16BAC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16C96" NAME="ai_LoadRinkPalette">
@@ -11480,8 +11484,9 @@ d0 = offset of player on roster</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A050" END="0x1A13F" />
             <TYPEINFO_CMT>InitSaveRAM</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A140">
+        <FUNCTION ENTRY_POINT="0x1A140" NAME="ai_WaitVBlankThunk">
             <ADDRESS_RANGE START="0x1A140" END="0x1A147" />
+            <REGULAR_CMT>[AI 0.6] jsr vcountwait then rts; a jump-table-friendly wrapper around the V-blank wait; caller InitSaveRAM</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A140</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A14E" NAME="ValidateSRAM">
@@ -11548,8 +11553,9 @@ d0 = start of data</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] EA 4-Way Play read of pad 4: requests the Z80 bus (with the reset retry), writes the select value $3C to port 2 ($A10005) and joins ai_ReadPad1Hardware's body at loc_1A498 to read the selected pad through port 1 ($A10003); ai_ReadFourWayPad1..3 write $0C/$1C/$2C the same way (batch 19 corrected this from 'ReadPad2Hardware'); caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A430</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A464">
+        <FUNCTION ENTRY_POINT="0x1A464" NAME="ai_ReadPad2Hardware">
             <ADDRESS_RANGE START="0x1A464" END="0x1A46F" />
+            <REGULAR_CMT>[AI 0.7] port-2 controller read: points a0 at $A10005 and joins ai_ReadPad1Hardware's body at loc_1A47A (TH toggling, button packing and remap); caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A464</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A470" NAME="ai_ReadPad1Hardware">
@@ -11587,8 +11593,9 @@ d0 = start of data</REGULAR_CMT>
             <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A66E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A7D8">
+        <FUNCTION ENTRY_POINT="0x1A7D8" NAME="ai_SetChannelFrequency">
             <ADDRESS_RANGE START="0x1A7D8" END="0x1A88F" />
+            <REGULAR_CMT>[AI 0.5] sound driver: converts the note byte 1(a2) into octave and semitone (word_1A890 table), scales by the channel's pitch entry in (a3) and the instrument's detune from unk_2C248, and for FM channels (byte 3 &lt; $60) stores the frequency word in $D18E[channel] with the update bits $D185/$D180, while for PSG channels with bit 0 of +6 set writes the attenuation byte straight to Z80 RAM $8E under bus request</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A7D8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1ABAA">
@@ -11647,8 +11654,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF6D5E" END="0xF6DC5" />
             <TYPEINFO_CMT>Unk_ControlsSetRelated</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF6E38">
+        <FUNCTION ENTRY_POINT="0xF6E38" NAME="ai_NopForcePlData">
             <ADDRESS_RANGE START="0xF6E38" END="0xF6E39" />
+            <REGULAR_CMT>[AI 0.8] a bare rts reached from forcepldata; an empty hook</REGULAR_CMT>
             <TYPEINFO_CMT>nullsub_2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF6E8A" NAME="LoadCrowdRec">
@@ -11744,8 +11752,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF76C8" END="0xF76CD" />
             <TYPEINFO_CMT>j_NewPO</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF76CE">
+        <FUNCTION ENTRY_POINT="0xF76CE" NAME="ai_ApplyPlayoffPasswordThunk">
             <ADDRESS_RANGE START="0xF76CE" END="0xF76D3" />
+            <REGULAR_CMT>[AI 0.8] jmp ai_ApplyPlayoffPassword; caller GameSetUp</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F76CE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF76D4" NAME="ai_MoveSetupCursor">
@@ -11805,8 +11814,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF8304" END="0xF8417" />
             <TYPEINFO_CMT>GameSetUp_2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF84F8">
+        <FUNCTION ENTRY_POINT="0xF84F8" NAME="ai_NopGameSetUp2">
             <ADDRESS_RANGE START="0xF84F8" END="0xF84F9" />
+            <REGULAR_CMT>[AI 0.8] a bare rts reached from GameSetUp_2; an empty hook</REGULAR_CMT>
             <TYPEINFO_CMT>nullsub_3</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF84FC" NAME="ai_ClearSetupLogoPanels">
@@ -11829,8 +11839,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] loads d4 = tile base $D436 and printx = $1C, then joins the shared photo-panel drawing at loc_F8796; called by ai_ShowNextSetupPhoto for the home side</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8762</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF8770">
+        <FUNCTION ENTRY_POINT="0xF8770" NAME="ai_SetAwayLogoPanel">
             <ADDRESS_RANGE START="0xF8770" END="0xF877D" />
+            <REGULAR_CMT>[AI 0.5] loads d4 = tile base $D436 and printx = $18, then joins the panel-frame drawing at loc_F8796 (see ai_DrawSetupPhotoFrame); caller ai_DrawSetupAwayLogo</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8770</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF877E" NAME="ai_SetAwayPhotoPanel">
@@ -11930,12 +11941,14 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] clears the write flag and transfers 16 bytes between SRAM $D20 + d1*16 and a0 (always ReadSRAM from this entry; sub_F9C56 is the writing twin that sets the flag first); caller ai_UpdateUserWinLoss</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C20</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9C56">
+        <FUNCTION ENTRY_POINT="0xF9C56" NAME="ai_WriteUserRecord">
             <ADDRESS_RANGE START="0xF9C56" END="0xF9C5D" />
+            <REGULAR_CMT>[AI 0.8] sets the SRAM write flag $C2F8 bit 6 and jumps into ai_ReadUserRecord's body, so the transfer of the 16-byte user record goes through WriteSRAM; caller ai_UpdateUserWinLoss</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C56</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9C5E">
+        <FUNCTION ENTRY_POINT="0xF9C5E" NAME="ai_WriteUserNames">
             <ADDRESS_RANGE START="0xF9C5E" END="0xF9C67" />
+            <REGULAR_CMT>[AI 0.8] sets the SRAM write flag and jumps into ai_ReadUserNames' body, writing the $80-byte user-name table to SRAM $DA0; caller ai_SaveUserName</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C5E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9C68" NAME="ai_ReadUserNames">
@@ -11996,8 +12009,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] records screen: at (d0,d1) draws the 6x6 logo of the selected team (HomeTeam, or VisTeam when $D4F6 is set) from off_F86F2 through dobitmap at tile base $D450 with the unk_FF462 template, preserving the palette longs $BD4A/$BD4E; caller ai_PrintRecordsScreen (once per side)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA66E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA6E8">
+        <FUNCTION ENTRY_POINT="0xFA6E8" NAME="ai_PrintCrowdRecordLine">
             <ADDRESS_RANGE START="0xFA6E8" END="0xFA6F5" />
+            <REGULAR_CMT>[AI 0.7] stores the 'dB Crowd Level' label (word_FA6F6) in $BF18 and joins the shared record-line printer at loc_FA7B0; caller ai_PrintRecordsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA6E8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA708" NAME="ai_PrintSaveRecordLine">
@@ -12064,8 +12078,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] d0 = player index, d1 = team index: scans the per-team table off_F92F4[team] of (photo pointer, player index) pairs and returns the photo in a0 when the player has one; otherwise walks the team's roster (team table $30E) to the player record and returns one of four generic images (unk_C6F02, unk_C726C, unk_C6B98, unk_C682E) chosen by bit 0 of the record's +4 byte and by whether the index is below the count derived from the +$A word (goalie vs skater); callers loc_FAEBC and ai_DrawRatingsPictures, whose sub_FD14A then decodes the image with ai_UnpackPhotoTiles</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAE26</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAEBC">
+        <FUNCTION ENTRY_POINT="0xFAEBC" NAME="ai_DrawRecordsPlayerPhoto">
             <ADDRESS_RANGE START="0xFAEBC" END="0xFAF4F" />
+            <REGULAR_CMT>[AI 0.7] records screen: selects the player (ai_SelectRecordsPlayer), fetches his photo for the shown side's team (ai_GetPlayerPhoto), decodes it (ai_UnpackPhotoTiles, generic image from off_C63F8 when none), copies the photo's 32-byte palette to $BD68 and draws the 6x6 image at column 1 row 8 with tile base $D452</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAEBC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAF50" NAME="ai_GetRecordsTeam">
@@ -12160,8 +12175,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] copies the 12-byte user-name entry $D45A + $D4EA*12 to a1, writing '-' for zero bytes and counting only the real characters in $D4E8; used by the name-entry screen loc_FB822 and by sub_FEEC8 for the '(played by ...)' credit</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB992</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB9D4">
+        <FUNCTION ENTRY_POINT="0xFB9D4" NAME="ai_SaveUserName">
             <ADDRESS_RANGE START="0xFB9D4" END="0xFBA75" />
+            <REGULAR_CMT>[AI 0.7] name entry confirm: compares the typed name $D4DA ('-' treated as end) with user entry $D4EA in the table $D45A; when it differs copies the new name in, writes the table (ai_WriteUserNames), purges the old user's records (ai_PurgeUserFromRecords) and sub_1A206; finally stores the user index (0 if the name is empty) in the controller's user id $D042 or $D044 ($D4EE selects)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB9D4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFBA76" NAME="ai_PurgeUserFromRecords">
@@ -12186,8 +12202,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFBD86" END="0xFBDB1" />
             <TYPEINFO_CMT>sub_FBD86</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFBEA4">
+        <FUNCTION ENTRY_POINT="0xFBEA4" NAME="ai_PrintUserStandings">
             <ADDRESS_RANGE START="0xFBEA4" END="0xFBF9F" />
+            <REGULAR_CMT>[AI 0.7] prints the seven ranked users from $D542: rank and name (ai_PrintRankedUserName) at column 2, percentage (3 digits) at $13, wins at $1A, losses (games - wins - ties, computed into $BF4C) at $1F and ties at $24, skipping users with no games</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FBEA4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFBFA0">
@@ -12199,12 +12216,14 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] user-records list: prints the rank as a digit (7 - d7 + '0') followed by '. ' in $BFA4, then the user name of the entry byte -1(a0) via ai_BuildUserNameString without trimming; caller loc_FBEA4 (user list screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC136</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC184">
+        <FUNCTION ENTRY_POINT="0xFC184" NAME="ai_RankUsersByRecord">
             <ADDRESS_RANGE START="0xFC184" END="0xFC281" />
+            <REGULAR_CMT>[AI 0.6] from the eight 16-byte user records loaded at $CF36 computes win percentage (wins bytes 8/9 * 100 / games bytes $A/$B) into $D54A, copies ties (+$C/$D) to $D552 and games to $D562, then bubble-sorts the index list $D542 (1..7) by percentage, ties and games; feeds ai_PrintUserStandings</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC184</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC282">
+        <FUNCTION ENTRY_POINT="0xFC282" NAME="ai_RankUsersByRecordByte">
             <ADDRESS_RANGE START="0xFC282" END="0xFC31F" />
+            <REGULAR_CMT>[AI 0.5] reads the $80-byte user-record block from SRAM $D20 into $CF36, fills the index list $D532 (or $D53A when $C2F8 bit 6) with 1..7 and bubble-sorts it descending by record byte 0 (or byte 4 with the flag), the goals / saves record fields</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC282</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC47C">
@@ -12230,8 +12249,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] SetPA: draws a 30x6 box at column 1 row $D, prints 'SHOOTOUT WON BY' in the big font, then the name of HomeTeam or VisTeam (team table $30E, name at offset +4) depending on which round score ($D574 vs $D576) is higher; caller SetPA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC5AE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC850">
+        <FUNCTION ENTRY_POINT="0xFC850" NAME="ai_PrintPlayerPickerList">
             <ADDRESS_RANGE START="0xFC850" END="0xFC919" />
+            <REGULAR_CMT>[AI 0.5] player picker page: prints the column header from word_1940E (or word_19570 when $D5B8 is 5) selected by $D5AC, with the 'Overall ]' variants word_FC91A/word_FC930, then up to six rows from the slot list $C018 starting at PlayerScrollCtr via sub_8D4E, highlighting the row equal to VertLineScrolling</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC850</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC986">
@@ -12319,8 +12339,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] a0 = team record: maps the ratings-screen position $D598 through byte_FD4B8 to a lineup slot (kept in $D5AA), reads that slot from the six-player list at team data offset +6 and returns the player index minus 1; only caller ai_SelectRatingsPlayers</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD492</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD4C0">
+        <FUNCTION ENTRY_POINT="0xFD4C0" NAME="ai_ResetAdvantageBar">
             <ADDRESS_RANGE START="0xFD4C0" END="0xFD4C9" />
+            <REGULAR_CMT>[AI 0.8] clears the advantage-bar frame counter $D5A6 and step $D5A4 used by ai_AnimateAdvantageBar; caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD4C0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD4CA" NAME="ai_AnimateAdvantageBar">
@@ -12387,8 +12408,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] sets $D6B4 = d0 (the animation id) and clears the script/asset pointers $D6B6/$D6BA so ai_UpdateTileAnimation reloads it on the next frame; callers include ROM:$FB4E and sub_14062</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE510</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE53C">
+        <FUNCTION ENTRY_POINT="0xFE53C" NAME="ai_RequestTileAnimation">
             <ADDRESS_RANGE START="0xFE53C" END="0xFE547" />
+            <REGULAR_CMT>[AI 0.5] sets $C2FC bit 0 and stores the requested animation id d0 in $D6BE for the animation player to pick up; caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE53C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE548" NAME="ai_StopTileAnimation">
@@ -12506,8 +12528,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] builds '(played by &lt;user name&gt;)' in $BF20 for controller 1's user $D042 (ai_CopyUserNameDashed into $D4DC, length in $D4DA, then appstring and the inline ')' via sub_11D96); returns a1 = the empty string word_FEF50 when no user is set; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEEC8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEF5A">
+        <FUNCTION ENTRY_POINT="0xFEF5A" NAME="ai_BuildPlayedByString2">
             <ADDRESS_RANGE START="0xFEF5A" END="0xFEF65" />
+            <REGULAR_CMT>[AI 0.7] controller-2 entry of ai_BuildPlayedByString: loads user $D044 and joins its body at loc_FEED0; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEF5A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEF66" NAME="set_bit1_C2FE">
@@ -12562,8 +12585,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] puckfaceoff2 helper: compares the active skater counts $24 of the home and away records; when they differ (a power play) and the state bit $C2EE bit 6 changes, sets HmTeam = HomeTeam and SongIndex = 1 (home power play) or 4 (away) and calls ChooseSong, guarded by $C2EE bit 5 so the song starts once; skipped in $C2FA bit 1 mode; caller puckfaceoff2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF7E2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF87C">
+        <FUNCTION ENTRY_POINT="0xFF87C" NAME="ai_ClearPowerPlaySongLatch">
             <ADDRESS_RANGE START="0xFF87C" END="0xFF883" />
+            <REGULAR_CMT>[AI 0.6] clears sflags2 bit 5, the once-only latch of ai_StartPowerPlaySong; caller ai_StartPowerPlaySong</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF87C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF88E" NAME="ai_ClearPenaltyState">

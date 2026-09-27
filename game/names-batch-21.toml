@@ -1,0 +1,154 @@
+# Names batch 21 - see docs/names/names-batch-21.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-21.toml
+# From here on the remaining routines have no direct callers in the listing
+# (reached through dispatch tables or jump tables); evidence leans on their
+# bodies and the RAM they touch. Also corrected batch 20's $A600 to
+# AdvanceReplayFrame once the replay ring became clear here.
+
+# ---- small stubs ---------------------------------------------------------------
+
+[[name]]
+addr = 0x01A464
+name = "ReadPad2Hardware"
+confidence = 0.7
+evidence = "port-2 controller read: points a0 at $A10005 and joins ai_ReadPad1Hardware's body at loc_1A47A (TH toggling, button packing and remap); caller ReadJoyData"
+
+[[name]]
+addr = 0x0F8770
+name = "SetAwayLogoPanel"
+confidence = 0.5
+evidence = "loads d4 = tile base $D436 and printx = $18, then joins the panel-frame drawing at loc_F8796 (see ai_DrawSetupPhotoFrame); caller ai_DrawSetupAwayLogo"
+
+[[name]]
+addr = 0x0FD4C0
+name = "ResetAdvantageBar"
+confidence = 0.8
+evidence = "clears the advantage-bar frame counter $D5A6 and step $D5A4 used by ai_AnimateAdvantageBar; caller ai_MatchupsScreen"
+
+[[name]]
+addr = 0x0FE53C
+name = "RequestTileAnimation"
+confidence = 0.5
+evidence = "sets $C2FC bit 0 and stores the requested animation id d0 in $D6BE for the animation player to pick up; caller puckfaceoff"
+
+[[name]]
+addr = 0x0FEF5A
+name = "BuildPlayedByString2"
+confidence = 0.7
+evidence = "controller-2 entry of ai_BuildPlayedByString: loads user $D044 and joins its body at loc_FEED0; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x00868C
+name = "PrintEditLinesLayout"
+confidence = 0.4
+evidence = "prints one long inline control string (attribute/position codes with embedded tile data) that lays out the edit-lines screen furniture; caller loc_8566"
+
+[[name]]
+addr = 0x01A140
+name = "WaitVBlankThunk"
+confidence = 0.6
+evidence = "jsr vcountwait then rts; a jump-table-friendly wrapper around the V-blank wait; caller InitSaveRAM"
+
+[[name]]
+addr = 0x0F9C56
+name = "WriteUserRecord"
+confidence = 0.8
+evidence = "sets the SRAM write flag $C2F8 bit 6 and jumps into ai_ReadUserRecord's body, so the transfer of the 16-byte user record goes through WriteSRAM; caller ai_UpdateUserWinLoss"
+
+[[name]]
+addr = 0x0F9C5E
+name = "WriteUserNames"
+confidence = 0.8
+evidence = "sets the SRAM write flag and jumps into ai_ReadUserNames' body, writing the $80-byte user-name table to SRAM $DA0; caller ai_SaveUserName"
+
+[[name]]
+addr = 0x0FA6E8
+name = "PrintCrowdRecordLine"
+confidence = 0.7
+evidence = "stores the 'dB Crowd Level' label (word_FA6F6) in $BF18 and joins the shared record-line printer at loc_FA7B0; caller ai_PrintRecordsScreen"
+
+[[name]]
+addr = 0x0FF87C
+name = "ClearPowerPlaySongLatch"
+confidence = 0.6
+evidence = "clears sflags2 bit 5, the once-only latch of ai_StartPowerPlaySong; caller ai_StartPowerPlaySong"
+
+[[name]]
+addr = 0x0F6E38
+name = "NopForcePlData"
+confidence = 0.8
+evidence = "a bare rts reached from forcepldata; an empty hook"
+
+[[name]]
+addr = 0x0F76CE
+name = "ApplyPlayoffPasswordThunk"
+confidence = 0.8
+evidence = "jmp ai_ApplyPlayoffPassword; caller GameSetUp"
+
+[[name]]
+addr = 0x0F84F8
+name = "NopGameSetUp2"
+confidence = 0.8
+evidence = "a bare rts reached from GameSetUp_2; an empty hook"
+
+# ---- table-dispatched routines ---------------------------------------------------
+
+[[name]]
+addr = 0x00EE58
+name = "PickBestAvailableSkater"
+confidence = 0.6
+evidence = "for BA_Team's roster walks the player records, skipping goalies (position nibble of byte 5 <= 1) and anyone whose status $66 is not -2/-1 (not available), sums the rating nibbles of bytes 1, 2, 3, 5, 6, 7 and keeps the best (compared against $D40A), leaving the winner in BA_Skater_Offset / BA_Sktr_SCnum; the 'best available' skater used for penalty shots and shootouts"
+
+[[name]]
+addr = 0x0FC184
+name = "RankUsersByRecord"
+confidence = 0.6
+evidence = "from the eight 16-byte user records loaded at $CF36 computes win percentage (wins bytes 8/9 * 100 / games bytes $A/$B) into $D54A, copies ties (+$C/$D) to $D552 and games to $D562, then bubble-sorts the index list $D542 (1..7) by percentage, ties and games; feeds ai_PrintUserStandings"
+
+[[name]]
+addr = 0x0FBEA4
+name = "PrintUserStandings"
+confidence = 0.7
+evidence = "prints the seven ranked users from $D542: rank and name (ai_PrintRankedUserName) at column 2, percentage (3 digits) at $13, wins at $1A, losses (games - wins - ties, computed into $BF4C) at $1F and ties at $24, skipping users with no games"
+
+[[name]]
+addr = 0x016BAC
+name = "InitRinkScreen"
+confidence = 0.6
+evidence = "rink screen start: sub_10F32, resets the camera (Hpos/Vpos = 0, $BD1A = $7D0), loads the palettes (sub_16DA2, ai_LoadRinkPalette), flips every player's facing bit when $C2EA bit 1 (rink flipped), sub_1720C, resets the per-player indicator words $BE78..$BE86, loads the rink tiles, initialises six $1C-byte indicator records at $BDB4 with sub_167AA, sets the sprite list pointer $BD14, sub_15E82, a fade ($BD26 = $1C) and installs sub_15D9A as the V-blank routine before enabling interrupts"
+
+[[name]]
+addr = 0x01A7D8
+name = "SetChannelFrequency"
+confidence = 0.5
+evidence = "sound driver: converts the note byte 1(a2) into octave and semitone (word_1A890 table), scales by the channel's pitch entry in (a3) and the instrument's detune from unk_2C248, and for FM channels (byte 3 < $60) stores the frequency word in $D18E[channel] with the update bits $D185/$D180, while for PSG channels with bit 0 of +6 set writes the attenuation byte straight to Z80 RAM $8E under bus request"
+
+[[name]]
+addr = 0x00A528
+name = "ReinitRinkAndReplay"
+confidence = 0.5
+evidence = "when $C2F4 bit 6 requests it: toggles bit 4, saves the camera, sub_10F5C, waits two frames, reloads the rink graphics (ai_LoadRinkGraphics), fades in with sub_15EC0, restores the camera, marks both nets' objects ($B64A, +$80) with +8 = 1, sub_A67C and ai_DrawRinkAuxBitmap; then handles the replay frame ring: advances the read pointer with ai_AdvanceReplayFrame and stops at recbpr ($B036), otherwise sub_A68C"
+
+[[name]]
+addr = 0x0FC282
+name = "RankUsersByRecordByte"
+confidence = 0.5
+evidence = "reads the $80-byte user-record block from SRAM $D20 into $CF36, fills the index list $D532 (or $D53A when $C2F8 bit 6) with 1..7 and bubble-sorts it descending by record byte 0 (or byte 4 with the flag), the goals / saves record fields"
+
+[[name]]
+addr = 0x0FB9D4
+name = "SaveUserName"
+confidence = 0.7
+evidence = "name entry confirm: compares the typed name $D4DA ('-' treated as end) with user entry $D4EA in the table $D45A; when it differs copies the new name in, writes the table (ai_WriteUserNames), purges the old user's records (ai_PurgeUserFromRecords) and sub_1A206; finally stores the user index (0 if the name is empty) in the controller's user id $D042 or $D044 ($D4EE selects)"
+
+[[name]]
+addr = 0x0FC850
+name = "PrintPlayerPickerList"
+confidence = 0.5
+evidence = "player picker page: prints the column header from word_1940E (or word_19570 when $D5B8 is 5) selected by $D5AC, with the 'Overall ]' variants word_FC91A/word_FC930, then up to six rows from the slot list $C018 starting at PlayerScrollCtr via sub_8D4E, highlighting the row equal to VertLineScrolling"
+
+[[name]]
+addr = 0x0FAEBC
+name = "DrawRecordsPlayerPhoto"
+confidence = 0.7
+evidence = "records screen: selects the player (ai_SelectRecordsPlayer), fetches his photo for the shown side's team (ai_GetPlayerPhoto), decodes it (ai_UnpackPhotoTiles, generic image from off_C63F8 when none), copies the photo's 32-byte palette to $BD68 and draws the 6x6 image at column 1 row 8 with tile base $D452"

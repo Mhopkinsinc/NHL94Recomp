@@ -45,9 +45,9 @@ XML (or the proposals file and re-apply).
 0FCA18  jmp	sub_1197E
 ```
 
-## `$00A600` -> `ai_AdvanceLowRamRecord`  (confidence 0.3, 5 insns)
+## `$00A600` -> `ai_AdvanceReplayFrame`  (confidence 0.5, 5 insns)
 
-**Evidence.** advances a4 by $62 bytes and, on reaching $AF54, wraps it to $FF0000 (the low RAM area that ai_SnapshotGameState also uses), i.e. steps through a ring of $62-byte records; caller sub_A528 (game init)
+**Evidence.** advances a4 by one $62-byte replay frame and wraps it from $AF54 back to $FF0000: the low-RAM ring of recorded frames whose write pointer is recbpr ($B036); ai_ReinitRinkAndReplay compares the advanced pointer with recbpr to detect the ring wrapping (batch 21 corrected this from 'AdvanceLowRamRecord'); caller ai_ReinitRinkAndReplay
 
 **Callers.** sub_A528
 **Callees.** none
