@@ -10,15 +10,15 @@ evidence = "after nodiag, implements menu key auto-repeat: d3 = held pad, d2 = p
 
 [[name]]
 addr = 0x01826C
-name = "RandomMod"
-confidence = 0.7
-evidence = "5-word seed at (a3): divides each word by d0 carrying the remainder through, returns the final remainder in d0 (0..d0-1) and leaves the quotients as the new seed; only called by sub_1803E with moduli 5, 8, $10, $20, $4000"
+name = "BigNumDivMod"
+confidence = 0.8
+evidence = "80-bit number as five words at (a3): long-divides it by d0 word by word, leaves the quotient in place and returns the remainder in d0. Used as the mixed-radix digit extractor of the playoff password decoder (batch 4 corrected this from 'RandomMod': the caller is the password decoder, not a demo randomizer)"
 
 [[name]]
 addr = 0x01803E
-name = "RandomizeDemoSetup"
-confidence = 0.6
-evidence = "saves the 5-word seed at (a3), draws random values with RandomMod into the eight $10-byte option blocks below $CED6 (fields +4/+6, flag bit 2 when the draw is 4), then $CEF2, pojoy (forced to 4 unless FourWayPlay when it lands on 1 or 2), potreeteam, gamelevel, bosgames, postarts, and restores the seed; callers GameSetUp, sub_17CA0, sub_180FC"
+name = "DecodePlayoffPassword"
+confidence = 0.7
+evidence = "a3 = five-word password value (sub_180FC passes the entry buffer $D176): saves it, then peels mixed-radix digits with BigNumDivMod into the eight playoff series records $CE66..$CED6 ($10 bytes each: wins at +4/+6 in base 5, bit 2 of +$E when a side reached 4), then $CEF2 (base $4000 check value), pojoy (base 8, forced to 4 unless FourWayPlay when 1 or 2), potreeteam ($10), gamelevel (4), bosgames (8), postarts ($20); restores the buffer. ai_EncodePlayoffPassword ($18192) is the exact inverse. Callers GameSetUp, sub_17CA0, sub_180FC"
 
 [[name]]
 addr = 0x01A304
@@ -70,6 +70,6 @@ evidence = "walks back from the end of the length-prefixed string at a2, replaci
 
 [[name]]
 addr = 0x0FE98A
-name = "Unpack3BitRatings"
-confidence = 0.5
-evidence = "reads a count word from (a2) into $DA1E, then for count*8 records takes 3 packed bytes, splits them into eight 3-bit fields and stores each as a nibble equal to field+5 in a longword written after the count at $DA1E; $DEA0 is scratch; callers loc_F8868, loc_FAEBC, sub_FD14A (SRAM/records screens), so this looks like the decoder for compactly stored custom ratings"
+name = "UnpackPhotoTiles"
+confidence = 0.7
+evidence = "decodes a player-photo image: reads the tile count word from (a2) into $DA1E, then for count*8 rows takes 3 packed bytes (eight 3-bit pixels), expands each pixel to a 4bpp nibble equal to pixel+5 (palette entries 5..12) and writes the longword row after the count at $DA1E; $DEA0 is scratch. Called by sub_FD14A after ai_GetPlayerPhoto chose the image, and by loc_F8868 / loc_FAEBC. Batch 4 corrected this from 'Unpack3BitRatings'"

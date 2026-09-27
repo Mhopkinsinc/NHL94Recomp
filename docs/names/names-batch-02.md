@@ -27,11 +27,11 @@ XML (or the proposals file and re-apply).
 01133E  rts
 ```
 
-## `$01826C` -> `ai_RandomMod`  (confidence 0.7, 12 insns)
+## `$01826C` -> `ai_BigNumDivMod`  (confidence 0.8, 12 insns)
 
-**Evidence.** 5-word seed at (a3): divides each word by d0 carrying the remainder through, returns the final remainder in d0 (0..d0-1) and leaves the quotients as the new seed; only called by sub_1803E with moduli 5, 8, $10, $20, $4000
+**Evidence.** 80-bit number as five words at (a3): long-divides it by d0 word by word, leaves the quotient in place and returns the remainder in d0. Used as the mixed-radix digit extractor of the playoff password decoder (batch 4 corrected this from 'RandomMod': the caller is the password decoder, not a demo randomizer)
 
-**Callers.** ai_RandomizeDemoSetup
+**Callers.** ai_DecodePlayoffPassword
 **Callees.** none
 
 ```
@@ -49,12 +49,12 @@ XML (or the proposals file and re-apply).
 018288  rts
 ```
 
-## `$01803E` -> `ai_RandomizeDemoSetup`  (confidence 0.6, 51 insns)
+## `$01803E` -> `ai_DecodePlayoffPassword`  (confidence 0.7, 51 insns)
 
-**Evidence.** saves the 5-word seed at (a3), draws random values with RandomMod into the eight $10-byte option blocks below $CED6 (fields +4/+6, flag bit 2 when the draw is 4), then $CEF2, pojoy (forced to 4 unless FourWayPlay when it lands on 1 or 2), potreeteam, gamelevel, bosgames, postarts, and restores the seed; callers GameSetUp, sub_17CA0, sub_180FC
+**Evidence.** a3 = five-word password value (sub_180FC passes the entry buffer $D176): saves it, then peels mixed-radix digits with BigNumDivMod into the eight playoff series records $CE66..$CED6 ($10 bytes each: wins at +4/+6 in base 5, bit 2 of +$E when a side reached 4), then $CEF2 (base $4000 check value), pojoy (base 8, forced to 4 unless FourWayPlay when 1 or 2), potreeteam ($10), gamelevel (4), bosgames (8), postarts ($20); restores the buffer. ai_EncodePlayoffPassword ($18192) is the exact inverse. Callers GameSetUp, sub_17CA0, sub_180FC
 
 **Callers.** GameSetUp, sub_17CA0, sub_180FC
-**Callees.** ai_RandomMod
+**Callees.** ai_BigNumDivMod
 **RAM.** FourWayPlay, bosgames, gamelevel, pojoy, postarts, potreeteam
 
 ```
@@ -202,7 +202,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** edit-lines/roster screen row: a4 = Satt+d3 (player slot), sets printy from d3, erases the 40-column row, returns if the slot byte is negative, prints the jersey/slot number and the player name (sub_18B26), then either the five attribute values (loc_9872 per attribute, the DispAttribCtr-selected one in palette $C000) or, when DispAttribCtr is negative, two stat counters (sub_988E) and their percentage with a '%' suffix; callers sub_9604, sub_960E, loc_961A
 
 **Callers.** loc_961A, sub_9604, sub_960E
-**Callees.** DeterStrLength?, eraser, loc_9872, locret_9870, print, printz, sub_18B26, sub_988E
+**Callees.** DeterStrLength?, ai_FormatPlayerNumberName, eraser, loc_9872, locret_9870, print, printz, sub_988E
 **RAM.** DispAttribCtr, printa, printx, printy
 
 ```
@@ -273,7 +273,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a2 = player record, $1E(a2) = pointer to the player's data block; adds the word at +$A, takes the word there and counts how many left shifts by 4 it survives before becoming zero (1..4), returned in d0; used by loc_9872 (attribute lookup for PrintPlayerStatRow) as an upper bound and by sub_9F5C which adds it to a nibble of the next field
 
-**Callers.** loc_8BA6, loc_961A, loc_9872, sub_1867E, sub_9F5C, sub_F9FC0
+**Callers.** ai_DrawEditLinesHeader, loc_961A, loc_9872, sub_1867E, sub_9F5C, sub_F9FC0
 **Callees.** none
 
 ```
@@ -373,9 +373,9 @@ XML (or the proposals file and re-apply).
 0FAF8A  rts
 ```
 
-## `$0FE98A` -> `ai_Unpack3BitRatings`  (confidence 0.5, 58 insns)
+## `$0FE98A` -> `ai_UnpackPhotoTiles`  (confidence 0.7, 58 insns)
 
-**Evidence.** reads a count word from (a2) into $DA1E, then for count*8 records takes 3 packed bytes, splits them into eight 3-bit fields and stores each as a nibble equal to field+5 in a longword written after the count at $DA1E; $DEA0 is scratch; callers loc_F8868, loc_FAEBC, sub_FD14A (SRAM/records screens), so this looks like the decoder for compactly stored custom ratings
+**Evidence.** decodes a player-photo image: reads the tile count word from (a2) into $DA1E, then for count*8 rows takes 3 packed bytes (eight 3-bit pixels), expands each pixel to a 4bpp nibble equal to pixel+5 (palette entries 5..12) and writes the longword row after the count at $DA1E; $DEA0 is scratch. Called by sub_FD14A after ai_GetPlayerPhoto chose the image, and by loc_F8868 / loc_FAEBC. Batch 4 corrected this from 'Unpack3BitRatings'
 
 **Callers.** loc_F8868, loc_FAEBC, sub_FD14A
 **Callees.** none

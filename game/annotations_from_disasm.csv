@@ -28,12 +28,14 @@
 007B30,clockcont,"#gmclock"
 007C58,demoread,
 007CF8,PauseMode,
+007EF2,ai_PrintScrollingMenu,
 008078,ai_DrawTeamBannerTiles,
 0080BA,vcountwait,
 0084CE,PrintAttribHeader,
 008BA6,ai_DrawEditLinesHeader,
 008D4E,getNameandAttrib,
 008E40,DispAttribValue,"mult by 100 dec"
+00907C,ai_PrintScoringSummaryRow,
 009744,ai_PrintPlayerStatRow,
 009F40,ai_CountRatingNibbles,
 009F9A,ai_CountRosterPlayers,
@@ -49,6 +51,7 @@
 00B86A,getGoalieSCnum,
 00B8F0,fightinput,"controller processing for fighting"
 00B8F2,SetLCmode,
+00B92E,ai_PrintLineChangeMenu,
 00B9C2,setlccords,
 00BA04,getlchoice,
 00BA88,lineinput,
@@ -172,6 +175,7 @@
 0113D0,DoDMApro,
 0113E4,DoDMA,
 01140E,VDP_TransferDMA,
+0114B8,ai_VDP_VramCopyDMA,
 011544,DoFill,
 011582,WaitDMA,
 011594,setvram,
@@ -275,6 +279,7 @@
 0160F4,showzam,
 016178,SetSframe,
 0161D0,showcrowd,"check if reverse angle replay"
+016246,ai_EmitCrowdSprites,
 0162FE,showclock,
 016480,checksso,
 0165FC,setsortcords,"move OOlist into a4"
@@ -302,10 +307,14 @@
 017D80,MakeTree,
 017E42,FigureJoy,
 018032,OptionRNG,
-01803E,ai_RandomizeDemoSetup,
-01826C,ai_RandomMod,
+01803E,ai_DecodePlayoffPassword,
+018192,ai_EncodePlayoffPassword,
+0181F6,ai_BigNumMulAdd,
+01820E,ai_BigNumClear,
+01826C,ai_BigNumDivMod,
 01828A,GetShifter,
 0182A2,AddPOStats,
+018380,ai_AdvancePlayoffSeries,
 018A56,box,
 018A90,getname,"push to stack"
 018AE8,ai_FormatPlayerInitialSurname,
@@ -337,6 +346,7 @@
 0F66EE,puckvzadj,
 0F693E,assonetimer,"pfna - clear new assignment"
 0F6C0A,setonetimeranim,
+0F6C44,ai_PuckOnFacingSide,
 0F6CBA,onetimershot,
 0F6D22,noidea,"push d0 and d1 on stack"
 0F6D5E,Unk_ControlsSetRelated,
@@ -348,6 +358,9 @@
 0F709C,wallcollb,
 0F70A2,Create_HotCold_Table,
 0F70E4,AttributeCalc,
+0F71A2,ai_BuildRatingsStartingSix,
+0F71F0,ai_RateStartingSix,
+0F737E,ai_SumStartingSixRatings,
 0F739E,GameSetUp,
 0F76C8,j_NewPO,
 0F7942,GameSetUp_3,
@@ -355,6 +368,8 @@
 0F8168,setoptions,
 0F8304,GameSetUp_2,
 0F84F8,nullsub_3,
+0F84FC,ai_ClearSetupLogoPanels,
+0F8608,ai_DrawSetupTeamLogo,
 0F87D2,ai_ResetCountdownD43C,
 0F8B5A,wallcollduringcheck,"check if goalie"
 0F8BA0,setSlotBit,"clears Slot Bit"
@@ -366,12 +381,17 @@
 0FA014,ai_BuildUserNameString,
 0FA934,nullsub_6,
 0FA9F8,CalcAttrib,"push a6 to stack"
+0FAE26,ai_GetPlayerPhoto,
 0FAF66,ai_TrimTrailingSpaces,
+0FD084,ai_DrawRatingsPictures,
+0FD17E,ai_DrawTeamLogo6x6,
+0FD1F0,ai_GetTeamLogoAsset,
 0FD1FE,ai_PrintTeamRatingsScreen,
 0FE14C,updatePPTeamTime,"check if PP"
 0FE556,ChooseSong,
+0FE696,ai_SavePlayoffPassword,
 0FE71C,PSandSOpassdir,
-0FE98A,ai_Unpack3BitRatings,
+0FE98A,ai_UnpackPhotoTiles,
 0FEA52,ai_LoadHomeCenterIceLogo,
 0FEC98,getFgtbyte,"clear d0"
 0FECA2,chkFgtBit1,

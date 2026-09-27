@@ -1,0 +1,135 @@
+# Names batch 4 - see docs/names/names-batch-04.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-04.toml
+# This batch also corrected three batch-2 names (BigNumDivMod,
+# DecodePlayoffPassword, UnpackPhotoTiles) once the playoff-password and
+# player-photo systems became clear; see game/names-batch-02.toml.
+
+# ---- playoff password ----------------------------------------------------
+
+[[name]]
+addr = 0x018192
+name = "EncodePlayoffPassword"
+confidence = 0.7
+evidence = "exact inverse of ai_DecodePlayoffPassword: clears the five-word number at a3 (ai_BigNumClear), then folds in postarts (radix $20), bosgames (8), gamelevel (4), potreeteam ($10), pojoy (8), $CEF2 ($4000) and the +4/+6 win counts of the eight playoff series at $CE66 (radix 5 each) with ai_BigNumMulAdd; sub_180FC calls it with a3 = $D088 after a playoff game and then saves the result with ai_SavePlayoffPassword; callers sub_180FC, sub_18380"
+
+[[name]]
+addr = 0x0181F6
+name = "BigNumMulAdd"
+confidence = 0.7
+evidence = "number = number * d1 + d0 on the five-word number at a3 (swaps the registers, multiplies via sub_18236, adds via sub_1821A); the mixed-radix accumulator used only by ai_EncodePlayoffPassword"
+
+[[name]]
+addr = 0x01820E
+name = "BigNumClear"
+confidence = 0.8
+evidence = "zeroes the five words at a3; callers sub_180FC (before saving an empty password) and ai_EncodePlayoffPassword"
+
+[[name]]
+addr = 0x018380
+name = "AdvancePlayoffSeries"
+confidence = 0.6
+evidence = "after a playoff game: stores the home and away scores ($C6DA, $CA3E) into the current series record at $CE66 + $CEE6*$10 (+$A/+$C), then credits the win to the side at +4 or +6 chosen by the score difference and the home/away bit 0 of +$E unless a side already has 4 wins; when bosgames is 7 it takes the loc_184D0 path; only caller sub_180FC (from PeriodOver)"
+
+[[name]]
+addr = 0x0FE696
+name = "SavePlayoffPassword"
+confidence = 0.7
+evidence = "WriteSRAM of $100 bytes from $D076 (the buffer holding the encoded password at $D088) to SRAM offset $1EF6, then sub_1A206, clears $C2EC bit 4 and resets $C016/$B036; only caller sub_180FC right after ai_EncodePlayoffPassword"
+
+# ---- player photos and team logos on the ratings/setup screens -----------
+
+[[name]]
+addr = 0x0FAE26
+name = "GetPlayerPhoto"
+confidence = 0.7
+evidence = "d0 = player index, d1 = team index: scans the per-team table off_F92F4[team] of (photo pointer, player index) pairs and returns the photo in a0 when the player has one; otherwise walks the team's roster (team table $30E) to the player record and returns one of four generic images (unk_C6F02, unk_C726C, unk_C6B98, unk_C682E) chosen by bit 0 of the record's +4 byte and by whether the index is below the count derived from the +$A word (goalie vs skater); callers loc_FAEBC and ai_DrawRatingsPictures, whose sub_FD14A then decodes the image with ai_UnpackPhotoTiles"
+
+[[name]]
+addr = 0x0FD084
+name = "DrawRatingsPictures"
+confidence = 0.6
+evidence = "team ratings screen pictures: when $D598 is zero draws the away ($C332) and home ($C330) team logos through ai_GetTeamLogoAsset + ai_DrawTeamLogo6x6 at tile bases $D432/$D430 and columns 2/$20, row $F; otherwise draws the selected away/home player photos ($D59E/$D59C) through ai_GetPlayerPhoto + sub_FD14A; sets the palette-fade counter $BD26 to $64; callers loc_FCC76, sub_FCF86"
+
+[[name]]
+addr = 0x0FD1F0
+name = "GetTeamLogoAsset"
+confidence = 0.8
+evidence = "returns a0 = off_F86F2[d3] (d3 = team id), the same logo table sub_F8608 indexes with $D428; only caller ai_DrawRatingsPictures"
+
+[[name]]
+addr = 0x0FD17E
+name = "DrawTeamLogo6x6"
+confidence = 0.7
+evidence = "a0 = logo asset (offset pair header), d3 = team id, d5 = 4 or 2 (palette line): builds the 6x6-tile map from the asset via sub_1169A using the tile-name template at unk_FF462 + d3*8 - $40 or - $20, then positions the caption at column 2 or $20, row $19 and erases 8x3 there; only caller ai_DrawRatingsPictures"
+
+[[name]]
+addr = 0x0F8608
+name = "DrawSetupTeamLogo"
+confidence = 0.6
+evidence = "game-setup screen: after ai_ClearSetupLogoPanels sets $D42E bits 3/7, calls sub_F878C, prints the panel captions, loads $D440 = $B4, then draws the logo of team $D428 (a copy of HomeTeam or VisTeam) from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (home) or $D432 (away, $D42E bit 2), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2"
+
+[[name]]
+addr = 0x0F84FC
+name = "ClearSetupLogoPanels"
+confidence = 0.4
+evidence = "when $D42E bit 0 was set: clears bits 6/7 and erases the 8x8 logo panel at column 3 or $1C (chosen by $D42E bit 1) and the 25x8 caption area next to it, using the attribute prefixes $EF/$FF; callers sub_F85B0 and ai_DrawSetupTeamLogo"
+
+# ---- team strength comparison --------------------------------------------
+
+[[name]]
+addr = 0x0F71F0
+name = "RateStartingSix"
+confidence = 0.5
+evidence = "a0 = team record: takes the six player indexes listed at team data offset +6, and for each sums attribute nibbles 3..$F of its 16-byte row in the rating table at team+$1A2 (skipping 9 and $D), writing (index-1, sum) byte pairs to $BF20, then bubble-sorts the six pairs by sum descending; callers ai_BuildRatingsStartingSix and ai_SumStartingSixRatings"
+
+[[name]]
+addr = 0x0F737E
+name = "SumStartingSixRatings"
+confidence = 0.6
+evidence = "runs ai_RateStartingSix for team a0 and returns d1 = the sum of the six rating totals at $BF20; sub_F7318 calls it for home and away, stores them in $BF12/$BF14 and derives the stronger side in $BF50 and an advantage bracket"
+
+[[name]]
+addr = 0x0F71A2
+name = "BuildRatingsStartingSix"
+confidence = 0.5
+evidence = "clears $BF54/$BF56, then for the home ($C6CE) and away ($CA32) teams runs ai_RateStartingSix and copies the sorted index list to $BF5E/$BF5C (sub_F72DA) and the sums to $BF62/$BF60 (sub_F72FA); caller loc_FCC76 (ratings screen setup)"
+
+# ---- in-game and menu printers -------------------------------------------
+
+[[name]]
+addr = 0x00907C
+name = "PrintScoringSummaryRow"
+confidence = 0.7
+evidence = "row of the scoring summary: entry d3 of ScoreSum ($C474; word time, byte team flag bit 7 = away and goal type in the low bits, then scorer and two assist indexes): erases the 40x4 row, prints the time (sub_11C72), the team name from the team record ($C6CE or +$364), the goal-type tag from word_912A (SH2, SH, PP, PP2) and the three player names via sub_9112; callers sub_9020 (row 30) and sub_904C"
+
+[[name]]
+addr = 0x00B92E
+name = "PrintLineChangeMenu"
+confidence = 0.6
+evidence = "in-game line change box: prints the header (sub_B9C2, plus sub_18A56 when printy < $F), then for lines 2..0 asks getlchoice for the line state, prints 'line N' from the text at unk_44120 with the digit added, the line label from word_191A6 and the line energy (sub_12E66), marking the active line $16(a2) or the pending one $2E(a2); ends by printing the team name; callers lineinput, sub_F64E"
+
+[[name]]
+addr = 0x007EF2
+name = "PrintScrollingMenu"
+confidence = 0.6
+evidence = "generic options list: $CF20 = cursor index (wrapped to the item count), $CF22 = first visible item (kept within 3 of the cursor), $CF24 = length-prefixed item list installed by sub_7E36; walks to the first visible item and prints from row $D using the print2/inline control strings; callers loc_7E46 and loc_7E88 (menu refresh)"
+
+# ---- sprites, video, puck ------------------------------------------------
+
+[[name]]
+addr = 0x016246
+name = "EmitCrowdSprites"
+confidence = 0.6
+evidence = "d0 = crowd section (offset by $1F when $C2EC bit 7), a1 = section offset table, d4/d5 = camera x/y, d6 = sprite count, a6 = sprite table cursor: for every 8-byte crowd record (x, y, tile, attr, size) inside the camera window (x within -$90..+$80, y within -$80..+$70 of the camera) appends a 4-word hardware sprite (y, size/link d6, tile+$B01A, x) until 64 sprites; callers showcrowd and sub_16226"
+
+[[name]]
+addr = 0x0114B8
+name = "VDP_VramCopyDMA"
+confidence = 0.9
+evidence = "VRAM-to-VRAM DMA: d0 = length, d2 = source VRAM address, d1 = destination; programs registers $93..$96, $97 = $C0 (copy mode), autoincrement 1, issues the command $4000xxxx | $C0 with the Z80 bus held, waits with VDP_WaitDMA and restores reg 1 = $64 / autoinc 2; $BF78 bit 2 is held during the transfer; callers sub_16D64 (team banner build) and sub_179D2"
+
+[[name]]
+addr = 0x0F6C44
+name = "PuckOnFacingSide"
+confidence = 0.5
+evidence = "returns d0 = 1 when pucky ($B75E, the puck's relative y) is on the side the player object a3 faces (sign flipped by bit 7 of $62(a3)), else 0; the block at $F6C62..$F6CA4 comparing passdir against $54(a3) is unreachable (the branch before it is unconditional); callers asspassrec and doinput"

@@ -9168,8 +9168,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x7E88" END="0x7EF1" />
             <TYPEINFO_CMT>sub_7E88</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x7EF2">
+        <FUNCTION ENTRY_POINT="0x7EF2" NAME="ai_PrintScrollingMenu">
             <ADDRESS_RANGE START="0x7EF2" END="0x8007" />
+            <REGULAR_CMT>[AI 0.6] generic options list: $CF20 = cursor index (wrapped to the item count), $CF22 = first visible item (kept within 3 of the cursor), $CF24 = length-prefixed item list installed by sub_7E36; walks to the first visible item and prints from row $D using the print2/inline control strings; callers loc_7E46 and loc_7E88 (menu refresh)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7EF2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8008">
@@ -9285,8 +9286,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x904C" END="0x907B" />
             <TYPEINFO_CMT>sub_904C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x907C">
+        <FUNCTION ENTRY_POINT="0x907C" NAME="ai_PrintScoringSummaryRow">
             <ADDRESS_RANGE START="0x907C" END="0x9111" />
+            <REGULAR_CMT>[AI 0.7] row of the scoring summary: entry d3 of ScoreSum ($C474; word time, byte team flag bit 7 = away and goal type in the low bits, then scorer and two assist indexes): erases the 40x4 row, prints the time (sub_11C72), the team name from the team record ($C6CE or +$364), the goal-type tag from word_912A (SH2, SH, PP, PP2) and the three player names via sub_9112; callers sub_9020 (row 30) and sub_904C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_907C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9112">
@@ -9490,8 +9492,9 @@ If no goalie, store FFFF in d0</REGULAR_CMT>
             <REGULAR_CMT>initiate line change option if available</REGULAR_CMT>
             <TYPEINFO_CMT>SetLCmode</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xB92E">
+        <FUNCTION ENTRY_POINT="0xB92E" NAME="ai_PrintLineChangeMenu">
             <ADDRESS_RANGE START="0xB92E" END="0xB9C1" />
+            <REGULAR_CMT>[AI 0.6] in-game line change box: prints the header (sub_B9C2, plus sub_18A56 when printy &lt; $F), then for lines 2..0 asks getlchoice for the line state, prints 'line N' from the text at unk_44120 with the digit added, the line label from word_191A6 and the line energy (sub_12E66), marking the active line $16(a2) or the pending one $2E(a2); ends by printing the team name; callers lineinput, sub_F64E</REGULAR_CMT>
             <TYPEINFO_CMT>sub_B92E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xB9C2" NAME="setlccords">
@@ -10212,8 +10215,9 @@ a0 = source address</REGULAR_CMT>
             <TYPEINFO_CMT>DoDMA</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x114B8">
+        <FUNCTION ENTRY_POINT="0x114B8" NAME="ai_VDP_VramCopyDMA">
             <ADDRESS_RANGE START="0x114B8" END="0x11543" />
+            <REGULAR_CMT>[AI 0.9] VRAM-to-VRAM DMA: d0 = length, d2 = source VRAM address, d1 = destination; programs registers $93..$96, $97 = $C0 (copy mode), autoincrement 1, issues the command $4000xxxx | $C0 with the Z80 bus held, waits with VDP_WaitDMA and restores reg 1 = $64 / autoinc 2; $BF78 bit 2 is held during the transfer; callers sub_16D64 (team banner build) and sub_179D2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_114B8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11544" NAME="DoFill">
@@ -10947,8 +10951,9 @@ d6 = link counter</REGULAR_CMT>
             <ADDRESS_RANGE START="0x16226" END="0x16245" />
             <TYPEINFO_CMT>sub_16226</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16246">
+        <FUNCTION ENTRY_POINT="0x16246" NAME="ai_EmitCrowdSprites">
             <ADDRESS_RANGE START="0x16246" END="0x162FD" />
+            <REGULAR_CMT>[AI 0.6] d0 = crowd section (offset by $1F when $C2EC bit 7), a1 = section offset table, d4/d5 = camera x/y, d6 = sprite count, a6 = sprite table cursor: for every 8-byte crowd record (x, y, tile, attr, size) inside the camera window (x within -$90..+$80, y within -$80..+$70 of the camera) appends a 4-word hardware sprite (y, size/link d6, tile+$B01A, x) until 64 sprites; callers showcrowd and sub_16226</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16246</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x162FE" NAME="showclock">
@@ -11213,25 +11218,28 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>calls randomd0 when changing options</REGULAR_CMT>
             <TYPEINFO_CMT>OptionRNG</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1803E" NAME="ai_RandomizeDemoSetup">
+        <FUNCTION ENTRY_POINT="0x1803E" NAME="ai_DecodePlayoffPassword">
             <ADDRESS_RANGE START="0x1803E" END="0x180FB" />
-            <REGULAR_CMT>[AI 0.6] saves the 5-word seed at (a3), draws random values with RandomMod into the eight $10-byte option blocks below $CED6 (fields +4/+6, flag bit 2 when the draw is 4), then $CEF2, pojoy (forced to 4 unless FourWayPlay when it lands on 1 or 2), potreeteam, gamelevel, bosgames, postarts, and restores the seed; callers GameSetUp, sub_17CA0, sub_180FC</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.7] a3 = five-word password value (sub_180FC passes the entry buffer $D176): saves it, then peels mixed-radix digits with BigNumDivMod into the eight playoff series records $CE66..$CED6 ($10 bytes each: wins at +4/+6 in base 5, bit 2 of +$E when a side reached 4), then $CEF2 (base $4000 check value), pojoy (base 8, forced to 4 unless FourWayPlay when 1 or 2), potreeteam ($10), gamelevel (4), bosgames (8), postarts ($20); restores the buffer. ai_EncodePlayoffPassword ($18192) is the exact inverse. Callers GameSetUp, sub_17CA0, sub_180FC</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1803E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x180FC">
             <ADDRESS_RANGE START="0x180FC" END="0x18191" />
             <TYPEINFO_CMT>sub_180FC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18192">
+        <FUNCTION ENTRY_POINT="0x18192" NAME="ai_EncodePlayoffPassword">
             <ADDRESS_RANGE START="0x18192" END="0x181F5" />
+            <REGULAR_CMT>[AI 0.7] exact inverse of ai_DecodePlayoffPassword: clears the five-word number at a3 (ai_BigNumClear), then folds in postarts (radix $20), bosgames (8), gamelevel (4), potreeteam ($10), pojoy (8), $CEF2 ($4000) and the +4/+6 win counts of the eight playoff series at $CE66 (radix 5 each) with ai_BigNumMulAdd; sub_180FC calls it with a3 = $D088 after a playoff game and then saves the result with ai_SavePlayoffPassword; callers sub_180FC, sub_18380</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18192</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x181F6">
+        <FUNCTION ENTRY_POINT="0x181F6" NAME="ai_BigNumMulAdd">
             <ADDRESS_RANGE START="0x181F6" END="0x1820D" />
+            <REGULAR_CMT>[AI 0.7] number = number * d1 + d0 on the five-word number at a3 (swaps the registers, multiplies via sub_18236, adds via sub_1821A); the mixed-radix accumulator used only by ai_EncodePlayoffPassword</REGULAR_CMT>
             <TYPEINFO_CMT>sub_181F6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1820E">
+        <FUNCTION ENTRY_POINT="0x1820E" NAME="ai_BigNumClear">
             <ADDRESS_RANGE START="0x1820E" END="0x18219" />
+            <REGULAR_CMT>[AI 0.8] zeroes the five words at a3; callers sub_180FC (before saving an empty password) and ai_EncodePlayoffPassword</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1820E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1821A">
@@ -11242,9 +11250,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x18236" END="0x1826B" />
             <TYPEINFO_CMT>sub_18236</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1826C" NAME="ai_RandomMod">
+        <FUNCTION ENTRY_POINT="0x1826C" NAME="ai_BigNumDivMod">
             <ADDRESS_RANGE START="0x1826C" END="0x18289" />
-            <REGULAR_CMT>[AI 0.7] 5-word seed at (a3): divides each word by d0 carrying the remainder through, returns the final remainder in d0 (0..d0-1) and leaves the quotients as the new seed; only called by sub_1803E with moduli 5, 8, $10, $20, $4000</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.8] 80-bit number as five words at (a3): long-divides it by d0 word by word, leaves the quotient in place and returns the remainder in d0. Used as the mixed-radix digit extractor of the playoff password decoder (batch 4 corrected this from 'RandomMod': the caller is the password decoder, not a demo randomizer)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1826C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1828A" NAME="GetShifter">
@@ -11259,8 +11267,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1833A" END="0x1837F" />
             <TYPEINFO_CMT>sub_1833A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18380">
+        <FUNCTION ENTRY_POINT="0x18380" NAME="ai_AdvancePlayoffSeries">
             <ADDRESS_RANGE START="0x18380" END="0x18509" />
+            <REGULAR_CMT>[AI 0.6] after a playoff game: stores the home and away scores ($C6DA, $CA3E) into the current series record at $CE66 + $CEE6*$10 (+$A/+$C), then credits the win to the side at +4 or +6 chosen by the score difference and the home/away bit 0 of +$E unless a side already has 4 wins; when bosgames is 7 it takes the loc_184D0 path; only caller sub_180FC (from PeriodOver)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18380</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1850A">
@@ -11498,8 +11507,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF6C0A" END="0xF6C43" />
             <TYPEINFO_CMT>setonetimeranim</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF6C44">
+        <FUNCTION ENTRY_POINT="0xF6C44" NAME="ai_PuckOnFacingSide">
             <ADDRESS_RANGE START="0xF6C44" END="0xF6CB9" />
+            <REGULAR_CMT>[AI 0.5] returns d0 = 1 when pucky ($B75E, the puck's relative y) is on the side the player object a3 faces (sign flipped by bit 7 of $62(a3)), else 0; the block at $F6C62..$F6CA4 comparing passdir against $54(a3) is unreachable (the branch before it is unconditional); callers asspassrec and doinput</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F6C44</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF6CBA" NAME="onetimershot">
@@ -11563,12 +11573,14 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7172" END="0xF719F" />
             <TYPEINFO_CMT>sub_F7172</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF71A2">
+        <FUNCTION ENTRY_POINT="0xF71A2" NAME="ai_BuildRatingsStartingSix">
             <ADDRESS_RANGE START="0xF71A2" END="0xF71EF" />
+            <REGULAR_CMT>[AI 0.5] clears $BF54/$BF56, then for the home ($C6CE) and away ($CA32) teams runs ai_RateStartingSix and copies the sorted index list to $BF5E/$BF5C (sub_F72DA) and the sums to $BF62/$BF60 (sub_F72FA); caller loc_FCC76 (ratings screen setup)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F71A2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF71F0">
+        <FUNCTION ENTRY_POINT="0xF71F0" NAME="ai_RateStartingSix">
             <ADDRESS_RANGE START="0xF71F0" END="0xF727B" />
+            <REGULAR_CMT>[AI 0.5] a0 = team record: takes the six player indexes listed at team data offset +6, and for each sums attribute nibbles 3..$F of its 16-byte row in the rating table at team+$1A2 (skipping 9 and $D), writing (index-1, sum) byte pairs to $BF20, then bubble-sorts the six pairs by sum descending; callers ai_BuildRatingsStartingSix and ai_SumStartingSixRatings</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F71F0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF727C">
@@ -11591,8 +11603,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7318" END="0xF737D" />
             <TYPEINFO_CMT>sub_F7318</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF737E">
+        <FUNCTION ENTRY_POINT="0xF737E" NAME="ai_SumStartingSixRatings">
             <ADDRESS_RANGE START="0xF737E" END="0xF739D" />
+            <REGULAR_CMT>[AI 0.6] runs ai_RateStartingSix for team a0 and returns d1 = the sum of the six rating totals at $BF20; sub_F7318 calls it for home and away, stores them in $BF12/$BF14 and derives the stronger side in $BF50 and an advantage bracket</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F737E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF739E" NAME="GameSetUp">
@@ -11660,16 +11673,18 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF84F8" END="0xF84F9" />
             <TYPEINFO_CMT>nullsub_3</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF84FC">
+        <FUNCTION ENTRY_POINT="0xF84FC" NAME="ai_ClearSetupLogoPanels">
             <ADDRESS_RANGE START="0xF84FC" END="0xF85AF" />
+            <REGULAR_CMT>[AI 0.4] when $D42E bit 0 was set: clears bits 6/7 and erases the 8x8 logo panel at column 3 or $1C (chosen by $D42E bit 1) and the 25x8 caption area next to it, using the attribute prefixes $EF/$FF; callers sub_F85B0 and ai_DrawSetupTeamLogo</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F84FC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF85B0">
             <ADDRESS_RANGE START="0xF85B0" END="0xF8607" />
             <TYPEINFO_CMT>sub_F85B0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF8608">
+        <FUNCTION ENTRY_POINT="0xF8608" NAME="ai_DrawSetupTeamLogo">
             <ADDRESS_RANGE START="0xF8608" END="0xF86F1" />
+            <REGULAR_CMT>[AI 0.6] game-setup screen: after ai_ClearSetupLogoPanels sets $D42E bits 3/7, calls sub_F878C, prints the panel captions, loads $D440 = $B4, then draws the logo of team $D428 (a copy of HomeTeam or VisTeam) from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (home) or $D432 (away, $D42E bit 2), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8608</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF8762">
@@ -11881,8 +11896,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFAD84" END="0xFAD97" />
             <TYPEINFO_CMT>sub_FAD84</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAE26">
+        <FUNCTION ENTRY_POINT="0xFAE26" NAME="ai_GetPlayerPhoto">
             <ADDRESS_RANGE START="0xFAE26" END="0xFAEBB" />
+            <REGULAR_CMT>[AI 0.7] d0 = player index, d1 = team index: scans the per-team table off_F92F4[team] of (photo pointer, player index) pairs and returns the photo in a0 when the player has one; otherwise walks the team's roster (team table $30E) to the player record and returns one of four generic images (unk_C6F02, unk_C726C, unk_C6B98, unk_C682E) chosen by bit 0 of the record's +4 byte and by whether the index is below the count derived from the +$A word (goalie vs skater); callers loc_FAEBC and ai_DrawRatingsPictures, whose sub_FD14A then decodes the image with ai_UnpackPhotoTiles</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAE26</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAEBC">
@@ -12086,20 +12102,23 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFCFDC" END="0xFCFF5" />
             <TYPEINFO_CMT>sub_FCFDC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD084">
+        <FUNCTION ENTRY_POINT="0xFD084" NAME="ai_DrawRatingsPictures">
             <ADDRESS_RANGE START="0xFD084" END="0xFD149" />
+            <REGULAR_CMT>[AI 0.6] team ratings screen pictures: when $D598 is zero draws the away ($C332) and home ($C330) team logos through ai_GetTeamLogoAsset + ai_DrawTeamLogo6x6 at tile bases $D432/$D430 and columns 2/$20, row $F; otherwise draws the selected away/home player photos ($D59E/$D59C) through ai_GetPlayerPhoto + sub_FD14A; sets the palette-fade counter $BD26 to $64; callers loc_FCC76, sub_FCF86</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD084</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD14A">
             <ADDRESS_RANGE START="0xFD14A" END="0xFD17D" />
             <TYPEINFO_CMT>sub_FD14A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD17E">
+        <FUNCTION ENTRY_POINT="0xFD17E" NAME="ai_DrawTeamLogo6x6">
             <ADDRESS_RANGE START="0xFD17E" END="0xFD1EF" />
+            <REGULAR_CMT>[AI 0.7] a0 = logo asset (offset pair header), d3 = team id, d5 = 4 or 2 (palette line): builds the 6x6-tile map from the asset via sub_1169A using the tile-name template at unk_FF462 + d3*8 - $40 or - $20, then positions the caption at column 2 or $20, row $19 and erases 8x3 there; only caller ai_DrawRatingsPictures</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD17E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD1F0">
+        <FUNCTION ENTRY_POINT="0xFD1F0" NAME="ai_GetTeamLogoAsset">
             <ADDRESS_RANGE START="0xFD1F0" END="0xFD1FD" />
+            <REGULAR_CMT>[AI 0.8] returns a0 = off_F86F2[d3] (d3 = team id), the same logo table sub_F8608 indexes with $D428; only caller ai_DrawRatingsPictures</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD1F0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD1FE" NAME="ai_PrintTeamRatingsScreen">
@@ -12187,8 +12206,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE660" END="0xFE695" />
             <TYPEINFO_CMT>sub_FE660</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE696">
+        <FUNCTION ENTRY_POINT="0xFE696" NAME="ai_SavePlayoffPassword">
             <ADDRESS_RANGE START="0xFE696" END="0xFE6D1" />
+            <REGULAR_CMT>[AI 0.7] WriteSRAM of $100 bytes from $D076 (the buffer holding the encoded password at $D088) to SRAM offset $1EF6, then sub_1A206, clears $C2EC bit 4 and resets $C016/$B036; only caller sub_180FC right after ai_EncodePlayoffPassword</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE696</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE6D2">
@@ -12215,9 +12235,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE8EC" END="0xFE989" />
             <TYPEINFO_CMT>sub_FE8EC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE98A" NAME="ai_Unpack3BitRatings">
+        <FUNCTION ENTRY_POINT="0xFE98A" NAME="ai_UnpackPhotoTiles">
             <ADDRESS_RANGE START="0xFE98A" END="0xFEA51" />
-            <REGULAR_CMT>[AI 0.5] reads a count word from (a2) into $DA1E, then for count*8 records takes 3 packed bytes, splits them into eight 3-bit fields and stores each as a nibble equal to field+5 in a longword written after the count at $DA1E; $DEA0 is scratch; callers loc_F8868, loc_FAEBC, sub_FD14A (SRAM/records screens), so this looks like the decoder for compactly stored custom ratings</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.7] decodes a player-photo image: reads the tile count word from (a2) into $DA1E, then for count*8 rows takes 3 packed bytes (eight 3-bit pixels), expands each pixel to a 4bpp nibble equal to pixel+5 (palette entries 5..12) and writes the longword row after the count at $DA1E; $DEA0 is scratch. Called by sub_FD14A after ai_GetPlayerPhoto chose the image, and by loc_F8868 / loc_FAEBC. Batch 4 corrected this from 'Unpack3BitRatings'</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE98A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEA52" NAME="ai_LoadHomeCenterIceLogo">
