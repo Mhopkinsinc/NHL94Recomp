@@ -1,0 +1,173 @@
+# Names batch 26 (final) - see docs/names/names-batch-26.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-26.toml
+# The last 28 unnamed routines: mostly tiny fragments reached through
+# dispatch tables. Several have XML extents of only a few instructions
+# (the IDA function boundary ends early); confidence is set accordingly.
+
+[[name]]
+addr = 0x0FBD86
+name = "PrintUserRecordsTitle"
+confidence = 0.6
+evidence = "prints the user-records page title by the mode $BF12: word_FBDB2 ('ALL win records') when 0, word_FBE54 when 2, otherwise word_FBE04 (the 'O QUALIFY' variants)"
+
+[[name]]
+addr = 0x0FBD7A
+name = "DispatchUserRecordsPage"
+confidence = 0.6
+evidence = "branches on the user-records mode $BF12: 0 goes to the standings printer (ai_PrintUserStandings), anything else to loc_FBFDE"
+
+[[name]]
+addr = 0x009F7E
+name = "GetGoalieCount"
+confidence = 0.5
+evidence = "returns the high nibble of byte 3 of the team data block at offset +8 (the roster count word; ai_CountRatingNibblesPlusGoalies adds the same value), believed to be the number of goalies"
+
+[[name]]
+addr = 0x0137FC
+name = "ResetLinesForFaceoff"
+confidence = 0.5
+evidence = "refills the line energy (ai_ResetLineEnergy), re-applies the personnel (SetPersonel), sub_159A8, then sets team a2's +$18/+$1A/+$1C flags to -1 and clears $C2FE bit 7"
+
+[[name]]
+addr = 0x011B28
+name = "PrintCtl_SetPlane"
+confidence = 0.6
+evidence = "print control-code handler: takes the next byte & 3, converts it to the plane descriptor offset (4*n - 4) in printm ($B02E) and continues with xyVmMap; one of the $F8..$FF control codes of the inline print strings"
+
+[[name]]
+addr = 0x011B3C
+name = "PrintCtl_SetPalette"
+confidence = 0.6
+evidence = "print control-code handler: takes the next byte & 7 rotated into bits 13..15 as the palette/priority attribute printa ($B02C)"
+
+[[name]]
+addr = 0x011B4C
+name = "PrintCtl_SetColumn"
+confidence = 0.6
+evidence = "print control-code handler: takes the next byte as printx and recomputes the VRAM position with xyVmMap"
+
+[[name]]
+addr = 0x013862
+name = "RestoreGameState"
+confidence = 0.6
+evidence = "inverse of ai_SnapshotGameState: copies the $5BE words saved at $FF0000 back to $C2EA and restores ScoreSumbytes; run after a highlight replay"
+
+[[name]]
+addr = 0x008B04
+name = "ScrollEditLinesPagesCheck"
+confidence = 0.5
+evidence = "entry of the edit-lines page scroller: applies PlayerScrollCtr to VertLineScrolling and, within 0..$380, continues into ai_ScrollEditLinesPages; otherwise loc_8B7E"
+
+[[name]]
+addr = 0x008FA0
+name = "ScrollSummaryListCheck"
+confidence = 0.5
+evidence = "entry of the scoring-summary scroller: applies PlayerScrollCtr to VertLineScrolling and, within 0..$D5B2, continues into ai_ScrollSummaryList"
+
+[[name]]
+addr = 0x0FB77A
+name = "PrintEntryCursorMarker"
+confidence = 0.5
+evidence = "name entry: positions at column 4 + d4 on row $13 and, when the blink flag $D6C4 is set, prints ' < ' as the cursor marker under the current letter"
+
+[[name]]
+addr = 0x00A48A
+name = "EraseCornerBox8x4"
+confidence = 0.4
+evidence = "positions at (2,2) with attribute $BD and erases an 8x4 area"
+
+[[name]]
+addr = 0x00A4D8
+name = "EraseCornerBox16x11"
+confidence = 0.4
+evidence = "positions at (2,2) with attribute $BD and erases a 16x11 area (the pause menu backdrop size of ai_DrawPauseMenuBackdrop)"
+
+[[name]]
+addr = 0x0FAD84
+name = "PrintSavesBox"
+confidence = 0.5
+evidence = "records screen: reads the selected team's goalie totals for player d0 (column +$B4 and following) and prints the 'Saves' / 'Save %' box (extent truncated in the IDA database after the first read)"
+
+[[name]]
+addr = 0x0FB97C
+name = "DrawBoxWithEntryFrame"
+confidence = 0.5
+evidence = "draws a box with sub_119B8 using the alternate frame tile base $D530 in place of $B01E, restoring it afterwards; name-entry screen frame"
+
+[[name]]
+addr = 0x0FEE4A
+name = "GetTeamRecordById"
+confidence = 0.7
+evidence = "returns a2 = the home record when its team id $28 equals d2, else the away record"
+
+[[name]]
+addr = 0x015E72
+name = "FlushSpriteTable"
+confidence = 0.6
+evidence = "DMAs the sprite list at $C018 ($C2E8 entries) to the sprite table VRAM address $B002 through sub_113E4; part of the attract-mode V-blank routine"
+
+[[name]]
+addr = 0x015E6E
+name = "AttractVBlankScroll"
+confidence = 0.5
+evidence = "writes the plane scroll (ai_WritePlaneScroll) and falls into ai_FlushSpriteTable; the V-blank tail used on the attract/menu screens"
+
+[[name]]
+addr = 0x018B5E
+name = "FormatPlayerSurnameOnly"
+confidence = 0.5
+evidence = "finds the player's record (sub_18BC8) and joins ai_FormatPlayerSurnamePadded's copy loop at loc_18B7E without the leading space"
+
+[[name]]
+addr = 0x0FEAE4
+name = "PrintAssistsInParens"
+confidence = 0.7
+evidence = "assist twin of ai_PrintGoalsInParens: prints ' (' then joins its body with the team's +$CE (assists) column"
+
+[[name]]
+addr = 0x00878E
+name = "ClearIndicatorPair"
+confidence = 0.4
+evidence = "clears the two words $BD82 and $BDA2 (fields of the second and third indicator records at $BDB4 - $1C*n... i.e. per-controller cursor state); byte-identical to ai_ClearIndicatorPair2"
+
+[[name]]
+addr = 0x0FCA1E
+name = "ClearIndicatorPair2"
+confidence = 0.4
+evidence = "clears $BD82 and $BDA2, byte-identical to ai_ClearIndicatorPair; shootout screen variant"
+
+[[name]]
+addr = 0x016CEE
+name = "LoadMenuTiles5C410"
+confidence = 0.4
+evidence = "loads asset unk_5C410 at tile base ExtraChars ($B026)"
+
+[[name]]
+addr = 0x016CFC
+name = "LoadTilesA78B6"
+confidence = 0.4
+evidence = "loads asset unk_A78B6 at tile base $B01C"
+
+[[name]]
+addr = 0x016D0A
+name = "LoadMenuTiles55BFE"
+confidence = 0.4
+evidence = "loads asset unk_55BFE at tile base ExtraChars ($B026)"
+
+[[name]]
+addr = 0x0FB6DC
+name = "NameEntryFragment"
+confidence = 0.3
+evidence = "IDA marks a function at $FB6DC whose body in the listing begins with data; only the register restore and rts at $FB6EA..$FB6EE are code; a fragment of the name-entry code"
+
+[[name]]
+addr = 0x0FCB1A
+name = "PrintShootoutFragment"
+confidence = 0.3
+evidence = "saves registers and prints an inline string (extent truncated in the IDA database after the print2 call); part of the shootout screen printers"
+
+[[name]]
+addr = 0x0FA934
+name = "NopRecords"
+confidence = 0.8
+evidence = "a bare rts sitting before the 'Starting Line' / position strings of the records screen; an empty hook"
