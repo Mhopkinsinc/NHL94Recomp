@@ -1,0 +1,101 @@
+# Names batch 3 - see docs/names/names-batch-03.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-03.toml
+# Entries with source = "listing" carry the MarkeyJester 2016 listing's human
+# label, which the IDA database never received; they are imported as-is (no
+# ai_ prefix). Everything else is an AI proposal and keeps the ai_ prefix.
+
+[[name]]
+addr = 0x011044
+name = "VDP_FlushPalette"
+source = "listing"
+evidence = "label from the 2016 listing; the IDA export has no name at this entry"
+
+[[name]]
+addr = 0x01381E
+name = "VDP_ReadHVCounter"
+source = "listing"
+evidence = "label from the 2016 listing; the IDA export has no name at this entry"
+
+[[name]]
+addr = 0x01A574
+name = "Z80_WriteVolume"
+source = "listing"
+evidence = "label from the 2016 listing; the IDA export has no name at this entry. Requests the Z80 bus, checks the driver handshake bytes at Z80 RAM $96/$97 ($7D/0), writes $D1/0 back and copies the 33 bytes at $D182 into Z80 RAM $98"
+
+[[name]]
+addr = 0x01A66E
+name = "Z80_ClearFlagUnknown"
+source = "listing"
+evidence = "label from the 2016 listing; the IDA export has no name at this entry"
+
+[[name]]
+addr = 0x009F9A
+name = "CountRosterPlayers"
+confidence = 0.7
+evidence = "a2 = team record; follows $1E(a2) to the team data block and its first offset word to the player list, then walks the length-prefixed player records (name part + 8 attribute bytes) counting them in d0 until the terminator record whose length word is 2; callers SetPlList, loc_961A (edit lines), sub_F9FEA (records)"
+
+[[name]]
+addr = 0x0FEA52
+name = "LoadHomeCenterIceLogo"
+confidence = 0.8
+evidence = "indexes the logo table off_FEA74 by HomeTeam ($C330), skips the 8-byte header and loads the tiles with LoadAsset at tile d4-$18; the same table was confirmed as the centre-ice logo art while prototyping the HUD overlay; callers ClrHor, loc_9CDC, setupice (rink setup)"
+
+[[name]]
+addr = 0x018BAE
+name = "FinishNameBuffer"
+confidence = 0.7
+evidence = "terminates the length-prefixed string being built at $BFA4 (text from $BFA6): computes the length from a1, pads with a zero byte to an even length and stores the length word at $BFA4; called by the three name formatters sub_18AE8, sub_18B26, sub_18B6E"
+
+[[name]]
+addr = 0x018B26
+name = "FormatPlayerNumberName"
+confidence = 0.6
+evidence = "builds the string at $BFA4: jersey number (sub_18BDC from the byte after the name), a space, then the player's name from the record found by sub_18BC8, copied from after its first space (the surname), and closes it with FinishNameBuffer; callers ai_PrintPlayerStatRow and sub_FD89A (team ratings screen)"
+
+[[name]]
+addr = 0x018AE8
+name = "FormatPlayerInitialSurname"
+confidence = 0.6
+evidence = "same as FormatPlayerNumberName but writes the first letter of the name, then '. ' ($2E20), then the surname after the first space; callers sub_18AC6, sub_9112"
+
+[[name]]
+addr = 0x018B6E
+name = "FormatPlayerSurnamePadded"
+confidence = 0.6
+evidence = "builds the string at $BFA4 as a space followed by the surname (text after the first space of the record's name), then pads with spaces up to $BFB2 (12 characters) before FinishNameBuffer; caller loc_85EE"
+
+[[name]]
+addr = 0x016C96
+name = "LoadRinkPalette"
+confidence = 0.5
+evidence = "copies 16 longwords (64 bytes = two CRAM lines) from ROM $59924 (off_5605A plus its own offset word) to $BD28; $BD28 also receives colour $EEE elsewhere and is cleared at reset, so it is a palette buffer; callers loc_9CDC, setupice, sub_16BAC, all rink setup"
+
+[[name]]
+addr = 0x016CAC
+name = "LoadRinkTiles"
+confidence = 0.5
+evidence = "loads asset unk_B3538 at the tile base $B020 via ai_LoadAssetInline with the inline nibble map $7123 $4567 $89AB $CDEF; same three callers as LoadRinkPalette (loc_9CDC, setupice, sub_16BAC) during rink setup"
+
+[[name]]
+addr = 0x011F04
+name = "LoadFontTiles"
+confidence = 0.8
+evidence = "stores d4 in $B012 and loads asset unk_AAC5A there with LoadAsset; $B012 is the tile base the text printer (print, $11C4E) adds to every character index, so unk_AAC5A is the text font; callers PlayoffScreen, loc_9BD8, loc_FCC76"
+
+[[name]]
+addr = 0x0F87D2
+name = "ResetCountdownD43C"
+confidence = 0.4
+evidence = "reloads the frame countdown $D43C with $AA, or $53 when $D42E bit 5 is set; sub_F87EA decrements it every frame and toggles $D42E bit 1 when it reaches $52 (what the countdown drives is not yet identified); callers GameSetUp_2, sub_F7B20, sub_F87EA"
+
+[[name]]
+addr = 0x0FD1FE
+name = "PrintTeamRatingsScreen"
+confidence = 0.7
+evidence = "prints the pre-game team comparison: the category labels from word_FCFFA (Shooting, Skating, Passing, Defense, Checking, Fighting, Goalkeeping, Power Play Adv., Home Team Adv., Overall), the home ($C6CE) and away ($CA32) team names via sub_FCFB8 with the overall values kept in $D5A0/$D5A2; when $D598 is non-zero it prints the per-position comparison (center, left forward, right forward, ...) instead; callers loc_FCC76, sub_FCF86"
+
+[[name]]
+addr = 0x008BA6
+name = "DrawEditLinesHeader"
+confidence = 0.6
+evidence = "edit-lines screen: prints the line title from word_8CBE indexed by $D5B2 (Goalies, Scoring 1, Scoring 2, Checking, Power Play 1, Power Play 2), the attribute column headers from word_193F8/word_1955A chosen by DispAttribCtr, erases the 40x16 body, and initialises the slot list at $C018 from the team's line table at $16A(a2); callers sub_8B84, sub_8B94"

@@ -9254,8 +9254,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8B94" END="0x8BA5" />
             <TYPEINFO_CMT>sub_8B94</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8BA6">
+        <FUNCTION ENTRY_POINT="0x8BA6" NAME="ai_DrawEditLinesHeader">
             <ADDRESS_RANGE START="0x8BA6" END="0x8CAD" />
+            <REGULAR_CMT>[AI 0.6] edit-lines screen: prints the line title from word_8CBE indexed by $D5B2 (Goalies, Scoring 1, Scoring 2, Checking, Power Play 1, Power Play 2), the attribute column headers from word_193F8/word_1955A chosen by DispAttribCtr, erases the 40x16 body, and initialises the slot list at $C018 from the team's line table at $16A(a2); callers sub_8B84, sub_8B94</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8BA6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8D4E" NAME="getNameandAttrib">
@@ -9374,8 +9375,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9F7E" END="0x9F99" />
             <TYPEINFO_CMT>sub_9F7E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9F9A">
+        <FUNCTION ENTRY_POINT="0x9F9A" NAME="ai_CountRosterPlayers">
             <ADDRESS_RANGE START="0x9F9A" END="0x9FB7" />
+            <REGULAR_CMT>[AI 0.7] a2 = team record; follows $1E(a2) to the team data block and its first offset word to the player list, then walks the length-prefixed player records (name part + 8 attribute bytes) counting them in d0 until the terminator record whose length word is 2; callers SetPlList, loc_961A (edit lines), sub_F9FEA (records)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9F9A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9FB8" NAME=".rjoy">
@@ -10095,8 +10097,9 @@ a1 mapping data (nibbles of color data)</REGULAR_CMT>
 this should be called during vblank because palette changes punch holes in video</REGULAR_CMT>
             <TYPEINFO_CMT>cramfade</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11044">
+        <FUNCTION ENTRY_POINT="0x11044" NAME="VDP_FlushPalette">
             <ADDRESS_RANGE START="0x11044" END="0x11079" />
+            <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11044</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1107A" NAME="randomd0s">
@@ -10393,8 +10396,9 @@ yy = y coord to print at</REGULAR_CMT>
             <ADDRESS_RANGE START="0x11EDA" END="0x11F03" />
             <TYPEINFO_CMT>sub_11EDA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11F04">
+        <FUNCTION ENTRY_POINT="0x11F04" NAME="ai_LoadFontTiles">
             <ADDRESS_RANGE START="0x11F04" END="0x11F11" />
+            <REGULAR_CMT>[AI 0.8] stores d4 in $B012 and loads asset unk_AAC5A there with LoadAsset; $B012 is the tile base the text printer (print, $11C4E) adds to every character index, so unk_AAC5A is the text font; callers PlayoffScreen, loc_9BD8, loc_FCC76</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11F04</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11F12">
@@ -10670,8 +10674,9 @@ d0 = iterator</REGULAR_CMT>
             <ADDRESS_RANGE START="0x137FC" END="0x1381D" />
             <TYPEINFO_CMT>sub_137FC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1381E">
+        <FUNCTION ENTRY_POINT="0x1381E" NAME="VDP_ReadHVCounter">
             <ADDRESS_RANGE START="0x1381E" END="0x13847" />
+            <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1381E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x13848">
@@ -11028,12 +11033,14 @@ output - d0=xscreen, d1=yscreen</REGULAR_CMT>
             <ADDRESS_RANGE START="0x16BAC" END="0x16C95" />
             <TYPEINFO_CMT>sub_16BAC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16C96">
+        <FUNCTION ENTRY_POINT="0x16C96" NAME="ai_LoadRinkPalette">
             <ADDRESS_RANGE START="0x16C96" END="0x16CAB" />
+            <REGULAR_CMT>[AI 0.5] copies 16 longwords (64 bytes = two CRAM lines) from ROM $59924 (off_5605A plus its own offset word) to $BD28; $BD28 also receives colour $EEE elsewhere and is cleared at reset, so it is a palette buffer; callers loc_9CDC, setupice, sub_16BAC, all rink setup</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16C96</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16CAC">
+        <FUNCTION ENTRY_POINT="0x16CAC" NAME="ai_LoadRinkTiles">
             <ADDRESS_RANGE START="0x16CAC" END="0x16CC3" />
+            <REGULAR_CMT>[AI 0.5] loads asset unk_B3538 at the tile base $B020 via ai_LoadAssetInline with the inline nibble map $7123 $4567 $89AB $CDEF; same three callers as LoadRinkPalette (loc_9CDC, setupice, sub_16BAC) during rink setup</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16CAC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16CC4">
@@ -11295,24 +11302,28 @@ d0 = Player roster offset</REGULAR_CMT>
             <ADDRESS_RANGE START="0x18AC6" END="0x18AE7" />
             <TYPEINFO_CMT>sub_18AC6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18AE8">
+        <FUNCTION ENTRY_POINT="0x18AE8" NAME="ai_FormatPlayerInitialSurname">
             <ADDRESS_RANGE START="0x18AE8" END="0x18B25" />
+            <REGULAR_CMT>[AI 0.6] same as FormatPlayerNumberName but writes the first letter of the name, then '. ' ($2E20), then the surname after the first space; callers sub_18AC6, sub_9112</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18AE8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18B26">
+        <FUNCTION ENTRY_POINT="0x18B26" NAME="ai_FormatPlayerNumberName">
             <ADDRESS_RANGE START="0x18B26" END="0x18B5D" />
+            <REGULAR_CMT>[AI 0.6] builds the string at $BFA4: jersey number (sub_18BDC from the byte after the name), a space, then the player's name from the record found by sub_18BC8, copied from after its first space (the surname), and closes it with FinishNameBuffer; callers ai_PrintPlayerStatRow and sub_FD89A (team ratings screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18B26</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18B5E">
             <ADDRESS_RANGE START="0x18B5E" END="0x18B6D" />
             <TYPEINFO_CMT>sub_18B5E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18B6E">
+        <FUNCTION ENTRY_POINT="0x18B6E" NAME="ai_FormatPlayerSurnamePadded">
             <ADDRESS_RANGE START="0x18B6E" END="0x18BAD" />
+            <REGULAR_CMT>[AI 0.6] builds the string at $BFA4 as a space followed by the surname (text after the first space of the record's name), then pads with spaces up to $BFB2 (12 characters) before FinishNameBuffer; caller loc_85EE</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18B6E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18BAE">
+        <FUNCTION ENTRY_POINT="0x18BAE" NAME="ai_FinishNameBuffer">
             <ADDRESS_RANGE START="0x18BAE" END="0x18BC7" />
+            <REGULAR_CMT>[AI 0.7] terminates the length-prefixed string being built at $BFA4 (text from $BFA6): computes the length from a1, pads with a zero byte to an even length and stores the length word at $BFA4; called by the three name formatters sub_18AE8, sub_18B26, sub_18B6E</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18BAE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18BC8" NAME="getplayername">
@@ -11429,8 +11440,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A50A" END="0x1A567" />
             <TYPEINFO_CMT>MusicVB</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A574">
+        <FUNCTION ENTRY_POINT="0x1A574" NAME="Z80_WriteVolume">
             <ADDRESS_RANGE START="0x1A574" END="0x1A5BF" />
+            <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry. Requests the Z80 bus, checks the driver handshake bytes at Z80 RAM $96/$97 ($7D/0), writes $D1/0 back and copies the 33 bytes at $D182 into Z80 RAM $98</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A574</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A5C0">
@@ -11443,8 +11455,9 @@ d0 = start of data</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] a2 = 8-byte channel record in $D3A4: clears the active bit 0 of +6; if it was set and the note/type byte +3 is below $60, sets the channel's bit (+4) in the pending-update mask $D182 and flags $D180, otherwise jumps to Z80_ClearFlagUnknown; only called from StopSound30</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A64C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A66E">
+        <FUNCTION ENTRY_POINT="0x1A66E" NAME="Z80_ClearFlagUnknown">
             <ADDRESS_RANGE START="0x1A66E" END="0x1A68D" />
+            <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A66E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A7D8">
@@ -11675,8 +11688,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF878C" END="0xF87D1" />
             <TYPEINFO_CMT>sub_F878C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF87D2">
+        <FUNCTION ENTRY_POINT="0xF87D2" NAME="ai_ResetCountdownD43C">
             <ADDRESS_RANGE START="0xF87D2" END="0xF87E9" />
+            <REGULAR_CMT>[AI 0.4] reloads the frame countdown $D43C with $AA, or $53 when $D42E bit 5 is set; sub_F87EA decrements it every frame and toggles $D42E bit 1 when it reaches $52 (what the countdown drives is not yet identified); callers GameSetUp_2, sub_F7B20, sub_F87EA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F87D2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF87EA">
@@ -12088,8 +12102,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFD1F0" END="0xFD1FD" />
             <TYPEINFO_CMT>sub_FD1F0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD1FE">
+        <FUNCTION ENTRY_POINT="0xFD1FE" NAME="ai_PrintTeamRatingsScreen">
             <ADDRESS_RANGE START="0xFD1FE" END="0xFD3FF" />
+            <REGULAR_CMT>[AI 0.7] prints the pre-game team comparison: the category labels from word_FCFFA (Shooting, Skating, Passing, Defense, Checking, Fighting, Goalkeeping, Power Play Adv., Home Team Adv., Overall), the home ($C6CE) and away ($CA32) team names via sub_FCFB8 with the overall values kept in $D5A0/$D5A2; when $D598 is non-zero it prints the per-position comparison (center, left forward, right forward, ...) instead; callers loc_FCC76, sub_FCF86</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD1FE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD46C">
@@ -12205,8 +12220,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] reads a count word from (a2) into $DA1E, then for count*8 records takes 3 packed bytes, splits them into eight 3-bit fields and stores each as a nibble equal to field+5 in a longword written after the count at $DA1E; $DEA0 is scratch; callers loc_F8868, loc_FAEBC, sub_FD14A (SRAM/records screens), so this looks like the decoder for compactly stored custom ratings</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE98A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEA52">
+        <FUNCTION ENTRY_POINT="0xFEA52" NAME="ai_LoadHomeCenterIceLogo">
             <ADDRESS_RANGE START="0xFEA52" END="0xFEA73" />
+            <REGULAR_CMT>[AI 0.8] indexes the logo table off_FEA74 by HomeTeam ($C330), skips the 8-byte header and loads the tiles with LoadAsset at tile d4-$18; the same table was confirmed as the centre-ice logo art while prototyping the HUD overlay; callers ClrHor, loc_9CDC, setupice (rink setup)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEA52</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEAE4">

@@ -16,7 +16,9 @@ Commands
                               (default output game/nhl94.dossier.md, tracked, regenerate per batch)
   review PROPOSALS.toml       reviewer's document for a batch: each proposal with its evidence,
                               callers/callees and the routine's assembly (docs/names/<batch>.md)
-  apply PROPOSALS.toml        write ai_ names (+ evidence comments) into game/nhl94.xml
+  apply PROPOSALS.toml        write ai_ names (+ evidence comments) into game/nhl94.xml;
+                              entries with source = "listing" are human names from the
+                              2016 listing and are written without the ai_ prefix
   accept ADDR [ADDR...]       drop the ai_ prefix (human confirmed) for those entries
   export-idc [--out FILE]     IDC script that applies the XML's ai_ names in IDA, if wanted
 
@@ -274,8 +276,10 @@ def cmd_review(args):
            "proposal rests on, who calls it and what it calls, and its assembly.",
            "Accept with `python tools/nhl94_names.py accept <addr>`; to rename, edit the",
            "XML (or the proposals file and re-apply).", ""]
-    for addr, name, conf, evidence in props:
-        out.append(f"## `${addr:06X}` -> `ai_{name}`  (confidence {conf:.1f}, {size[addr]} insns)")
+    for addr, name, conf, evidence, source in props:
+        shown = name if source == "listing" else f"ai_{name}"
+        tag = "from the 2016 listing, not AI" if source == "listing" else f"confidence {conf:.1f}"
+        out.append(f"## `${addr:06X}` -> `{shown}`  ({tag}, {size[addr]} insns)")
         out.append("")
         out.append(f"**Evidence.** {evidence}")
         out.append("")
@@ -308,7 +312,10 @@ def parse_proposals(path: Path):
         name = t["name"].strip()
         if not re.match(r"^[A-Za-z_]\w*$", name):
             sys.exit(f"bad identifier {name!r} for {addr:06X}")
-        props.append((addr, name, float(t.get("confidence", 0.5)), t.get("evidence", "").strip()))
+        source = t.get("source", "ai")
+        if source not in ("ai", "listing"):
+            sys.exit(f"bad source {source!r} for {addr:06X} (ai or listing)")
+        props.append((addr, name, float(t.get("confidence", 0.5)), t.get("evidence", "").strip(), source))
     return props
 
 
@@ -316,16 +323,21 @@ def cmd_apply(args):
     text = read_xml()
     props = parse_proposals(Path(args.proposals))
     applied, skipped = 0, []
-    for addr, name, conf, evidence in props:
+    for addr, name, conf, evidence, source in props:
         m = next((mm for a, n, mm in functions(text) if a == addr), None)
         if m is None:
             skipped.append((addr, "no FUNCTION at that address in the XML")); continue
         existing = m.group(4)
         if existing and not existing.startswith(AI_PREFIX):
             skipped.append((addr, f"human-named already ({existing})")); continue
-        full = name if name.startswith(AI_PREFIX) else AI_PREFIX + name
+        if source == "listing":      # human name from the 2016 listing: no ai_ prefix
+            full = name
+            cmt = f"[listing] {evidence}"
+        else:
+            full = name if name.startswith(AI_PREFIX) else AI_PREFIX + name
+            cmt = f"[AI {conf:.1f}] {evidence}"
         indent = m.group(1)
-        cmt = f"[AI {conf:.1f}] {evidence}".replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        cmt = cmt.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         if m.group(5) == "/":   # self-closing FUNCTION: expand it
             new_line = f'{indent}<FUNCTION ENTRY_POINT="0x{addr:X}" NAME="{full}">\n{indent}    <REGULAR_CMT>{cmt}</REGULAR_CMT>\n{indent}</FUNCTION>'
             text = text[: m.start()] + new_line + text[m.end():]
@@ -337,7 +349,7 @@ def cmd_apply(args):
             start = text.index(head)
             end = text.index("</FUNCTION>", start)
             body = text[start:end]
-            body = re.sub(r"\n\s*<REGULAR_CMT>\[AI [^<]*</REGULAR_CMT>", "", body)
+            body = re.sub(r"\n\s*<REGULAR_CMT>\[(AI|listing)[^<]*</REGULAR_CMT>", "", body)
             ins = body.find("/>", body.find("<ADDRESS_RANGE"))
             if ins >= 0:
                 ins += 2
