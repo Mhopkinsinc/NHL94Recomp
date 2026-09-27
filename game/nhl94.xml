@@ -9340,8 +9340,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x98CE" END="0x98E5" />
             <TYPEINFO_CMT>sub_98CE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x99C6">
+        <FUNCTION ENTRY_POINT="0x99C6" NAME="ai_PrintScrollArrows">
             <ADDRESS_RANGE START="0x99C6" END="0x9A01" />
+            <REGULAR_CMT>[AI 0.6] edit-lines roster: prints one of the four control strings at word_9A02 chosen by d0 = (VertLineScrolling &gt; 0) + 2*(VertLineScrolling &lt; $D5B2), i.e. whether the list can scroll up and/or down, at the header position set by the inline print2 string; callers loc_945C and sub_9588</REGULAR_CMT>
             <TYPEINFO_CMT>sub_99C6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9A84">
@@ -9739,8 +9740,9 @@ a3 = goalie</REGULAR_CMT>
             <ADDRESS_RANGE START="0xDB3E" END="0xDB67" />
             <TYPEINFO_CMT>sub_DB3E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xDB68">
+        <FUNCTION ENTRY_POINT="0xDB68" NAME="ai_GoalieTurnToward">
             <ADDRESS_RANGE START="0xDB68" END="0xDBB9" />
+            <REGULAR_CMT>[AI 0.6] d0 = desired facing 0..7, a3 = goalie object: computes the shortest rotation from the current facing $54(a3), stepping by one (or two when bit 3 of $62(a3) is clear and the special cases in the $DB86..$DBA9 block apply) and stores the new facing masked to 0..7. Note: the 2016 listing shows $DB86..$DBA9 as dc.w data although it is reached by fall-through; the recompiler translated it (it appears in nhl94_part07.c). Callers assgoaliecpu and goalieacc</REGULAR_CMT>
             <TYPEINFO_CMT>sub_DB68</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xDBBA" NAME="goaliesave">
@@ -11187,8 +11189,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17C72" END="0x17C8D" />
             <TYPEINFO_CMT>LoadDefMenuOptions</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17CA0">
+        <FUNCTION ENTRY_POINT="0x17CA0" NAME="ai_ApplyPlayoffPassword">
             <ADDRESS_RANGE START="0x17CA0" END="0x17D15" />
+            <REGULAR_CMT>[AI 0.6] decodes the SRAM password copy at $D088 with ai_DecodePlayoffPassword; if gamelevel or bosgames is non-zero it rebuilds the bracket (sub_17D80), normalises pojoy (2..7 minus 2 without FourWayPlay, 1-&gt;3 and 2-&gt;4 with it) and sets $D04A = rounds remaining as 7 (or $B for 4-way play) minus pojoy; callers GameSetUp_3 and sub_F76CE (a jmp thunk used by GameSetUp)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17CA0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17D16" NAME="NewPO">
@@ -11263,8 +11266,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x182A2" END="0x18335" />
             <TYPEINFO_CMT>AddPOStats</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1833A">
+        <FUNCTION ENTRY_POINT="0x1833A" NAME="ai_UnpackPlayoffStats">
             <ADDRESS_RANGE START="0x1833A" END="0x1837F" />
+            <REGULAR_CMT>[AI 0.6] bit-stream reader: unpacks 104 words into $CD96 from the packed block ending at $D092 (reads a long at $D092-$22+$100-2*(bit&gt;&gt;4), shifts by bit&amp;15), with field widths cycling through byte_18336 = $C, $E, $A, $A; the packer sub_182A2 uses the same width table; callers AddPOStats and sub_9428 (PeriodOver's playoff stats print)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1833A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18380" NAME="ai_AdvancePlayoffSeries">
@@ -11481,8 +11485,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1ACC2" END="0x1AD53" />
             <TYPEINFO_CMT>Z80_LoadROM</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1AD54">
+        <FUNCTION ENTRY_POINT="0x1AD54" NAME="ai_InitSoundChannels">
             <ADDRESS_RANGE START="0x1AD54" END="0x1AD8F" />
+            <REGULAR_CMT>[AI 0.8] fills the eight 6-byte active-sound slots at $D3D4 with -1, then initialises the six 8-byte channel records below it ($D3A4..): hardware channel at +4 = 0,1,2,4,5,6 (skips FM channel 3), +0 and +3 = $FF, +1 and +6 = 0; callers AllSndOff and Z80_LoadROM</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1AD54</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF66EE" NAME="puckvzadj">
@@ -11656,8 +11661,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7BFA" END="0xF7C51" />
             <TYPEINFO_CMT>sub_F7BFA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF8070">
+        <FUNCTION ENTRY_POINT="0xF8070" NAME="ai_PrintSetupMenuLabels">
             <ADDRESS_RANGE START="0xF8070" END="0xF80D3" />
+            <REGULAR_CMT>[AI 0.8] prints the setup menu's row labels from word_F80D4 (Play Mode, Players, Team 1, Team 2, Per. Length, Goalies) at column 3, two rows apart starting at row $F - 2*$D422 (the scroll offset), skipping rows above $F and stopping past $19; $C2F8 bit 3 held while printing; callers GameSetUp and sub_F78A2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8070</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF8168" NAME="setoptions">
@@ -11675,16 +11681,17 @@ d3 = attribute value</REGULAR_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF84FC" NAME="ai_ClearSetupLogoPanels">
             <ADDRESS_RANGE START="0xF84FC" END="0xF85AF" />
-            <REGULAR_CMT>[AI 0.4] when $D42E bit 0 was set: clears bits 6/7 and erases the 8x8 logo panel at column 3 or $1C (chosen by $D42E bit 1) and the 25x8 caption area next to it, using the attribute prefixes $EF/$FF; callers sub_F85B0 and ai_DrawSetupTeamLogo</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.4] when $D42E bit 0 was set: clears bits 6/7 and erases the 8x8 logo panel at column 3 or $1C (chosen by $D42E bit 1) and the 25x8 caption area next to it, using the attribute prefixes $EF/$FF; callers ai_DrawSetupAwayLogo and ai_DrawSetupHomeLogo</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F84FC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF85B0">
+        <FUNCTION ENTRY_POINT="0xF85B0" NAME="ai_DrawSetupAwayLogo">
             <ADDRESS_RANGE START="0xF85B0" END="0xF8607" />
+            <REGULAR_CMT>[AI 0.6] away-side twin of ai_DrawSetupHomeLogo: after ai_ClearSetupLogoPanels sets $D42E bits 2 (away) and 6, calls sub_F8770, prints the caption at column 8 or $19 and jumps into the shared logo-drawing tail at loc_F865C, which picks tile base $D432 because bit 2 is set; callers GameSetUp, GameSetUp_2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F85B0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF8608" NAME="ai_DrawSetupTeamLogo">
+        <FUNCTION ENTRY_POINT="0xF8608" NAME="ai_DrawSetupHomeLogo">
             <ADDRESS_RANGE START="0xF8608" END="0xF86F1" />
-            <REGULAR_CMT>[AI 0.6] game-setup screen: after ai_ClearSetupLogoPanels sets $D42E bits 3/7, calls sub_F878C, prints the panel captions, loads $D440 = $B4, then draws the logo of team $D428 (a copy of HomeTeam or VisTeam) from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (home) or $D432 (away, $D42E bit 2), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.6] game-setup screen, home side: after ai_ClearSetupLogoPanels clears $D42E bit 2 (away) and sets bits 3/7, calls sub_F878C, prints the panel caption at column $18, loads $D440 = $B4, then (shared tail loc_F865C) draws the logo of team $D428 from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (or $D432 when bit 2 is set, the away entry ai_DrawSetupAwayLogo), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8608</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF8762">
@@ -11851,8 +11858,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFA75C" END="0xFA875" />
             <TYPEINFO_CMT>sub_FA75C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA880">
+        <FUNCTION ENTRY_POINT="0xFA880" NAME="ai_AppendTeamName">
             <ADDRESS_RANGE START="0xFA880" END="0xFA8AB" />
+            <REGULAR_CMT>[AI 0.7] d0 = team index, a1 = destination string: looks up the team record via the table at $30E, follows its +4 offset to the team name string and appends it with appstring; callers sub_F9B2A and sub_FA75C (user records text)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA880</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA8AC">
@@ -11986,8 +11994,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB97C" END="0xFB991" />
             <TYPEINFO_CMT>sub_FB97C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB992">
+        <FUNCTION ENTRY_POINT="0xFB992" NAME="ai_CopyUserNameDashed">
             <ADDRESS_RANGE START="0xFB992" END="0xFB9D3" />
+            <REGULAR_CMT>[AI 0.6] copies the 12-byte user-name entry $D45A + $D4EA*12 to a1, writing '-' for zero bytes and counting only the real characters in $D4E8; used by the name-entry screen loc_FB822 and by sub_FEEC8 for the '(played by ...)' credit</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB992</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB9D4">
@@ -12178,16 +12187,19 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE1AA" END="0xFE1D7" />
             <TYPEINFO_CMT>sub_FE1AA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE2C8">
+        <FUNCTION ENTRY_POINT="0xFE2C8" NAME="ai_UpdateTileAnimation">
             <ADDRESS_RANGE START="0xFE2C8" END="0xFE325" />
+            <REGULAR_CMT>[AI 0.6] per-frame driver for the animation selected in $D6B4 (-1 = none): on first run takes the (frame script, asset) pair from off_FE364[$D6B4], loads the asset at tile $D6AC with LoadAsset and starts frame 0; otherwise counts $D6B2 down by d7 and advances $D6B0 through ai_TileAnimationStep; callers periodiceevents and waitxsr</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE2C8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE326">
+        <FUNCTION ENTRY_POINT="0xFE326" NAME="ai_TileAnimationStep">
             <ADDRESS_RANGE START="0xFE326" END="0xFE363" />
+            <REGULAR_CMT>[AI 0.6] reads the current frame's (frame index, duration) byte pair from the script at $D6B6 + 2*$D6B0 into $D6AE/$D6B2; -1 restarts the script from frame 0, -2 calls sub_FE548 (script end); only caller ai_UpdateTileAnimation</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE326</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE510">
+        <FUNCTION ENTRY_POINT="0xFE510" NAME="ai_StartTileAnimation">
             <ADDRESS_RANGE START="0xFE510" END="0xFE53B" />
+            <REGULAR_CMT>[AI 0.7] sets $D6B4 = d0 (the animation id) and clears the script/asset pointers $D6B6/$D6BA so ai_UpdateTileAnimation reloads it on the next frame; callers include ROM:$FB4E and sub_14062</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE510</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE53C">
@@ -12219,12 +12231,14 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE71C" END="0xFE743" />
             <TYPEINFO_CMT>PSandSOpassdir</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE756">
+        <FUNCTION ENTRY_POINT="0xFE756" NAME="ai_StartWaypointScript">
             <ADDRESS_RANGE START="0xFE756" END="0xFE787" />
+            <REGULAR_CMT>[AI 0.4] picks a random script 0..6 (sub_11086 with d0 = 7) into $DA12, clears $C2FC bit 3, resets the step index $DA14 to -1 and the current x $DA16, and loads the first point via ai_NextWaypoint; only caller sub_FC4C0</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE756</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE7FC">
+        <FUNCTION ENTRY_POINT="0xFE7FC" NAME="ai_NextWaypoint">
             <ADDRESS_RANGE START="0xFE7FC" END="0xFE863" />
+            <REGULAR_CMT>[AI 0.4] advances $DA14 and reads the next 8-byte entry of script off_FE788[$DA12]: relative x into $DA16 (negated when bit 0 of $76(a3) is set) and y into $DA18; an entry whose byte 4 is $80 ends the script, setting $C2FC bit 3 and copying its bytes 5..7 into $DA1D/$DA1A; sub_FE864 (from asspuckc) steers the player toward the point and calls this when within reach; callers ai_StartWaypointScript, sub_FE864</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE7FC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE864">
@@ -12319,8 +12333,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>checks if goalie is pulled (position $26 in Team Struct)</REGULAR_CMT>
             <TYPEINFO_CMT>ReadGoaliePulled</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEFF0">
+        <FUNCTION ENTRY_POINT="0xFEFF0" NAME="ai_ClearOneTimer">
             <ADDRESS_RANGE START="0xFEFF0" END="0xFF041" />
+            <REGULAR_CMT>[AI 0.5] cancels a one-timer for player object a3: clears $64 bit 3, $62 bit 5, $63 bit 1, zeroes $BF76, sets onetimerplayer ($BF6C) to -1, forces animation state $50C through SetSPA, then calls sub_10646 when the position slot $34(a3) is negative or sub_15A88 otherwise, and resets $5A/$5C; callers assonetimer and setass</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEFF0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF042" NAME="newTitleScreen">

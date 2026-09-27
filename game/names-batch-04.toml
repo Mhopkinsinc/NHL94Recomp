@@ -64,15 +64,15 @@ evidence = "a0 = logo asset (offset pair header), d3 = team id, d5 = 4 or 2 (pal
 
 [[name]]
 addr = 0x0F8608
-name = "DrawSetupTeamLogo"
+name = "DrawSetupHomeLogo"
 confidence = 0.6
-evidence = "game-setup screen: after ai_ClearSetupLogoPanels sets $D42E bits 3/7, calls sub_F878C, prints the panel captions, loads $D440 = $B4, then draws the logo of team $D428 (a copy of HomeTeam or VisTeam) from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (home) or $D432 (away, $D42E bit 2), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2"
+evidence = "game-setup screen, home side: after ai_ClearSetupLogoPanels clears $D42E bit 2 (away) and sets bits 3/7, calls sub_F878C, prints the panel caption at column $18, loads $D440 = $B4, then (shared tail loc_F865C) draws the logo of team $D428 from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (or $D432 when bit 2 is set, the away entry ai_DrawSetupAwayLogo), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2"
 
 [[name]]
 addr = 0x0F84FC
 name = "ClearSetupLogoPanels"
 confidence = 0.4
-evidence = "when $D42E bit 0 was set: clears bits 6/7 and erases the 8x8 logo panel at column 3 or $1C (chosen by $D42E bit 1) and the 25x8 caption area next to it, using the attribute prefixes $EF/$FF; callers sub_F85B0 and ai_DrawSetupTeamLogo"
+evidence = "when $D42E bit 0 was set: clears bits 6/7 and erases the 8x8 logo panel at column 3 or $1C (chosen by $D42E bit 1) and the 25x8 caption area next to it, using the attribute prefixes $EF/$FF; callers ai_DrawSetupAwayLogo and ai_DrawSetupHomeLogo"
 
 # ---- team strength comparison --------------------------------------------
 
