@@ -7604,7 +7604,7 @@ FFFF = none
         <SYMBOL ADDRESS="0x8D88" NAME="attribjmp" />
         <SYMBOL ADDRESS="0x8E40" NAME="DispAttribValue" />
         <SYMBOL ADDRESS="0x8E7A" NAME="Handedlist" />
-        <SYMBOL ADDRESS="0x9FB8" NAME=".rjoy" />
+        <SYMBOL ADDRESS="0x9FB8" NAME="ai_WaitVBlankForAnyPress" />
         <SYMBOL ADDRESS="0x9FBC" NAME=".rj0" TYPE="local" />
         <SYMBOL ADDRESS="0xA41E" NAME="getpzjoy" />
         <SYMBOL ADDRESS="0xA67C" NAME="RevReplayAdj" />
@@ -9430,8 +9430,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] a2 = team record; follows $1E(a2) to the team data block and its first offset word to the player list, then walks the length-prefixed player records (name part + 8 attribute bytes) counting them in d0 until the terminator record whose length word is 2; callers SetPlList, loc_961A (edit lines), sub_F9FEA (records)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9F9A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9FB8" NAME=".rjoy">
+        <FUNCTION ENTRY_POINT="0x9FB8" NAME="ai_WaitVBlankForAnyPress">
             <ADDRESS_RANGE START="0x9FB8" END="0x9FCF" />
+            <REGULAR_CMT>[renamed, was .rjoy] IDA gave this function the local-style name .rjoy; it waits for a V-blank (vcount change), reads the pad (sub_A41E), strips diagonals (nodiag) and loops until a button byte is non-zero, i.e. waits for any press; kept as an ai_ proposal until reviewed</REGULAR_CMT>
             <REGULAR_CMT>wait for vblank and read controller</REGULAR_CMT>
             <TYPEINFO_CMT>_rjoy</TYPEINFO_CMT>
         </FUNCTION>
@@ -12698,6 +12699,114 @@ returns calculated value in d0</REGULAR_CMT>
         <FUNCTION ENTRY_POINT="0xFFAC0" NAME="Calc_Checksum">
             <ADDRESS_RANGE START="0xFFAC0" END="0xFFB0F" />
             <TYPEINFO_CMT>Calc_Checksum</TYPEINFO_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x88C8" NAME="ai_UnpackLinesFromPassword">
+            <ADDRESS_RANGE START="0x88C8" END="0x8927" />
+            <REGULAR_CMT>[AI 0.5] reads nibbles from $D076 + 1 (the playoff password buffer) through the slot table at $898A, rebuilding player indexes from the attribute count (ai_CountRatingNibbles) and goalie count (ai_GetGoalieCount) offsets; the inverse of ai_PackLinesToPassword, so custom lines travel inside the password</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x8928" NAME="ai_PackLinesToPassword">
+            <ADDRESS_RANGE START="0x8928" END="0x8989" />
+            <REGULAR_CMT>[AI 0.5] writes team a2's id + 1 and then, guided by the slot table at $898A, the line table $16A(a2) as nibbles (index minus the attribute/goalie count offsets) into $D076; inverse of ai_UnpackLinesFromPassword</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x8D82" NAME="ai_RestoreRegsReturn">
+            <ADDRESS_RANGE START="0x8D82" END="0x8D87" />
+            <REGULAR_CMT>[AI 0.6] shared epilogue jumped to by the attribute lookup handlers: movem.l (sp)+,d0-d4/a0-a1/a4-a5 then rts</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x9232" NAME="ai_ScrollPenaltySummaryCheck">
+            <ADDRESS_RANGE START="0x9232" END="0x9249" />
+            <REGULAR_CMT>[AI 0.5] entry of the penalty-summary scroller: applies PlayerScrollCtr to VertLineScrolling within 0..$D5B2 and continues into ai_ScrollPenaltySummary</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x924A" NAME="ai_ScrollPenaltySummary">
+            <ADDRESS_RANGE START="0x924A" END="0x92B9" />
+            <REGULAR_CMT>[AI 0.6] penalty summary scroll step with a 24-pixel pitch: updates VertLineScrolling, redraws the arrows (ai_PrintSummaryScrollArrows) at a boundary, pre-draws the row entering from above (ai_PrintPenaltyRowAbove at $16) or below (ai_PrintPenaltyRowBelow at 2), then writes the vertical scroll</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x92BA" NAME="ai_PrintPenaltyRowBelow">
+            <ADDRESS_RANGE START="0x92BA" END="0x92C7" />
+            <REGULAR_CMT>[AI 0.5] prints penalty summary entry (d0 high word) * 4 via the shared row printer ai_PrintPenaltySummaryRow; the row entering at the bottom of the list</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x92E6" NAME="ai_PrintPenaltyRowAbove">
+            <ADDRESS_RANGE START="0x92E6" END="0x92F5" />
+            <REGULAR_CMT>[AI 0.5] prints penalty summary entry (d0 high word + 5) * 4 via ai_PrintPenaltySummaryRow; the row entering at the top of the list</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x9316" NAME="ai_PrintPenaltySummaryRow">
+            <ADDRESS_RANGE START="0x9316" END="0x93C3" />
+            <REGULAR_CMT>[AI 0.6] one row of the penalty summary from the table at $C5DE (entry d3: time word, team flag bit 7, penalty type in the low bits): erases the 40x3 row, prints the time (ai_PrintPeriodAndTime), the team name, the penalty description from the string table word_18E0C and its minutes (PushNumber)</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x9FD0" NAME="ai_InstantReplay">
+            <ADDRESS_RANGE START="0x9FD0" END="0xA41D" />
+            <REGULAR_CMT>[AI 0.6] instant replay entry: sets $C2EE bit 3, clears the sprite table (sub_11544), loads the replay overlay tiles unk_BB4F6 at ExtraChars, ai_DrawRinkAuxBitmap, then from the write pointer recbpr steps the frame ring backwards with ai_StepReplayBack until it stops, sub_1702E and a fade before running the playback loop</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xCBE0" NAME="NullSub4">
+            <ADDRESS_RANGE START="0xCBE0" END="0xCBE1" />
+            <REGULAR_CMT>[listing] IDA's nullsub_4: a bare rts</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xCBE2" NAME="NullSub5">
+            <ADDRESS_RANGE START="0xCBE2" END="0xCBE3" />
+            <REGULAR_CMT>[listing] IDA's nullsub_5: a bare rts</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x15D9A" NAME="ai_GameVBlankRoutine">
+            <ADDRESS_RANGE START="0x15D9A" END="0x15E4B" />
+            <REGULAR_CMT>[AI 0.7] the V-blank routine installed by ai_InitRinkScreen ($B03A): flushes the scroll/sprites unless $BF78 bit 2 (ai_AttractVBlankScroll), sub_10FB6, then during play counts the game clock down (subtracts $AAA from the fraction $C46A and decrements gameclock on borrow, flagging $BF78 bit 3) and triggers the 60-second warning at $3C..$3D; ends with rte</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x15E4C" NAME="ai_AttractVBlankRoutine">
+            <ADDRESS_RANGE START="0x15E4C" END="0x15E6D" />
+            <REGULAR_CMT>[AI 0.7] the V-blank routine installed by ai_MatchupsScreen: sub_10FB6 unless $BF78 bit 2, increments vcount, sub_1A50A (sound), rte</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x17692" NAME="ai_PlayoffVBlankRoutine">
+            <ADDRESS_RANGE START="0x17692" END="0x176DD" />
+            <REGULAR_CMT>[AI 0.7] the playoff screen's V-blank routine: DMAs the sprite list at $C018 ($C2E8 entries) and writes the bracket scroll (-$160 + $D5AC) to the scroll table unless $BF78 bit 2, then sub_10FB6, vcount and the sound driver; rte</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0x1A148" NAME="VBcount">
+            <ADDRESS_RANGE START="0x1A148" END="0x1A14D" />
+            <REGULAR_CMT>[listing] IDA SYMBOL name at this address ('vblank with counter only'): increments vcount and returns from the interrupt</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xF84D0" NAME="ai_LoadSetupLogoTiles">
+            <ADDRESS_RANGE START="0xF84D0" END="0xF84F7" />
+            <REGULAR_CMT>[AI 0.4] setoptions: loads asset unk_AFE1A at tile 2 (LoadAsset) and records the base in $D43A, then loads it again through ai_LoadAssetInline; the listing decodes the 8 inline bytes that follow as instructions, which is why the routine looks like it runs into garbage</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDB8C" NAME="ai_PrintPeriodStatColumns">
+            <ADDRESS_RANGE START="0xFDB8C" END="0xFDBFB" />
+            <REGULAR_CMT>[AI 0.6] game stats header: from the per-period stat block at a2 + $342 (or +$34A for the second view $D598) prints the column headers for each period played (gsp) with ai_PrintPeriodStatHeader at columns $B, $10, $15, the OT column at $1A when $C2FC bit 1, and 'Total' at $21</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDC28" NAME="ai_PrintPeriodStatHeader">
+            <ADDRESS_RANGE START="0xFDC28" END="0xFDC33" />
+            <REGULAR_CMT>[AI 0.5] takes the next word from (a0)+ and adds it to $D5A8, then prints the inline column label; called once per period column by ai_PrintPeriodStatColumns</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDD1A" NAME="ai_ScrollGameStats">
+            <ADDRESS_RANGE START="0xFDD1A" END="0xFDD69" />
+            <REGULAR_CMT>[AI 0.6] game stats scroll step with a 16-pixel pitch: applies PlayerScrollCtr to VertLineScrolling within 0..$D59E, stops at a boundary, computes the entering row slot (ai_GameStatsRowSlot / ai_GameStatsRowSlotPlus6) and writes the scroll with ai_WriteGameStatsScroll</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDD6A" NAME="ai_WriteGameStatsScroll">
+            <ADDRESS_RANGE START="0xFDD6A" END="0xFDD91" />
+            <REGULAR_CMT>[AI 0.6] writes the game stats plane's vertical scroll (-$50 + VertLineScrolling) to VSRAM entry 1 with $BF78 bit 2 held</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDD92" NAME="ai_GameStatsRowSlot">
+            <ADDRESS_RANGE START="0xFDD92" END="0xFDD9B" />
+            <REGULAR_CMT>[AI 0.5] computes d3 = VertLineScrolling / 16 and returns; the row print that once followed was removed (falls straight to the rts), so it is a leftover of the stats-list scroller pattern</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDD9C" NAME="ai_GameStatsRowSlotPlus6">
+            <ADDRESS_RANGE START="0xFDD9C" END="0xFDDA9" />
+            <REGULAR_CMT>[AI 0.5] computes d3 = VertLineScrolling / 16 + 6 and returns (bra to the next instruction, then rts); the row print was removed like ai_GameStatsRowSlot</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDE24" NAME="ai_PrintGameStatsScreen">
+            <ADDRESS_RANGE START="0xFDE24" END="0xFDEB3" />
+            <REGULAR_CMT>[AI 0.6] game statistics screen: draws both team banners (ai_DrawTeamBannerTiles at columns 2 and $1A), writes the scroll, then prints the $E stat rows from the descriptor table word_FDFAA ('Score', 'Shots', 'Shooting Pct', 'Power Play', 'PP Minutes', 'PP Shots', ...) with ai_PrintGameStatValue, honouring OptPen ($D056)</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDEB4" NAME="ai_PrintGameStatValue">
+            <ADDRESS_RANGE START="0xFDEB4" END="0xFDF9D" />
+            <REGULAR_CMT>[AI 0.6] prints one game stat into $BFA4: a descriptor of -1 prints the shooting percentage (a2[$C] * 100 / a2[0]) with '%', otherwise the value at a2[(a0)] formatted as a time when the descriptor is $352 (ai_PushTimeThunk), a plain number for $A, or a number with the following text</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDF9E" NAME="ai_PushNumberThunk">
+            <ADDRESS_RANGE START="0xFDF9E" END="0xFDFA3" />
+            <REGULAR_CMT>[AI 0.8] jmp PushNumber; a jump-table-friendly wrapper used by ai_PrintGameStatValue</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFDFA4" NAME="ai_PushTimeThunk">
+            <ADDRESS_RANGE START="0xFDFA4" END="0xFDFA9" />
+            <REGULAR_CMT>[AI 0.8] jmp PushTime; wrapper used by ai_PrintGameStatValue for the time-formatted stats</REGULAR_CMT>
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="0xFE1D8" NAME="ai_ToggleGoalieControl">
+            <ADDRESS_RANGE START="0xFE1D8" END="0xFE2C7" />
+            <REGULAR_CMT>[AI 0.4] pause-menu handler: in playoff mode ($D04A) toggles the goalie-control option of the pausing controller ($D05C when both controllers share a team or sflags bit 1, else $D05A); then, unless in shootout mode or during a stoppage, checks the current best-available skater against the 5-slot limit for each side before continuing at loc_FE2C2</REGULAR_CMT>
         </FUNCTION>
     </FUNCTIONS>
     <MARKUP>

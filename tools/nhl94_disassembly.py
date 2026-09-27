@@ -209,6 +209,80 @@ def find_jump_tables(rom: bytes, code: set[int], labels: dict[int, str],
     return out
 
 
+SUB_HEADER_RE = re.compile(r"^[0-9A-F]{8}\s+; =+ S U B")
+END_FUNC_RE = re.compile(r"^[0-9A-F]{8}\s+; End of function")
+CHUNK_START_RE = re.compile(r"^[0-9A-F]{8}\s+; START\s+OF FUNCTION CHUNK FOR (\S+)")
+CHUNK_END_RE = re.compile(r"^[0-9A-F]{8}\s+; END\s+OF FUNCTION CHUNK\s+FOR")
+
+
+def listing_function_spans(path: Path, base: int) -> list[tuple[int, int, str]]:
+    """(start, end_exclusive, name) for every function the asm68k listing
+    delimits with a 'S U B R O U T I N E' header and 'End of function': the
+    first label after a header names and starts the function."""
+    spans = []
+    header_open = False
+    start = name = None
+    chunk_start = chunk_parent = None
+    with open(path, encoding="latin-1") as fh:
+        for line in fh:
+            line = line.rstrip("\r\n")
+            m = ROW_RE.match(line)
+            if not m:
+                continue
+            addr = int(m.group(1), 16) + base
+            cs = CHUNK_START_RE.match(line)
+            if cs:
+                chunk_start, chunk_parent = addr, cs.group(1)
+                continue
+            if CHUNK_END_RE.match(line):
+                if chunk_start is not None:
+                    spans.append((chunk_start, addr, "chunk:" + chunk_parent))
+                chunk_start = chunk_parent = None
+                continue
+            if SUB_HEADER_RE.match(line):
+                header_open, start, name = True, None, None
+                continue
+            if END_FUNC_RE.match(line):
+                if start is not None:
+                    spans.append((start, addr, name))
+                header_open, start, name = False, None, None
+                continue
+            lm = LABEL_RE.match(m.group(3).strip())
+            if lm and header_open and start is None:
+                start, name = addr, lm.group(1)
+    return spans
+
+
+def load_ida_extras(xml_path: Path):
+    """Global and local SYMBOL names, function ADDRESS_RANGEs and comments
+    from the IDA XML export."""
+    import xml.etree.ElementTree as ET
+    root = ET.parse(xml_path).getroot()
+    symbols, comments, ranges = {}, {}, []
+    sy = root.find("SYMBOL_TABLE")
+    for e in (sy if sy is not None else []):
+        try:
+            symbols[int(e.attrib["ADDRESS"], 16)] = e.attrib.get("NAME", "")
+        except (KeyError, ValueError):
+            pass
+    cm = root.find("COMMENTS")
+    for c in (cm if cm is not None else []):
+        try:
+            comments[int(c.attrib["ADDRESS"], 16)] = (c.text or "").strip()
+        except (KeyError, ValueError):
+            pass
+    fn = root.find("FUNCTIONS")
+    for f in (fn if fn is not None else []):
+        try:
+            entry = int(f.attrib["ENTRY_POINT"], 16)
+        except (KeyError, ValueError):
+            continue
+        r = f.find("ADDRESS_RANGE")
+        if r is not None:
+            ranges.append((int(r.attrib["START"], 16), int(r.attrib["END"], 16), entry))
+    return symbols, comments, ranges
+
+
 def load_ida_names(xml_path: Path, code: set[int]) -> dict[int, tuple[str, str]]:
     """Human function names (and the end-of-line comment at the entry, if any)
     from an IDA Pro XML export (File > Produce > XML). Only FUNCTIONS entries
@@ -258,6 +332,9 @@ def main() -> int:
     ap.add_argument("--scratch", type=Path,
                     default=Path(tempfile.gettempdir()) / "nhl94_disasm_build")
     ap.add_argument("--reuse", action="store_true", help="reuse listings already in --scratch")
+    ap.add_argument("--decls", type=Path,
+                    default=Path(__file__).resolve().parents[1] / "build" / "generated" / "nhl94" / "nhl94_decls.h",
+                    help="generated declarations from a previous build; every func_ there gets a name")
     ap.add_argument("--ida-xml", type=Path,
                     default=Path(__file__).resolve().parents[1] / "game" / "nhl94.xml",
                     help="IDA Pro XML export supplying function names (skipped if absent)")
@@ -313,6 +390,85 @@ def main() -> int:
         named.update(ida)          # the owner's IDA names override the 2016 listing's
         ida_count = len(ida)
         print(f"[ida] {ida_count} function names from {args.ida_xml.name}")
+        # Every other code label gets a derived name so the generated C never
+        # shows a bare func_XXXXXX: an IDA global label as-is, otherwise
+        # "<Function>.<label>" for a label inside a listing function.
+        symbols, comments, _ranges = load_ida_extras(args.ida_xml)
+        spans = listing_function_spans(main_lst, 0) + listing_function_spans(chk_lst, CHECKSUM_BASE)
+        # Candidates: every code label, jump-table target, raw pointer target
+        # and (after a first build) every function the recompiler generated.
+        candidates = dict(code_labels)
+        for base, end, stride, fmt, _note in tables:
+            for off in range(base, end, stride):
+                if stride == 2:
+                    t = base + int.from_bytes(rom[off:off + 2], "big")
+                else:
+                    t = int.from_bytes(rom[off:off + 4], "big")
+                if t in code:
+                    candidates.setdefault(t, f"jt_{t:X}")
+        for a in pointer_addr_refs:
+            if a in code:
+                candidates.setdefault(a, f"ptr_{a:X}")
+        if args.decls and args.decls.exists():
+            for m in re.finditer(r"\bfunc_([0-9A-Fa-f]{6})\(", args.decls.read_text(encoding="utf-8", errors="replace")):
+                t = int(m.group(1), 16)
+                if t in code:
+                    candidates.setdefault(t, f"code_{t:X}")
+        name_to_addr = {n: a for a, n in labels.items()}
+        span_of = {}           # address -> address of the function it belongs to
+        for st, en, nm in spans:
+            if nm.startswith("chunk:"):
+                owner = name_to_addr.get(nm[6:])
+                lo = st
+            else:
+                owner, lo = st, st + 1
+            if owner is None:
+                continue
+            for a in candidates:
+                if lo <= a < en:
+                    span_of[a] = owner
+        # a listing function that IDA folded into a larger one is an interior
+        # label of that IDA function
+        for a in candidates:
+            if a not in span_of:
+                for lo, hi, entry in _ranges:
+                    if lo < a <= hi:
+                        span_of[a] = entry
+                        break
+        # code outside every function (top-level flow, jump-table handlers in
+        # unstructured regions): attribute it to the nearest preceding named
+        # function with a '~' so the reader knows it is *after*, not inside
+        named_addrs = sorted(named)
+        import bisect
+        after_of = {}
+        for a in candidates:
+            if a not in span_of and a not in named:
+                i = bisect.bisect_right(named_addrs, a) - 1
+                if i >= 0:
+                    after_of[a] = named_addrs[i]
+        derived = 0
+        for a, lbl in sorted(candidates.items()):
+            if a in named:
+                continue
+            sym = symbols.get(a, "")
+            cmt = comments.get(a, "").replace('"', "'").replace(",", ";").replace("\n", " ")
+            if sym and not sym.startswith(".") and not GENERATED_NAME_RE.match(sym) and not sym.startswith("nullsub_"):
+                named[a] = (sym, ("IDA label. " + cmt).strip())
+                derived += 1
+                continue
+            tag = sym[1:] if sym.startswith(".") else lbl
+            st = span_of.get(a)
+            if st is not None:
+                parent = named[st][0] if st in named else labels.get(st, f"sub_{st:X}")
+                named[a] = (f"{parent}.{tag}", (f"interior label of {parent}. " + cmt).strip())
+                derived += 1
+                continue
+            st = after_of.get(a)
+            if st is not None:
+                parent = named[st][0]
+                named[a] = (f"{parent}~{tag}", (f"top-level code after {parent}; not inside any listing function. " + cmt).strip())
+                derived += 1
+        print(f"[ida] {derived} derived names for interior labels")
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     nl = "\n"
@@ -354,6 +510,9 @@ def main() -> int:
     csv = ["# addr,name,notes - function names for the generated C. Names come from the",
            "# IDA Pro export game/nhl94.xml (FUNCTIONS with a human name, entry comment as",
            "# notes), falling back to the MarkeyJester 2016 listing's named labels.",
+           "# Interior labels that the recompiler turns into functions get derived names:",
+           "# an IDA global label as-is, <Function>.<label> for a label inside that function,",
+           "# <Function>~<label> for top-level code after it that no function contains.",
            "# Regenerate with tools/nhl94_disassembly.py (rerun after every IDA export)."]
     csv += [f"{a:06X},{n},\"{note}\"" if note else f"{a:06X},{n}," for a, (n, note) in sorted(named.items())]
     (args.out_dir / "annotations_from_disasm.csv").write_text(nl.join(csv) + nl, encoding="utf-8", newline=nl)

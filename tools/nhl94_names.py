@@ -20,6 +20,8 @@ Commands
                               entries with source = "listing" are human names from the
                               2016 listing and are written without the ai_ prefix
   accept ADDR [ADDR...]       drop the ai_ prefix (human confirmed) for those entries
+  add-functions               add FUNCTION entries (with ADDRESS_RANGE) for functions the 2016
+                              listing delimits that the IDA export lacks, so they get named too
   rename ADDR NAME --why ...  replace an existing (human or ai_) name; the old name is
                               kept in a [renamed, was X] comment together with the reason
   export-idc [--out FILE]     IDC script that applies the XML's ai_ names in IDA, if wanted
@@ -416,6 +418,33 @@ def cmd_rename(args):
     return 0
 
 
+def cmd_add_functions(args):
+    sys.path.insert(0, str(HERE))
+    import nhl94_disassembly as D
+    text = read_xml()
+    have = {a for a, _, _ in functions(text)}
+    ranges = [(int(m.group(1), 16), int(m.group(2), 16))
+              for m in re.finditer(r'<ADDRESS_RANGE START="0x([0-9A-Fa-f]+)" END="0x([0-9A-Fa-f]+)"', text)]
+    spans = D.listing_function_spans(Path(LISTING), 0)
+    added = []
+    for st, en, nm in sorted(spans):
+        if st in have or any(lo <= st <= hi for lo, hi in ranges):
+            continue
+        added.append((st, en, nm))
+    if not added:
+        print("nothing to add"); return 0
+    block = ""
+    for st, en, nm in added:
+        block += (f'        <FUNCTION ENTRY_POINT="0x{st:X}">\n'
+                  f'            <ADDRESS_RANGE START="0x{st:X}" END="0x{en - 1:X}" />\n'
+                  f'            <REGULAR_CMT>[listing] function delimited by the 2016 listing ({nm}), absent from the IDA export</REGULAR_CMT>\n'
+                  f'        </FUNCTION>\n')
+    text = text.replace("    </FUNCTIONS>", block + "    </FUNCTIONS>", 1)
+    XML.write_text(text, encoding="utf-8", newline="\n")
+    print(f"added {len(added)} functions: " + ", ".join(f"${st:06X} {nm}" for st, _, nm in added))
+    return 0
+
+
 def cmd_export_idc(args):
     text = read_xml()
     lines = ["// Apply ai_ names from game/nhl94.xml in IDA (File > Script file).", "#include <idc.idc>", "static main() {"]
@@ -437,10 +466,11 @@ def main() -> int:
     r = sub.add_parser("review"); r.add_argument("proposals"); r.add_argument("--out")
     a = sub.add_parser("apply"); a.add_argument("proposals")
     c = sub.add_parser("accept"); c.add_argument("addrs", nargs="+")
+    sub.add_parser("add-functions")
     rn = sub.add_parser("rename"); rn.add_argument("addr"); rn.add_argument("name"); rn.add_argument("--why", required=True)
     e = sub.add_parser("export-idc"); e.add_argument("--out")
     args = ap.parse_args()
-    return {"status": cmd_status, "dossier": cmd_dossier, "review": cmd_review, "apply": cmd_apply, "accept": cmd_accept, "rename": cmd_rename, "export-idc": cmd_export_idc}[args.cmd](args)
+    return {"status": cmd_status, "dossier": cmd_dossier, "review": cmd_review, "apply": cmd_apply, "accept": cmd_accept, "rename": cmd_rename, "add-functions": cmd_add_functions, "export-idc": cmd_export_idc}[args.cmd](args)
 
 
 if __name__ == "__main__":

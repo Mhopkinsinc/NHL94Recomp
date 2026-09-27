@@ -1,0 +1,167 @@
+# Names batch 27 - see docs/names/names-batch-27.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-27.toml
+# These 27 functions are delimited by the 2016 listing but were absent from
+# the IDA export (added with `nhl94_names.py add-functions`). They exist as
+# separate functions in the generated C, which is why they need names.
+
+[[name]]
+addr = 0x01A148
+name = "VBcount"
+source = "listing"
+evidence = "IDA SYMBOL name at this address ('vblank with counter only'): increments vcount and returns from the interrupt"
+
+[[name]]
+addr = 0x00CBE0
+name = "NullSub4"
+source = "listing"
+evidence = "IDA's nullsub_4: a bare rts"
+
+[[name]]
+addr = 0x00CBE2
+name = "NullSub5"
+source = "listing"
+evidence = "IDA's nullsub_5: a bare rts"
+
+[[name]]
+addr = 0x015D9A
+name = "GameVBlankRoutine"
+confidence = 0.7
+evidence = "the V-blank routine installed by ai_InitRinkScreen ($B03A): flushes the scroll/sprites unless $BF78 bit 2 (ai_AttractVBlankScroll), sub_10FB6, then during play counts the game clock down (subtracts $AAA from the fraction $C46A and decrements gameclock on borrow, flagging $BF78 bit 3) and triggers the 60-second warning at $3C..$3D; ends with rte"
+
+[[name]]
+addr = 0x015E4C
+name = "AttractVBlankRoutine"
+confidence = 0.7
+evidence = "the V-blank routine installed by ai_MatchupsScreen: sub_10FB6 unless $BF78 bit 2, increments vcount, sub_1A50A (sound), rte"
+
+[[name]]
+addr = 0x017692
+name = "PlayoffVBlankRoutine"
+confidence = 0.7
+evidence = "the playoff screen's V-blank routine: DMAs the sprite list at $C018 ($C2E8 entries) and writes the bracket scroll (-$160 + $D5AC) to the scroll table unless $BF78 bit 2, then sub_10FB6, vcount and the sound driver; rte"
+
+[[name]]
+addr = 0x009FD0
+name = "InstantReplay"
+confidence = 0.6
+evidence = "instant replay entry: sets $C2EE bit 3, clears the sprite table (sub_11544), loads the replay overlay tiles unk_BB4F6 at ExtraChars, ai_DrawRinkAuxBitmap, then from the write pointer recbpr steps the frame ring backwards with ai_StepReplayBack until it stops, sub_1702E and a fade before running the playback loop"
+
+[[name]]
+addr = 0x0088C8
+name = "UnpackLinesFromPassword"
+confidence = 0.5
+evidence = "reads nibbles from $D076 + 1 (the playoff password buffer) through the slot table at $898A, rebuilding player indexes from the attribute count (ai_CountRatingNibbles) and goalie count (ai_GetGoalieCount) offsets; the inverse of ai_PackLinesToPassword, so custom lines travel inside the password"
+
+[[name]]
+addr = 0x008928
+name = "PackLinesToPassword"
+confidence = 0.5
+evidence = "writes team a2's id + 1 and then, guided by the slot table at $898A, the line table $16A(a2) as nibbles (index minus the attribute/goalie count offsets) into $D076; inverse of ai_UnpackLinesFromPassword"
+
+[[name]]
+addr = 0x008D82
+name = "RestoreRegsReturn"
+confidence = 0.6
+evidence = "shared epilogue jumped to by the attribute lookup handlers: movem.l (sp)+,d0-d4/a0-a1/a4-a5 then rts"
+
+[[name]]
+addr = 0x009232
+name = "ScrollPenaltySummaryCheck"
+confidence = 0.5
+evidence = "entry of the penalty-summary scroller: applies PlayerScrollCtr to VertLineScrolling within 0..$D5B2 and continues into ai_ScrollPenaltySummary"
+
+[[name]]
+addr = 0x00924A
+name = "ScrollPenaltySummary"
+confidence = 0.6
+evidence = "penalty summary scroll step with a 24-pixel pitch: updates VertLineScrolling, redraws the arrows (ai_PrintSummaryScrollArrows) at a boundary, pre-draws the row entering from above (ai_PrintPenaltyRowAbove at $16) or below (ai_PrintPenaltyRowBelow at 2), then writes the vertical scroll"
+
+[[name]]
+addr = 0x0092BA
+name = "PrintPenaltyRowBelow"
+confidence = 0.5
+evidence = "prints penalty summary entry (d0 high word) * 4 via the shared row printer ai_PrintPenaltySummaryRow; the row entering at the bottom of the list"
+
+[[name]]
+addr = 0x0092E6
+name = "PrintPenaltyRowAbove"
+confidence = 0.5
+evidence = "prints penalty summary entry (d0 high word + 5) * 4 via ai_PrintPenaltySummaryRow; the row entering at the top of the list"
+
+[[name]]
+addr = 0x009316
+name = "PrintPenaltySummaryRow"
+confidence = 0.6
+evidence = "one row of the penalty summary from the table at $C5DE (entry d3: time word, team flag bit 7, penalty type in the low bits): erases the 40x3 row, prints the time (ai_PrintPeriodAndTime), the team name, the penalty description from the string table word_18E0C and its minutes (PushNumber)"
+
+[[name]]
+addr = 0x0FDE24
+name = "PrintGameStatsScreen"
+confidence = 0.6
+evidence = "game statistics screen: draws both team banners (ai_DrawTeamBannerTiles at columns 2 and $1A), writes the scroll, then prints the $E stat rows from the descriptor table word_FDFAA ('Score', 'Shots', 'Shooting Pct', 'Power Play', 'PP Minutes', 'PP Shots', ...) with ai_PrintGameStatValue, honouring OptPen ($D056)"
+
+[[name]]
+addr = 0x0FDB8C
+name = "PrintPeriodStatColumns"
+confidence = 0.6
+evidence = "game stats header: from the per-period stat block at a2 + $342 (or +$34A for the second view $D598) prints the column headers for each period played (gsp) with ai_PrintPeriodStatHeader at columns $B, $10, $15, the OT column at $1A when $C2FC bit 1, and 'Total' at $21"
+
+[[name]]
+addr = 0x0FDC28
+name = "PrintPeriodStatHeader"
+confidence = 0.5
+evidence = "takes the next word from (a0)+ and adds it to $D5A8, then prints the inline column label; called once per period column by ai_PrintPeriodStatColumns"
+
+[[name]]
+addr = 0x0FDD1A
+name = "ScrollGameStats"
+confidence = 0.6
+evidence = "game stats scroll step with a 16-pixel pitch: applies PlayerScrollCtr to VertLineScrolling within 0..$D59E, stops at a boundary, computes the entering row slot (ai_GameStatsRowSlot / ai_GameStatsRowSlotPlus6) and writes the scroll with ai_WriteGameStatsScroll"
+
+[[name]]
+addr = 0x0FDD6A
+name = "WriteGameStatsScroll"
+confidence = 0.6
+evidence = "writes the game stats plane's vertical scroll (-$50 + VertLineScrolling) to VSRAM entry 1 with $BF78 bit 2 held"
+
+[[name]]
+addr = 0x0FDD92
+name = "GameStatsRowSlot"
+confidence = 0.5
+evidence = "computes d3 = VertLineScrolling / 16 and returns; the row print that once followed was removed (falls straight to the rts), so it is a leftover of the stats-list scroller pattern"
+
+[[name]]
+addr = 0x0FDD9C
+name = "GameStatsRowSlotPlus6"
+confidence = 0.5
+evidence = "computes d3 = VertLineScrolling / 16 + 6 and returns (bra to the next instruction, then rts); the row print was removed like ai_GameStatsRowSlot"
+
+[[name]]
+addr = 0x0FDEB4
+name = "PrintGameStatValue"
+confidence = 0.6
+evidence = "prints one game stat into $BFA4: a descriptor of -1 prints the shooting percentage (a2[$C] * 100 / a2[0]) with '%', otherwise the value at a2[(a0)] formatted as a time when the descriptor is $352 (ai_PushTimeThunk), a plain number for $A, or a number with the following text"
+
+[[name]]
+addr = 0x0FDF9E
+name = "PushNumberThunk"
+confidence = 0.8
+evidence = "jmp PushNumber; a jump-table-friendly wrapper used by ai_PrintGameStatValue"
+
+[[name]]
+addr = 0x0FDFA4
+name = "PushTimeThunk"
+confidence = 0.8
+evidence = "jmp PushTime; wrapper used by ai_PrintGameStatValue for the time-formatted stats"
+
+[[name]]
+addr = 0x0F84D0
+name = "LoadSetupLogoTiles"
+confidence = 0.4
+evidence = "setoptions: loads asset unk_AFE1A at tile 2 (LoadAsset) and records the base in $D43A, then loads it again through ai_LoadAssetInline; the listing decodes the 8 inline bytes that follow as instructions, which is why the routine looks like it runs into garbage"
+
+[[name]]
+addr = 0x0FE1D8
+name = "ToggleGoalieControl"
+confidence = 0.4
+evidence = "pause-menu handler: in playoff mode ($D04A) toggles the goalie-control option of the pausing controller ($D05C when both controllers share a team or sflags bit 1, else $D05A); then, unless in shootout mode or during a stoppage, checks the current best-available skater against the 5-slot limit for each side before continuing at loc_FE2C2"
