@@ -9867,8 +9867,9 @@ a3 = player</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] pucknorm helper: when puckc is the goalie (BA_Goalie_SCnum) and $C2F2 bit 5 allows it, counts $C31C down and then sets $C2F2 bit 4 (stoppage), also set when $D454 is 0; the first time (bit 6 latch) posts event $A through sub_11F62 (the message/sound dispatcher used by checkgoal and clockcont); caller pucknorm</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F2F4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF37C">
+        <FUNCTION ENTRY_POINT="0xF37C" NAME="ai_EndShootoutAttempt">
             <ADDRESS_RANGE START="0xF37C" END="0xF3E3" />
+            <REGULAR_CMT>[AI 0.6] checkgoal helper: freezes the camera (freezewindow), outside shootout mode sets a $A-frame timer $DEF0 and $C2EE bit 2, sets $C2EA bit 0, clears the stoppage bits of $C2F2 / $C2FA bit 2, restores the shooter's jersey byte $61 (BA_Sktr_SCnum object) from $C31E and calls ai_AdvanceShootoutRound; caller checkgoal</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F37C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF3E4" NAME="puckfaceoff">
@@ -9880,8 +9881,9 @@ a3 = player</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF590" END="0xF5C5" />
             <TYPEINFO_CMT>sub_F590</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF5C6">
+        <FUNCTION ENTRY_POINT="0xF5C6" NAME="ai_AssignFaceoffPlayer">
             <ADDRESS_RANGE START="0xF5C6" END="0xF611" />
+            <REGULAR_CMT>[AI 0.4] puckfaceoff helper: with a2/a3 swapped, selects object d0 ($B04A + d0*$80), clears its $63 bit 3, runs SetLCmode (line-change mode when the option allows), and if bit 3 got set records the player's state $52 and a target ($168 into +$42/+$46 for the bit-6 side, $258 into +$40/+$44 for the other) in the faceoff record a2; caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F5C6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF64E">
@@ -11101,12 +11103,14 @@ output - d0=xscreen, d1=yscreen</REGULAR_CMT>
             <ADDRESS_RANGE START="0x16D0A" END="0x16D17" />
             <TYPEINFO_CMT>sub_16D0A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16D18">
+        <FUNCTION ENTRY_POINT="0x16D18" NAME="ai_LoadTeamBanners">
             <ADDRESS_RANGE START="0x16D18" END="0x16D63" />
+            <REGULAR_CMT>[AI 0.7] setupice: records the banner tile base in $B022, loads asset off_ABA14 (the banner font/tiles) into VRAM with the name-table buffer $C334 as a1, then builds the home ($C330) and away ($C332) banner rows with ai_BuildTeamBannerTiles at tile offsets $B022*32 and ($B022+$16)*32; returns d4 = $B022 + $2C (next free tile); caller setupice</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16D18</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16D64">
+        <FUNCTION ENTRY_POINT="0x16D64" NAME="ai_BuildTeamBannerTiles">
             <ADDRESS_RANGE START="0x16D64" END="0x16DA1" />
+            <REGULAR_CMT>[AI 0.6] d0 = team id, d1 = destination VRAM address: takes the team's 44-byte banner row (44 * team + 4 in the asset) and for its 22 entries writes a name-table word (priority/palette from the entry byte, tile = destination/32 | $8000) into the $C334 buffer at a1 and copies the referenced source tile (entry &amp; $7FF + $B022 + $2C) to the destination with ai_VDP_VramCopyDMA; caller ai_LoadTeamBanners</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16D64</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16DA2" NAME="defaultsprites">
@@ -11282,8 +11286,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1821A" END="0x18235" />
             <TYPEINFO_CMT>sub_1821A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18236">
+        <FUNCTION ENTRY_POINT="0x18236" NAME="ai_BigNumMul">
             <ADDRESS_RANGE START="0x18236" END="0x1826B" />
+            <REGULAR_CMT>[AI 0.8] multiplies the five-word number at a3 by d0: pops each word, multiplies it by d0 and adds the 32-bit product into the running number with carry propagation (dbcc loop); only caller ai_BigNumMulAdd</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18236</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1826C" NAME="ai_BigNumDivMod">
@@ -11314,8 +11319,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] post-game 'Stars of the Game' panel: once RefCnt is above $40 and $C2EA bit 7 was clear, waits a frame, draws a 28x9 box, prints the title, draws the star bitmap from off_5605A at tile base $B018, scores every player with sub_18620 / ai_ScorePlayerForStars and prints the three stars with sub_185E0; caller UpdatePA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1850A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x185E0">
+        <FUNCTION ENTRY_POINT="0x185E0" NAME="ai_TakeTopStar">
             <ADDRESS_RANGE START="0x185E0" END="0x1861F" />
+            <REGULAR_CMT>[AI 0.7] scans the 52 star scores at $CF36, picks the highest, clears it so the next call returns the runner-up, and returns d0 = the player index (0..$19) with a2 = the home record, or the away record for indexes $1A and up; caller ai_StarsOfTheGameScreen (three times)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_185E0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18620" NAME="ai_ScoreAllPlayersForStars">
@@ -11496,8 +11502,9 @@ d0 = start of data</REGULAR_CMT>
             <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry. Requests the Z80 bus, checks the driver handshake bytes at Z80 RAM $96/$97 ($7D/0), writes $D1/0 back and copies the 33 bytes at $D182 into Z80 RAM $98</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A574</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A5C0">
+        <FUNCTION ENTRY_POINT="0x1A5C0" NAME="ai_RunMusicTrack">
             <ADDRESS_RANGE START="0x1A5C0" END="0x1A609" />
+            <REGULAR_CMT>[AI 0.7] MusicVB sequencer step for track a5: counts the wait 4(a5) down, then reads the next 4-byte command from the track pointer (a5): byte 1 = 0 ends the track (or jumps to the loop pointer at +2 unless -1), otherwise bits 4..6 of byte 1 select a handler from the jump table word_1A60A (8 entries) and the loop continues until a wait is set; caller MusicVB</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A5C0</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x1" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
@@ -11692,8 +11699,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7B0A" END="0xF7B1F" />
             <TYPEINFO_CMT>sub_F7B0A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7B20">
+        <FUNCTION ENTRY_POINT="0xF7B20" NAME="ai_RedrawSetupValues">
             <ADDRESS_RANGE START="0xF7B20" END="0xF7B65" />
+            <REGULAR_CMT>[AI 0.5] for the setup rows -2..$10 in steps of 2 calls GameSetUp_3 (option value logic) and, when the row is within the scrolled window ($D422), GameSetUp_4 (prints the value), then sub_F7BFA (the team names / 'Regular Season' / 'Continue Playoffs' entries), ai_RefreshSetupTeamLogos and, unless $D42E bit 0, ai_ResetPhotoRotateTimer; caller ai_RefreshSetupOptions</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7B20</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF7B66" NAME="GameSetUp_4">
@@ -12070,8 +12078,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] user-name deletion: for the $2D8 four-byte SRAM records from offset 0 and the $1C sixteen-byte records from $B60, reads each with ReadSRAM into $CF36, clears every user-index byte (odd offsets) equal to the user being deleted ($D4EA) and writes the record back with WriteSRAM when changed; caller sub_FB9D4 (delete user name)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FBA76</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFBB88">
+        <FUNCTION ENTRY_POINT="0xFBB88" NAME="ai_PromptUserRecordSelect">
             <ADDRESS_RANGE START="0xFBB88" END="0xFBBDD" />
+            <REGULAR_CMT>[AI 0.5] PeriodOver, only when OptUserRec is off: clears the user ids $D042/$D044 and, for each controller with a team selected (cont1team, and cont2team when it differs), sets $D4EE = team - 1 and runs the user-name selection screen loc_FB018 (installs loc_17C42 as the V-blank routine and rebuilds the planes); caller PeriodOver</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FBB88</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFBBDE">
@@ -12114,16 +12123,18 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFC4C0" END="0xFC515" />
             <TYPEINFO_CMT>sub_FC4C0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC516">
+        <FUNCTION ENTRY_POINT="0xFC516" NAME="ai_AdvanceShootoutRound">
             <ADDRESS_RANGE START="0xFC516" END="0xFC56F" />
+            <REGULAR_CMT>[AI 0.7] after each shootout attempt: when the shootout is enabled ($D595 bit 0), at least 5 rounds are done ($D578) and the round scores $D574/$D576 differ, sets $C2FA bit 3 and runs ai_ShootoutWinnersCelebrate; otherwise toggles the shooting side $D594 and, once both sides have shot, advances the shooter index $D586 (wrapping at 5) and the round counter; caller ai_EndShootoutAttempt</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC516</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC570">
             <ADDRESS_RANGE START="0xFC570" END="0xFC5AD" />
             <TYPEINFO_CMT>sub_FC570</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC5AE">
+        <FUNCTION ENTRY_POINT="0xFC5AE" NAME="ai_PrintShootoutWinner">
             <ADDRESS_RANGE START="0xFC5AE" END="0xFC61F" />
+            <REGULAR_CMT>[AI 0.8] SetPA: draws a 30x6 box at column 1 row $D, prints 'SHOOTOUT WON BY' in the big font, then the name of HomeTeam or VisTeam (team table $30E, name at offset +4) depending on which round score ($D574 vs $D576) is higher; caller SetPA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC5AE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC850">
@@ -12232,8 +12243,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] called by sub_FC516 when the shootout is decided ($D595 bit 0, at least 5 rounds in $D578 and the round scores $D574/$D576 differ): sets $C2EE bit 2, $DED0 = $60, then for the five skaters of the team with the higher score (object block $B04A or +6*$80) sets slot $34 = 2, places them at x = 0 and y = Vpos +-$F0, starts animation 7 (sub_10658) and clears their state flags; caller sub_FC516</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD618</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD73C">
+        <FUNCTION ENTRY_POINT="0xFD73C" NAME="ai_ClearGameState">
             <ADDRESS_RANGE START="0xFD73C" END="0xFD789" />
+            <REGULAR_CMT>[AI 0.7] GameSetUp: zeroes the shootout block $D572 (19 words), both team records ($C6CE, 2 x $364 bytes), the penalty message buffer $C3A4 ($25 words), the state flag words $C2F2/$C2F4/$C2F8/$C2FA, the setup-screen flags $D42E and the photo index $D43E; caller GameSetUp</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD73C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD78A" NAME="ai_EmitAnimationSprites">

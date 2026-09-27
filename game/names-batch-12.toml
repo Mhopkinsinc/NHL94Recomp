@@ -1,0 +1,84 @@
+# Names batch 12 - see docs/names/names-batch-12.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-12.toml
+
+# ---- shootout --------------------------------------------------------------------
+
+[[name]]
+addr = 0x0FC516
+name = "AdvanceShootoutRound"
+confidence = 0.7
+evidence = "after each shootout attempt: when the shootout is enabled ($D595 bit 0), at least 5 rounds are done ($D578) and the round scores $D574/$D576 differ, sets $C2FA bit 3 and runs ai_ShootoutWinnersCelebrate; otherwise toggles the shooting side $D594 and, once both sides have shot, advances the shooter index $D586 (wrapping at 5) and the round counter; caller ai_EndShootoutAttempt"
+
+[[name]]
+addr = 0x00F37C
+name = "EndShootoutAttempt"
+confidence = 0.6
+evidence = "checkgoal helper: freezes the camera (freezewindow), outside shootout mode sets a $A-frame timer $DEF0 and $C2EE bit 2, sets $C2EA bit 0, clears the stoppage bits of $C2F2 / $C2FA bit 2, restores the shooter's jersey byte $61 (BA_Sktr_SCnum object) from $C31E and calls ai_AdvanceShootoutRound; caller checkgoal"
+
+[[name]]
+addr = 0x0FC5AE
+name = "PrintShootoutWinner"
+confidence = 0.8
+evidence = "SetPA: draws a 30x6 box at column 1 row $D, prints 'SHOOTOUT WON BY' in the big font, then the name of HomeTeam or VisTeam (team table $30E, name at offset +4) depending on which round score ($D574 vs $D576) is higher; caller SetPA"
+
+# ---- game setup --------------------------------------------------------------------
+
+[[name]]
+addr = 0x0FD73C
+name = "ClearGameState"
+confidence = 0.7
+evidence = "GameSetUp: zeroes the shootout block $D572 (19 words), both team records ($C6CE, 2 x $364 bytes), the penalty message buffer $C3A4 ($25 words), the state flag words $C2F2/$C2F4/$C2F8/$C2FA, the setup-screen flags $D42E and the photo index $D43E; caller GameSetUp"
+
+[[name]]
+addr = 0x0F7B20
+name = "RedrawSetupValues"
+confidence = 0.5
+evidence = "for the setup rows -2..$10 in steps of 2 calls GameSetUp_3 (option value logic) and, when the row is within the scrolled window ($D422), GameSetUp_4 (prints the value), then sub_F7BFA (the team names / 'Regular Season' / 'Continue Playoffs' entries), ai_RefreshSetupTeamLogos and, unless $D42E bit 0, ai_ResetPhotoRotateTimer; caller ai_RefreshSetupOptions"
+
+[[name]]
+addr = 0x0FBB88
+name = "PromptUserRecordSelect"
+confidence = 0.5
+evidence = "PeriodOver, only when OptUserRec is off: clears the user ids $D042/$D044 and, for each controller with a team selected (cont1team, and cont2team when it differs), sets $D4EE = team - 1 and runs the user-name selection screen loc_FB018 (installs loc_17C42 as the V-blank routine and rebuilds the planes); caller PeriodOver"
+
+# ---- team banners / rink ------------------------------------------------------------
+
+[[name]]
+addr = 0x016D18
+name = "LoadTeamBanners"
+confidence = 0.7
+evidence = "setupice: records the banner tile base in $B022, loads asset off_ABA14 (the banner font/tiles) into VRAM with the name-table buffer $C334 as a1, then builds the home ($C330) and away ($C332) banner rows with ai_BuildTeamBannerTiles at tile offsets $B022*32 and ($B022+$16)*32; returns d4 = $B022 + $2C (next free tile); caller setupice"
+
+[[name]]
+addr = 0x016D64
+name = "BuildTeamBannerTiles"
+confidence = 0.6
+evidence = "d0 = team id, d1 = destination VRAM address: takes the team's 44-byte banner row (44 * team + 4 in the asset) and for its 22 entries writes a name-table word (priority/palette from the entry byte, tile = destination/32 | $8000) into the $C334 buffer at a1 and copies the referenced source tile (entry & $7FF + $B022 + $2C) to the destination with ai_VDP_VramCopyDMA; caller ai_LoadTeamBanners"
+
+# ---- stars / password / faceoff ------------------------------------------------------
+
+[[name]]
+addr = 0x0185E0
+name = "TakeTopStar"
+confidence = 0.7
+evidence = "scans the 52 star scores at $CF36, picks the highest, clears it so the next call returns the runner-up, and returns d0 = the player index (0..$19) with a2 = the home record, or the away record for indexes $1A and up; caller ai_StarsOfTheGameScreen (three times)"
+
+[[name]]
+addr = 0x018236
+name = "BigNumMul"
+confidence = 0.8
+evidence = "multiplies the five-word number at a3 by d0: pops each word, multiplies it by d0 and adds the 32-bit product into the running number with carry propagation (dbcc loop); only caller ai_BigNumMulAdd"
+
+[[name]]
+addr = 0x00F5C6
+name = "AssignFaceoffPlayer"
+confidence = 0.4
+evidence = "puckfaceoff helper: with a2/a3 swapped, selects object d0 ($B04A + d0*$80), clears its $63 bit 3, runs SetLCmode (line-change mode when the option allows), and if bit 3 got set records the player's state $52 and a target ($168 into +$42/+$46 for the bit-6 side, $258 into +$40/+$44 for the other) in the faceoff record a2; caller puckfaceoff"
+
+# ---- sound ---------------------------------------------------------------------------
+
+[[name]]
+addr = 0x01A5C0
+name = "RunMusicTrack"
+confidence = 0.7
+evidence = "MusicVB sequencer step for track a5: counts the wait 4(a5) down, then reads the next 4-byte command from the track pointer (a5): byte 1 = 0 ends the track (or jumps to the loop pointer at +2 unless -1), otherwise bits 4..6 of byte 1 select a handler from the jump table word_1A60A (8 entries) and the loop continues until a wait is set; caller MusicVB"
