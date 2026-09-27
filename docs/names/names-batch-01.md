@@ -136,9 +136,9 @@ XML (or the proposals file and re-apply).
 01A508  rts
 ```
 
-## `$0F9B94` -> `ai_SaveRecordField`  (confidence 0.6, 18 insns)
+## `$0F9B94` -> `ai_ReadRecordField`  (confidence 0.7, 18 insns)
 
-**Evidence.** computes a byte offset from d0*4 plus word_F9CA4[d1]*4 and reads or writes it through ReadSRAM/WriteSRAM depending on bit 6 of $C2F8; callers are the user-records screens
+**Evidence.** clears bit 6 of $C2F8 (SRAM write flag) then computes field offset d0*4 + word_F9CA4[d1]*4 and reads 4 bytes via ReadSRAM; the write twin sub_F9BDA sets the same bit and jumps into the shared body at loc_F9B9A
 
 **Callers.** sub_F99F2, sub_F9AE4, sub_F9B2A, sub_F9F50
 **Callees.** ReadSRAM, WriteSRAM, loc_F9BD4
@@ -162,5 +162,17 @@ XML (or the proposals file and re-apply).
 0F9BCE  jsr	sub_1A244
 0F9BD4  movem.l	(sp)+,d0-d1/a0-a1
 0F9BD8  rts
+```
+
+## `$0F9BDA` -> `ai_WriteRecordField`  (confidence 0.7, 2 insns)
+
+**Evidence.** sets bit 6 of $C2F8 and branches into ReadRecordField's body at loc_F9B9A, where the bit selects WriteSRAM over ReadSRAM; called from sub_F9F50 (records screen)
+
+**Callers.** sub_F9F50
+**Callees.** loc_F9B9A
+
+```
+0F9BDA  bset	#6,($FFFFC2F8).w
+0F9BE0  bra.s	loc_F9B9A
 ```
 

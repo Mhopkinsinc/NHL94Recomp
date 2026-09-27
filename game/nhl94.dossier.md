@@ -406,7 +406,7 @@ ram     : DispAttribCtr, PlayerScrollCtr, VertLineScrolling
 
 ## $0F99F2  (sub_F99F2, 38 insns, 1 callers)
 callers : sub_F98C6
-callees : ai_SaveRecordField, loc_F9A10, loc_F9A5E
+callees : ai_ReadRecordField, loc_F9A10, loc_F9A5E
 
 ## $0085EE  (loc_85EE, 37 insns, 1 callers)
 callers : loc_8566
@@ -455,7 +455,7 @@ ram     : puckvx, puckvy, puckvz, puckx, pucky
 
 ## $0F9F50  (sub_F9F50, 31 insns, 1 callers)
 callers : sub_F9CDE
-callees : ai_SaveRecordField, loc_F9F84, sub_F9BDA
+callees : ai_ReadRecordField, ai_WriteRecordField, loc_F9F84
 
 ## $007E88  (loc_7E88, 30 insns, 1 callers)
 callers : PauseMode
@@ -518,7 +518,7 @@ ram     : OptGoalie, OptNOP, OptPlayMode, OptUserRec
 
 ## $0F9B2A  (sub_F9B2A, 26 insns, 1 callers)
 callers : sub_F9AAC
-callees : ai_SaveRecordField, appstring, sub_FA014, sub_FA880
+callees : ai_ReadRecordField, appstring, sub_FA014, sub_FA880
 
 ## $0FD4CA  (sub_FD4CA, 26 insns, 1 callers)
 callers : loc_FCC76
@@ -657,7 +657,7 @@ ram     : potreeteam, printa
 
 ## $0F9AE4  (sub_F9AE4, 19 insns, 1 callers)
 callers : sub_F9A64
-callees : ai_SaveRecordField, sub_FA014
+callees : ai_ReadRecordField, sub_FA014
 
 ## $0FABDC  (sub_FABDC, 19 insns, 1 callers)
 callers : loc_FA550
@@ -1251,10 +1251,6 @@ callees : printz2
 ## $01A140  (sub_1A140, 2 insns, 1 callers)
 callers : InitSaveRAM
 callees : vcountwait
-
-## $0F9BDA  (sub_F9BDA, 2 insns, 1 callers)
-callers : sub_F9F50
-callees : loc_F9B9A
 
 ## $0F9C18  (sub_F9C18, 2 insns, 1 callers)
 callers : sub_F9EAA

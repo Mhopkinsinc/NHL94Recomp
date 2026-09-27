@@ -11722,13 +11722,14 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF9B2A" END="0xF9B8F" />
             <TYPEINFO_CMT>sub_F9B2A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9B94" NAME="ai_SaveRecordField">
+        <FUNCTION ENTRY_POINT="0xF9B94" NAME="ai_ReadRecordField">
             <ADDRESS_RANGE START="0xF9B94" END="0xF9BD9" />
-            <REGULAR_CMT>[AI 0.6] computes a byte offset from d0*4 plus word_F9CA4[d1]*4 and reads or writes it through ReadSRAM/WriteSRAM depending on bit 6 of $C2F8; callers are the user-records screens</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.7] clears bit 6 of $C2F8 (SRAM write flag) then computes field offset d0*4 + word_F9CA4[d1]*4 and reads 4 bytes via ReadSRAM; the write twin sub_F9BDA sets the same bit and jumps into the shared body at loc_F9B9A</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9B94</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9BDA">
+        <FUNCTION ENTRY_POINT="0xF9BDA" NAME="ai_WriteRecordField">
             <ADDRESS_RANGE START="0xF9BDA" END="0xF9BE1" />
+            <REGULAR_CMT>[AI 0.7] sets bit 6 of $C2F8 and branches into ReadRecordField's body at loc_F9B9A, where the bit selects WriteSRAM over ReadSRAM; called from sub_F9F50 (records screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9BDA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9BE2" NAME="clrCrowdRAM?">

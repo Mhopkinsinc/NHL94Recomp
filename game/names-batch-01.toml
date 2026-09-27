@@ -47,6 +47,12 @@ evidence = "writes $100 to $A11200 (Z80 reset release) and $A11100 (bus request)
 
 [[name]]
 addr = 0x0F9B94
-name = "SaveRecordField"
-confidence = 0.6
-evidence = "computes a byte offset from d0*4 plus word_F9CA4[d1]*4 and reads or writes it through ReadSRAM/WriteSRAM depending on bit 6 of $C2F8; callers are the user-records screens"
+name = "ReadRecordField"
+confidence = 0.7
+evidence = "clears bit 6 of $C2F8 (SRAM write flag) then computes field offset d0*4 + word_F9CA4[d1]*4 and reads 4 bytes via ReadSRAM; the write twin sub_F9BDA sets the same bit and jumps into the shared body at loc_F9B9A"
+
+[[name]]
+addr = 0x0F9BDA
+name = "WriteRecordField"
+confidence = 0.7
+evidence = "sets bit 6 of $C2F8 and branches into ReadRecordField's body at loc_F9B9A, where the bit selects WriteSRAM over ReadSRAM; called from sub_F9F50 (records screen)"
