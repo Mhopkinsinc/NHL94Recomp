@@ -9203,8 +9203,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x81CA" END="0x81F1" />
             <TYPEINFO_CMT>sub_81CA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x81F2">
+        <FUNCTION ENTRY_POINT="0x81F2" NAME="ai_PrintSeriesMatchup">
             <ADDRESS_RANGE START="0x81F2" END="0x824F" />
+            <REGULAR_CMT>[AI 0.6] playoff results list: for series d3 (skipped when it is the current series $CEE6 or its +$E flags 1/2 mark it pending/finished) prints the away team and its wins (+2, +$C) and the home team and its wins (+0, +$A) with ai_PrintTeamNameAndNumber, then the game/round label from word_191E4 (entry 8(a0) - 1) at column $1C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_81F2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8250" NAME="ai_PrintTeamNameAndNumber">
@@ -9236,8 +9237,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.4] prints one long inline control string (attribute/position codes with embedded tile data) that lays out the edit-lines screen furniture; caller loc_8566</REGULAR_CMT>
             <TYPEINFO_CMT>sub_868C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x86F8">
+        <FUNCTION ENTRY_POINT="0x86F8" NAME="ai_PrintEditLinesScreen">
             <ADDRESS_RANGE START="0x86F8" END="0x8773" />
+            <REGULAR_CMT>[AI 0.6] edit-lines screen frame, byte-for-byte the shape of ai_PrintShootoutScreen: erases the body (ai_EraseEditLinesBody), draws the background bitmap off_54E24 at tile base 1 and the 26x6 title box at column 7 row 1</REGULAR_CMT>
             <TYPEINFO_CMT>sub_86F8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8774" NAME="ai_EraseEditLinesBody">
@@ -9376,12 +9378,14 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] edit-lines roster: prints one of the four control strings at word_9A02 chosen by d0 = (VertLineScrolling &gt; 0) + 2*(VertLineScrolling &lt; $D5B2), i.e. whether the list can scroll up and/or down, at the header position set by the inline print2 string; callers loc_945C and sub_9588</REGULAR_CMT>
             <TYPEINFO_CMT>sub_99C6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9A84">
+        <FUNCTION ENTRY_POINT="0x9A84" NAME="ai_PrintCrowdMeterLevels">
             <ADDRESS_RANGE START="0x9A84" END="0x9B1D" />
+            <REGULAR_CMT>[AI 0.7] crowd meter page: prints 'Current Level' (CwdExciteLvl), 'Average Level' (SumCwdExciteLvl / NumCwdExciteLvl), 'Peak Level' (MaxCwdExciteLvl) and 'Arena Record' with ai_PrintCrowdMeterValue for each, then falls into ai_PrintLeagueCrowdRecord</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9A84</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9B4A">
+        <FUNCTION ENTRY_POINT="0x9B4A" NAME="ai_PrintLeagueCrowdRecord">
             <ADDRESS_RANGE START="0x9B4A" END="0x9BB3" />
+            <REGULAR_CMT>[AI 0.7] crowd meter page tail: finds the loudest team (ai_FindLoudestCrowdTeam), reads its record byte 8 (default $50) and prints 'League Record' with the value as a 3-digit number followed by 'dB'</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9B4A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9BB4" NAME="ai_PrintCrowdMeterValue">
@@ -9918,8 +9922,9 @@ a3 = player</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.4] puckfaceoff helper: with a2/a3 swapped, selects object d0 ($B04A + d0*$80), clears its $63 bit 3, runs SetLCmode (line-change mode when the option allows), and if bit 3 got set records the player's state $52 and a target ($168 into +$42/+$46 for the bit-6 side, $258 into +$40/+$44 for the other) in the faceoff record a2; caller puckfaceoff</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F5C6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF64E">
+        <FUNCTION ENTRY_POINT="0xF64E" NAME="ai_TickLineChangeTimer">
             <ADDRESS_RANGE START="0xF64E" END="0xF6A9" />
+            <REGULAR_CMT>[AI 0.5] per-controller line-change box: a3 + d0 = timer word, +4 = player index (object $B04A + index*$80, team by $62 bit 6); when the player is not in line-change mode ($63 bit 3) sets the timer to -1 and shows the menu (ai_PrintLineChangeMenu); otherwise counts it down by d7 and on expiry auto-completes the change (sub_BB06 with d2 = 0) and reprints the menu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F64E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF6AA" NAME="ChkGoalies">
@@ -10330,8 +10335,9 @@ d5 = pal used bits (0-3) for color fam 1-4</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] tile decompressor used by ai_LoadTilesCore for negative-count blocks: with the scratch buffer $CF36, the inline map slot $CF32 and the writers remap / DoDMApro in a5/a6, reads control bytes from a0 and dispatches on their high nibble through the jump table word_117B2 until the block is done; caller ai_LoadTilesCore</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1177A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11924">
+        <FUNCTION ENTRY_POINT="0x11924" NAME="ai_DecompressTileRun">
             <ADDRESS_RANGE START="0x11924" END="0x11951" />
+            <REGULAR_CMT>[AI 0.5] ai_DecompressTiles handler for a raw run: d1 = tile count (0 means 256), advances the destination d3 by count*2 words... and writes the tiles from a1 through the remap routine (a5) when an inline nibble map is set in (a4), else through DoDMApro (a6)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11924</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11952" NAME="xyVmMap">
@@ -12155,8 +12161,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB7CA" END="0xFB7F1" />
             <TYPEINFO_CMT>sub_FB7CA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB822">
+        <FUNCTION ENTRY_POINT="0xFB822" NAME="ai_PrintUserNameList">
             <ADDRESS_RANGE START="0xFB822" END="0xFB873" />
+            <REGULAR_CMT>[AI 0.7] user selection screen: prints the seven stored user names (entries 1..7 of $D45A via ai_CopyUserNameDashed and ai_PrintNameEntryField) one per row from column 5 row 8, preserving $D4E8/$D4EA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB822</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB874">
@@ -12241,8 +12248,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFC47C" END="0xFC4BF" />
             <TYPEINFO_CMT>sub_FC47C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC4C0">
+        <FUNCTION ENTRY_POINT="0xFC4C0" NAME="ai_StartShootoutAttempt">
             <ADDRESS_RANGE START="0xFC4C0" END="0xFC515" />
+            <REGULAR_CMT>[AI 0.6] shootout attempt start: when the shootout is already decided ($C2FA bit 3) jumps to loc_172E4; otherwise starts a skating script (ai_StartWaypointScript), sets BA_Team = the shooting side $D594, the goalie slot BA_Goalie_SCnum = $B (home) or 5 (away), takes the shooter index from the side's list ($D57A/$D588) at $D586 into $D40A and clears $B7AC bit 2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC4C0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC516" NAME="ai_AdvanceShootoutRound">
@@ -12265,8 +12273,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] player picker page: prints the column header from word_1940E (or word_19570 when $D5B8 is 5) selected by $D5AC, with the 'Overall ]' variants word_FC91A/word_FC930, then up to six rows from the slot list $C018 starting at PlayerScrollCtr via sub_8D4E, highlighting the row equal to VertLineScrolling</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC850</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC986">
+        <FUNCTION ENTRY_POINT="0xFC986" NAME="ai_PrintShootoutScreen">
             <ADDRESS_RANGE START="0xFC986" END="0xFCA03" />
+            <REGULAR_CMT>[AI 0.6] shootout screen frame: erases the body (ai_EraseStatsBody), draws the background bitmap off_54E24 at tile base 1, a 26x6 box at column 7 row 1 and the 'Shootout' title; reached from the shootout mode dispatcher</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC986</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCA04" NAME="ai_EraseStatsBody">
@@ -12282,8 +12291,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFCA28" END="0xFCAB7" />
             <TYPEINFO_CMT>sub_FCA28</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCAB8">
+        <FUNCTION ENTRY_POINT="0xFCAB8" NAME="ai_PrintShootoutShooterBox">
             <ADDRESS_RANGE START="0xFCAB8" END="0xFCB19" />
+            <REGULAR_CMT>[AI 0.5] shootout screen: draws a 24x3 box at column 8 row 7 and prints, at column $15, the shooter selected by $D5B8 from the home ($D57A) or away ($D588) shooter list of ai_LoadShootoutShooters (a2 chooses the side)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCAB8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCB1A">
@@ -12485,8 +12495,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFEAE4" END="0xFEAF9" />
             <TYPEINFO_CMT>sub_FEAE4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEAFA">
+        <FUNCTION ENTRY_POINT="0xFEAFA" NAME="ai_PrintGoalsInParens">
             <ADDRESS_RANGE START="0xFEAFA" END="0xFEB53" />
+            <REGULAR_CMT>[AI 0.7] prints ' (' + player d0's goal total (team column +$B4, 1..3 digits) + ')' then moves to the next row at column $E; used by the ticker/scoring text</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEAFA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEB54" NAME="ai_SlideToFaceoffSpot">
@@ -12553,8 +12564,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>Adjusts attribute display based on d0 value</REGULAR_CMT>
             <TYPEINFO_CMT>AttribAdjust</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEF8C">
+        <FUNCTION ENTRY_POINT="0xFEF8C" NAME="ai_PuckApproachingPlayer">
             <ADDRESS_RANGE START="0xFEF8C" END="0xFEFCB" />
+            <REGULAR_CMT>[AI 0.5] returns (in the condition codes) whether the puck is within $1E of player a3 in x and y and moving toward him: the sign of (puckx - x) is compared with puckvx and, when both agree, (pucky - y) with puckvy; used by the pass-reception checks</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEF8C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEFCC" NAME="ReadGoaliePulled">

@@ -1,0 +1,74 @@
+# Names batch 23 - see docs/names/names-batch-23.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-23.toml
+
+[[name]]
+addr = 0x0081F2
+name = "PrintSeriesMatchup"
+confidence = 0.6
+evidence = "playoff results list: for series d3 (skipped when it is the current series $CEE6 or its +$E flags 1/2 mark it pending/finished) prints the away team and its wins (+2, +$C) and the home team and its wins (+0, +$A) with ai_PrintTeamNameAndNumber, then the game/round label from word_191E4 (entry 8(a0) - 1) at column $1C"
+
+[[name]]
+addr = 0x00F64E
+name = "TickLineChangeTimer"
+confidence = 0.5
+evidence = "per-controller line-change box: a3 + d0 = timer word, +4 = player index (object $B04A + index*$80, team by $62 bit 6); when the player is not in line-change mode ($63 bit 3) sets the timer to -1 and shows the menu (ai_PrintLineChangeMenu); otherwise counts it down by d7 and on expiry auto-completes the change (sub_BB06 with d2 = 0) and reprints the menu"
+
+[[name]]
+addr = 0x0FC986
+name = "PrintShootoutScreen"
+confidence = 0.6
+evidence = "shootout screen frame: erases the body (ai_EraseStatsBody), draws the background bitmap off_54E24 at tile base 1, a 26x6 box at column 7 row 1 and the 'Shootout' title; reached from the shootout mode dispatcher"
+
+[[name]]
+addr = 0x0086F8
+name = "PrintEditLinesScreen"
+confidence = 0.6
+evidence = "edit-lines screen frame, byte-for-byte the shape of ai_PrintShootoutScreen: erases the body (ai_EraseEditLinesBody), draws the background bitmap off_54E24 at tile base 1 and the 26x6 title box at column 7 row 1"
+
+[[name]]
+addr = 0x009A84
+name = "PrintCrowdMeterLevels"
+confidence = 0.7
+evidence = "crowd meter page: prints 'Current Level' (CwdExciteLvl), 'Average Level' (SumCwdExciteLvl / NumCwdExciteLvl), 'Peak Level' (MaxCwdExciteLvl) and 'Arena Record' with ai_PrintCrowdMeterValue for each, then falls into ai_PrintLeagueCrowdRecord"
+
+[[name]]
+addr = 0x009B4A
+name = "PrintLeagueCrowdRecord"
+confidence = 0.7
+evidence = "crowd meter page tail: finds the loudest team (ai_FindLoudestCrowdTeam), reads its record byte 8 (default $50) and prints 'League Record' with the value as a 3-digit number followed by 'dB'"
+
+[[name]]
+addr = 0x0FCAB8
+name = "PrintShootoutShooterBox"
+confidence = 0.5
+evidence = "shootout screen: draws a 24x3 box at column 8 row 7 and prints, at column $15, the shooter selected by $D5B8 from the home ($D57A) or away ($D588) shooter list of ai_LoadShootoutShooters (a2 chooses the side)"
+
+[[name]]
+addr = 0x0FEAFA
+name = "PrintGoalsInParens"
+confidence = 0.7
+evidence = "prints ' (' + player d0's goal total (team column +$B4, 1..3 digits) + ')' then moves to the next row at column $E; used by the ticker/scoring text"
+
+[[name]]
+addr = 0x0FB822
+name = "PrintUserNameList"
+confidence = 0.7
+evidence = "user selection screen: prints the seven stored user names (entries 1..7 of $D45A via ai_CopyUserNameDashed and ai_PrintNameEntryField) one per row from column 5 row 8, preserving $D4E8/$D4EA"
+
+[[name]]
+addr = 0x0FC4C0
+name = "StartShootoutAttempt"
+confidence = 0.6
+evidence = "shootout attempt start: when the shootout is already decided ($C2FA bit 3) jumps to loc_172E4; otherwise starts a skating script (ai_StartWaypointScript), sets BA_Team = the shooting side $D594, the goalie slot BA_Goalie_SCnum = $B (home) or 5 (away), takes the shooter index from the side's list ($D57A/$D588) at $D586 into $D40A and clears $B7AC bit 2"
+
+[[name]]
+addr = 0x0FEF8C
+name = "PuckApproachingPlayer"
+confidence = 0.5
+evidence = "returns (in the condition codes) whether the puck is within $1E of player a3 in x and y and moving toward him: the sign of (puckx - x) is compared with puckvx and, when both agree, (pucky - y) with puckvy; used by the pass-reception checks"
+
+[[name]]
+addr = 0x011924
+name = "DecompressTileRun"
+confidence = 0.5
+evidence = "ai_DecompressTiles handler for a raw run: d1 = tile count (0 means 256), advances the destination d3 by count*2 words... and writes the tiles from a1 through the remap routine (a5) when an inline nibble map is set in (a4), else through DoDMApro (a6)"
