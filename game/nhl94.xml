@@ -9146,8 +9146,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>game is in pause mode</REGULAR_CMT>
             <TYPEINFO_CMT>PauseMode</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x7DCE">
+        <FUNCTION ENTRY_POINT="0x7DCE" NAME="ai_PauseScreenSetup">
             <ADDRESS_RANGE START="0x7DCE" END="0x7E0D" />
+            <REGULAR_CMT>[AI 0.5] sets the window/plane registers ($91 = 0, $92 = $1C), calls sub_12B94, fades with sub_15EC0, resets the PSG noise (PSG_SetupNoise), positions at (0,0) via the inline string and erases a 32x28 area, i.e. clears the display for the pause menu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7DCE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x7E0E" NAME="ai_GetControllingTeam">
@@ -9200,8 +9201,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] player picker scroll step with a 24-pixel pitch: applies PlayerScrollCtr to VertLineScrolling within 0..$D5B2; at a row boundary redraws the arrows (ai_PrintSelectPlayerArrows) and stops, otherwise continues in sub_81CA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8198</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x81CA">
+        <FUNCTION ENTRY_POINT="0x81CA" NAME="ai_WritePlayerPickerScroll">
             <ADDRESS_RANGE START="0x81CA" END="0x81F1" />
+            <REGULAR_CMT>[AI 0.6] writes the player picker's vertical scroll (-$30 + VertLineScrolling) to VSRAM entry 1 with $BF78 bit 2 held; tail of ai_ScrollPlayerPicker</REGULAR_CMT>
             <TYPEINFO_CMT>sub_81CA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x81F2" NAME="ai_PrintSeriesMatchup">
@@ -9410,8 +9412,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] a2 = player record, $1E(a2) = pointer to the player's data block; adds the word at +$A, takes the word there and counts how many left shifts by 4 it survives before becoming zero (1..4), returned in d0; used by loc_9872 (attribute lookup for PrintPlayerStatRow) as an upper bound and by sub_9F5C which adds it to a nibble of the next field</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9F40</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9F5C">
+        <FUNCTION ENTRY_POINT="0x9F5C" NAME="ai_CountRatingNibblesPlusGoalies">
             <ADDRESS_RANGE START="0x9F5C" END="0x9F7D" />
+            <REGULAR_CMT>[AI 0.5] ai_CountRatingNibbles plus the high nibble of byte 3 of the team data block at offset +8 (the roster count word, believed to hold the goalie count), returning the sum in d0</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9F5C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9F7E">
@@ -10677,8 +10680,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] sub_13056 helper: refills the energy (ai_ResetLineEnergy), sets team a3's line $16 to 0, and with automatic lines (OptLine = 0) picks line 3 when a3 has more skaters than a2 (power play) or line 5 when fewer (penalty kill); caller sub_13056</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13068</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x13098">
+        <FUNCTION ENTRY_POINT="0x13098" NAME="ai_ResetLineEnergyExceptOut">
             <ADDRESS_RANGE START="0x13098" END="0x130BD" />
+            <REGULAR_CMT>[AI 0.5] variant of ai_ResetLineEnergy: refills all 26 energy words $32+2i of team a2 to $1000 except slots whose status $66+2i is -3 and -4 at once (the unreachable double test means every slot is refilled)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13098</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x130BE" NAME="ai_ResetLineEnergy">
@@ -11059,8 +11063,9 @@ d6 = link counter</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] showclock: prints string d0 of the label table off_16396; caller showclock</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16384</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x16468">
+        <FUNCTION ENTRY_POINT="0x16468" NAME="ai_PushNumberTile">
             <ADDRESS_RANGE START="0x16468" END="0x1647F" />
+            <REGULAR_CMT>[AI 0.5] takes the tile word $64(a1, 2*index) for the digit in the high word of d0, adds the font base $B012 and the priority bit and pushes it at -(a0); part of the on-ice number/clock sprite builders</REGULAR_CMT>
             <TYPEINFO_CMT>sub_16468</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x16480" NAME="checksso">
@@ -11287,8 +11292,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17A18" END="0x17AC7" />
             <TYPEINFO_CMT>EASportsScreen</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17AC8">
+        <FUNCTION ENTRY_POINT="0x17AC8" NAME="ai_SetPlayoffRoundFromRemaining">
             <ADDRESS_RANGE START="0x17AC8" END="0x17AF3" />
+            <REGULAR_CMT>[AI 0.6] in playoff states 2 and 3 sets pojoy ($CEF0) = 7 (or $B with FourWayPlay) minus the rounds remaining $D04A, the inverse of the computation in ai_ApplyPlayoffPassword</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17AC8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17AF4" NAME="ai_RefreshSetupTeamLogos">
@@ -11438,8 +11444,9 @@ a2 = Team Struct
 d0 = Player roster offset</REGULAR_CMT>
             <TYPEINFO_CMT>getname</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x18AC6">
+        <FUNCTION ENTRY_POINT="0x18AC6" NAME="ai_FormatCheckedPlayerName">
             <ADDRESS_RANGE START="0x18AC6" END="0x18AE7" />
+            <REGULAR_CMT>[AI 0.6] takes TempPlOffset ($C470; negative = away record, low byte = index) and formats that player's 'I. Surname' with ai_FormatPlayerInitialSurname; the checked/hit player message</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18AC6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x18AE8" NAME="ai_FormatPlayerInitialSurname">
@@ -12123,8 +12130,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] records screen: takes entry $D4F4 - 1 of the starters/bench list for the selected side ($D4FA home, $D514 away by $D4F6, built by ai_SplitRosterByLineup) and stores the player index in $D52E; caller loc_FAEBC</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAF8C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAFBA">
+        <FUNCTION ENTRY_POINT="0xFAFBA" NAME="ai_SplitBothRostersByLineup">
             <ADDRESS_RANGE START="0xFAFBA" END="0xFAFE3" />
+            <REGULAR_CMT>[AI 0.7] runs ai_SplitRosterByLineup for the home record into $D4FA and the away record into $D514</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAFBA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAFE4" NAME="ai_SplitRosterByLineup">
@@ -12137,20 +12145,23 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] name-entry screen: erases the 22x7 help area at column 1 row $14 and, toggling $D6C5 bit 0 each call, alternately prints the letter grid (the alphabet 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' laid out five per row from column $19) or the instructions 'D-Pad to a letter.', 'C to select letter.', 'A to go back.', 'B to cancel.', 'START when done.'</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB4C4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB634">
+        <FUNCTION ENTRY_POINT="0xFB634" NAME="ai_PrintUserListHelp">
             <ADDRESS_RANGE START="0xFB634" END="0xFB6AF" />
+            <REGULAR_CMT>[AI 0.7] prints the user-list instructions 'D-Pad up/down to' / 'move arrows.' at column 2 rows $15/$16 and 'Press START to' / 'select name.' / 'Press B to edit.' below</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB634</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB6DC">
             <ADDRESS_RANGE START="0xFB6DC" END="0xFB6EF" />
             <TYPEINFO_CMT>sub_FB6DC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB6F0">
+        <FUNCTION ENTRY_POINT="0xFB6F0" NAME="ai_PrintEntryPrompt">
             <ADDRESS_RANGE START="0xFB6F0" END="0xFB721" />
+            <REGULAR_CMT>[AI 0.6] name entry: prints word_FB7F2 ('Enter new name:') when user entry $D4EA is empty in the table $D45A, else word_FB80A ('Select or replace:')</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB6F0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB722">
+        <FUNCTION ENTRY_POINT="0xFB722" NAME="ai_SnapEntryCharToAlphabet">
             <ADDRESS_RANGE START="0xFB722" END="0xFB74F" />
+            <REGULAR_CMT>[AI 0.6] name entry: converts the current character $D4DA to its alphabet index (ai_CharToEntryIndex); an unknown character becomes index 0 ('A'), otherwise the character is rewritten from the alphabet table so it is canonical; returns the index in d5</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB722</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB750" NAME="ai_CharToEntryIndex">
@@ -12162,12 +12173,14 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB77A" END="0xFB79F" />
             <TYPEINFO_CMT>sub_FB77A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB7A0">
+        <FUNCTION ENTRY_POINT="0xFB7A0" NAME="ai_PrintEntryCursorChar">
             <ADDRESS_RANGE START="0xFB7A0" END="0xFB7C9" />
+            <REGULAR_CMT>[AI 0.6] name entry: when the blink flag $D6C4 is set prints the single alphabet character at index d5 (as a 1-character string in $CF36) at the cursor</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB7A0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB7CA">
+        <FUNCTION ENTRY_POINT="0xFB7CA" NAME="ai_PositionEntryCursor">
             <ADDRESS_RANGE START="0xFB7CA" END="0xFB7F1" />
+            <REGULAR_CMT>[AI 0.6] name entry: positions the letter-grid cursor for alphabet index d5 (row = index / 6 * 2 from row $10, column = index mod 6 * 2 from $18) and returns the 3x3 cursor box size; 'Enter new name:' / 'Select or replace:' strings sit next to it</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB7CA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB822" NAME="ai_PrintUserNameList">
@@ -12175,8 +12188,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] user selection screen: prints the seven stored user names (entries 1..7 of $D45A via ai_CopyUserNameDashed and ai_PrintNameEntryField) one per row from column 5 row 8, preserving $D4E8/$D4EA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB822</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB874">
+        <FUNCTION ENTRY_POINT="0xFB874" NAME="ai_MoveUserListCursor">
             <ADDRESS_RANGE START="0xFB874" END="0xFB89D" />
+            <REGULAR_CMT>[AI 0.5] when the user-list selection $D4EA changed from the previous $D4EC, redraws the old row and the new one (ai_RedrawUserListRow with word_FB8E4 then word_FB8DC, the arrow and blank markers)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB874</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB89E" NAME="ai_RedrawUserListRow">
@@ -12184,8 +12198,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.4] user list screen: if a previous selection $D4EC exists, reprints that row (row 8 + index - 1) with the text at a1 and the following string at column $12 (restoring its unhighlighted look), then records the current selection $D4EA as the previous one; caller sub_FB874</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB89E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB8EC">
+        <FUNCTION ENTRY_POINT="0xFB8EC" NAME="ai_CountEnteredChars">
             <ADDRESS_RANGE START="0xFB8EC" END="0xFB919" />
+            <REGULAR_CMT>[AI 0.7] name entry: counts the characters of the typed name $D4DA up to the first '-' or zero (max 12) into $D4E8</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB8EC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB91A" NAME="ai_PrintNameEntryField">
@@ -12299,8 +12314,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFCA1E" END="0xFCA27" />
             <TYPEINFO_CMT>sub_FCA1E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCA28">
+        <FUNCTION ENTRY_POINT="0xFCA28" NAME="ai_PrintShootersHeader">
             <ADDRESS_RANGE START="0xFCA28" END="0xFCAB7" />
+            <REGULAR_CMT>[AI 0.7] shootout screen: prints the 'Shooters' heading at column $C and the numbered rows '1. ' .. '5. ' at column $E</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCA28</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCAB8" NAME="ai_PrintShootoutShooterBox">

@@ -1,0 +1,98 @@
+# Names batch 25 - see docs/names/names-batch-25.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-25.toml
+
+[[name]]
+addr = 0x0FB722
+name = "SnapEntryCharToAlphabet"
+confidence = 0.6
+evidence = "name entry: converts the current character $D4DA to its alphabet index (ai_CharToEntryIndex); an unknown character becomes index 0 ('A'), otherwise the character is rewritten from the alphabet table so it is canonical; returns the index in d5"
+
+[[name]]
+addr = 0x0FB7CA
+name = "PositionEntryCursor"
+confidence = 0.6
+evidence = "name entry: positions the letter-grid cursor for alphabet index d5 (row = index / 6 * 2 from row $10, column = index mod 6 * 2 from $18) and returns the 3x3 cursor box size; 'Enter new name:' / 'Select or replace:' strings sit next to it"
+
+[[name]]
+addr = 0x0FB8EC
+name = "CountEnteredChars"
+confidence = 0.7
+evidence = "name entry: counts the characters of the typed name $D4DA up to the first '-' or zero (max 12) into $D4E8"
+
+[[name]]
+addr = 0x007DCE
+name = "PauseScreenSetup"
+confidence = 0.5
+evidence = "sets the window/plane registers ($91 = 0, $92 = $1C), calls sub_12B94, fades with sub_15EC0, resets the PSG noise (PSG_SetupNoise), positions at (0,0) via the inline string and erases a 32x28 area, i.e. clears the display for the pause menu"
+
+[[name]]
+addr = 0x009F5C
+name = "CountRatingNibblesPlusGoalies"
+confidence = 0.5
+evidence = "ai_CountRatingNibbles plus the high nibble of byte 3 of the team data block at offset +8 (the roster count word, believed to hold the goalie count), returning the sum in d0"
+
+[[name]]
+addr = 0x017AC8
+name = "SetPlayoffRoundFromRemaining"
+confidence = 0.6
+evidence = "in playoff states 2 and 3 sets pojoy ($CEF0) = 7 (or $B with FourWayPlay) minus the rounds remaining $D04A, the inverse of the computation in ai_ApplyPlayoffPassword"
+
+[[name]]
+addr = 0x0FB6F0
+name = "PrintEntryPrompt"
+confidence = 0.6
+evidence = "name entry: prints word_FB7F2 ('Enter new name:') when user entry $D4EA is empty in the table $D45A, else word_FB80A ('Select or replace:')"
+
+[[name]]
+addr = 0x013098
+name = "ResetLineEnergyExceptOut"
+confidence = 0.5
+evidence = "variant of ai_ResetLineEnergy: refills all 26 energy words $32+2i of team a2 to $1000 except slots whose status $66+2i is -3 and -4 at once (the unreachable double test means every slot is refilled)"
+
+[[name]]
+addr = 0x0FB634
+name = "PrintUserListHelp"
+confidence = 0.7
+evidence = "prints the user-list instructions 'D-Pad up/down to' / 'move arrows.' at column 2 rows $15/$16 and 'Press START to' / 'select name.' / 'Press B to edit.' below"
+
+[[name]]
+addr = 0x0FB874
+name = "MoveUserListCursor"
+confidence = 0.5
+evidence = "when the user-list selection $D4EA changed from the previous $D4EC, redraws the old row and the new one (ai_RedrawUserListRow with word_FB8E4 then word_FB8DC, the arrow and blank markers)"
+
+[[name]]
+addr = 0x0FCA28
+name = "PrintShootersHeader"
+confidence = 0.7
+evidence = "shootout screen: prints the 'Shooters' heading at column $C and the numbered rows '1. ' .. '5. ' at column $E"
+
+[[name]]
+addr = 0x0081CA
+name = "WritePlayerPickerScroll"
+confidence = 0.6
+evidence = "writes the player picker's vertical scroll (-$30 + VertLineScrolling) to VSRAM entry 1 with $BF78 bit 2 held; tail of ai_ScrollPlayerPicker"
+
+[[name]]
+addr = 0x016468
+name = "PushNumberTile"
+confidence = 0.5
+evidence = "takes the tile word $64(a1, 2*index) for the digit in the high word of d0, adds the font base $B012 and the priority bit and pushes it at -(a0); part of the on-ice number/clock sprite builders"
+
+[[name]]
+addr = 0x018AC6
+name = "FormatCheckedPlayerName"
+confidence = 0.6
+evidence = "takes TempPlOffset ($C470; negative = away record, low byte = index) and formats that player's 'I. Surname' with ai_FormatPlayerInitialSurname; the checked/hit player message"
+
+[[name]]
+addr = 0x0FAFBA
+name = "SplitBothRostersByLineup"
+confidence = 0.7
+evidence = "runs ai_SplitRosterByLineup for the home record into $D4FA and the away record into $D514"
+
+[[name]]
+addr = 0x0FB7A0
+name = "PrintEntryCursorChar"
+confidence = 0.6
+evidence = "name entry: when the blink flag $D6C4 is set prints the single alphabet character at index d5 (as a 1-character string in $CF36) at the cursor"
