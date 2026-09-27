@@ -1,0 +1,74 @@
+# Names batch 14 - see docs/names/names-batch-14.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-14.toml
+
+[[name]]
+addr = 0x0FB91A
+name = "PrintNameEntryField"
+confidence = 0.7
+evidence = "name-entry screen: builds a 12-character string in $CF36 from the letters typed so far (a1, count $D4E8) padded with '-' and prints it; the character set 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' sits next to it; caller loc_FB822"
+
+[[name]]
+addr = 0x0FC570
+name = "LoadShootoutShooters"
+confidence = 0.6
+evidence = "shootout setup: takes the six-entry lineup list (team data offset +6) of HomeTeam, or VisTeam when the side flag $D594 is set, and stores the six player indexes (minus 1) as words below $D586 or $D594, the shooter lists that ai_AdvanceShootoutRound indexes with $D586; caller sub_FC47C"
+
+[[name]]
+addr = 0x0FCB9A
+name = "BuildCrowdRecordText"
+confidence = 0.6
+evidence = "ticker helper: reads the home team's record (ReadTeamRecord into $CFFE), takes the loudest-crowd byte 8 (defaulting to $50 when unset) and converts it to decimal text in $BF20 with NumberToDecimalText for the 'by' phrase; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0FEC5E
+name = "FindLoudestCrowdTeam"
+confidence = 0.7
+evidence = "scans the 28 team records (ReadTeamRecord into $CF36) for the highest crowd byte 8 (unset counts as $50) and returns d0 = that team and d7 = the value; caller loc_9B4A (crowd meter / records display)"
+
+[[name]]
+addr = 0x008280
+name = "PrintSelectPlayerArrows"
+confidence = 0.6
+evidence = "same shape as ai_PrintScrollArrows: chooses one of the four strings at word_82BC (none / down / up / both) from VertLineScrolling against $D5B2 and prints it in the '{Select  Player}' header of the edit-lines player picker; caller sub_8198"
+
+[[name]]
+addr = 0x0093C4
+name = "PrintSummaryScrollArrows"
+confidence = 0.6
+evidence = "same shape as ai_PrintScrollArrows for the scoring-summary list: chooses one of the four strings at word_9400 from VertLineScrolling against $D5B2 and prints it at column 4 row 9; caller sub_8FB8 (summary page handler)"
+
+[[name]]
+addr = 0x0100A6
+name = "CheckZoneCleared"
+confidence = 0.5
+evidence = "ChkOffsides helper: while $30(a2) bit 4 (team in the attacking zone) is set, scans team a2's six objects with a non-negative slot and clears the bit once none of them is deeper than y = $58 (after the side flip), i.e. the team has left the zone; caller ChkOffsides"
+
+[[name]]
+addr = 0x01177A
+name = "DecompressTiles"
+confidence = 0.7
+evidence = "tile decompressor used by ai_LoadTilesCore for negative-count blocks: with the scratch buffer $CF36, the inline map slot $CF32 and the writers remap / DoDMApro in a5/a6, reads control bytes from a0 and dispatches on their high nibble through the jump table word_117B2 until the block is done; caller ai_LoadTilesCore"
+
+[[name]]
+addr = 0x012DDE
+name = "PrintPenaltyList"
+confidence = 0.7
+evidence = "walks the penalized-player list $9A(a2) twice, printing minors (status $66 bit 6 clear) first and majors second with ai_PrintPenaltyRow; caller loc_12DA6 (penalty box display)"
+
+[[name]]
+addr = 0x0F7BFA
+name = "PrintSetupModeRow"
+confidence = 0.5
+evidence = "setup screen: prints at column 2 row $19 the 'Continue Playoffs' text off_F7C5A (when the scroll is at 3 or the playoff state is 4) or 'Regular Season' off_F7C56, then at row $F the off_F7C5A / off_F7C52 line depending on whether the menu is scrolled; caller ai_RedrawSetupValues"
+
+[[name]]
+addr = 0x00A448
+name = "DrawRinkAuxBitmap"
+confidence = 0.3
+evidence = "game init (sub_A528): sets $DEB4 = $F0 and draws an 8x4-tile bitmap at column $20 row $55 (beyond the visible rows of the plane) from the second block of off_5605A, or off_B5180 when $C2F4 bit 4 is set, at tile base rinkvrcset; which on-screen element this becomes is not identified; caller sub_A528"
+
+[[name]]
+addr = 0x010EB4
+name = "WeightedRandomIndex"
+confidence = 0.8
+evidence = "d0 = entry count: sums the weight words at $D036, draws a random number below the sum (sub_11086) and walks back through the weights until it goes negative, returning the chosen index in d0; caller getscore (shot outcome selection)"

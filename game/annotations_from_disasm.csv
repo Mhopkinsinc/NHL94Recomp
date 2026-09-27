@@ -35,12 +35,14 @@
 008008,ai_PrintPauseMenuItem,
 008078,ai_DrawTeamBannerTiles,
 0080BA,vcountwait,
+008280,ai_PrintSelectPlayerArrows,
 0084CE,PrintAttribHeader,
 0085EE,ai_PrintLineRoster,
 008BA6,ai_DrawEditLinesHeader,
 008D4E,getNameandAttrib,
 008E40,DispAttribValue,"mult by 100 dec"
 00907C,ai_PrintScoringSummaryRow,
+0093C4,ai_PrintSummaryScrollArrows,
 00945C,ai_PrintStatsScreen,
 00961A,ai_PrintPlayerStatsList,
 009744,ai_PrintPlayerStatRow,
@@ -52,6 +54,7 @@
 009F40,ai_CountRatingNibbles,
 009F9A,ai_CountRosterPlayers,
 00A41E,getpzjoy,
+00A448,ai_DrawRinkAuxBitmap,
 00A616,ai_CenterCameraOnObject,
 00A67C,RevReplayAdj,"check if reverse angle replay"
 00A68C,SetRCords,
@@ -146,6 +149,7 @@
 00FE18,Endfaceoff,
 00FF0C,pucknorm,"check if flag is clear (normal play)"
 00FFEA,ChkOffsides,
+0100A6,ai_CheckZoneCleared,
 0100E6,a2offsides,
 01013E,a2touchpuck,"move Xpos to last touch X"
 010246,puckIChk,"#ifok"
@@ -169,6 +173,7 @@
 010BC2,playeracc,
 010DB6,dostop,"Xvel"
 010E1A,stopna,"Xvel"
+010EB4,ai_WeightedRandomIndex,
 010EE0,remap,
 010F32,forceblack,
 010F5C,forceblack2,
@@ -204,6 +209,7 @@
 01172C,ai_LoadAssetInline,
 011738,ai_LoadAsset,
 01173C,ai_LoadTilesCore,
+01177A,ai_DecompressTiles,
 011952,xyVmMap,
 01197E,eraser,
 0119B8,Framer,
@@ -247,6 +253,7 @@
 012C04,PrintScores1,
 012D30,ai_PrintTeamScoreBlock,
 012D70,ai_DrawHudPanel,
+012DDE,ai_PrintPenaltyList,
 012E12,ai_PrintPenaltyRow,
 012E66,ai_DrawLineEnergyBar,
 012EB4,getlinee,
@@ -427,6 +434,7 @@
 0F7942,GameSetUp_3,
 0F7B20,ai_RedrawSetupValues,
 0F7B66,GameSetUp_4,
+0F7BFA,ai_PrintSetupModeRow,
 0F8070,ai_PrintSetupMenuLabels,
 0F8168,setoptions,
 0F8304,GameSetUp_2,
@@ -469,12 +477,15 @@
 0FAF50,ai_GetRecordsTeam,
 0FAF66,ai_TrimTrailingSpaces,
 0FAFE4,ai_SplitRosterByLineup,
+0FB91A,ai_PrintNameEntryField,
 0FB992,ai_CopyUserNameDashed,
 0FBA76,ai_PurgeUserFromRecords,
 0FBB88,ai_PromptUserRecordSelect,
 0FC136,ai_PrintRankedUserName,
 0FC516,ai_AdvanceShootoutRound,
+0FC570,ai_LoadShootoutShooters,
 0FC5AE,ai_PrintShootoutWinner,
+0FCB9A,ai_BuildCrowdRecordText,
 0FCC76,ai_MatchupsScreen,
 0FCFDC,ai_PrintRatingsSpacer,
 0FD084,ai_DrawRatingsPictures,
@@ -505,6 +516,7 @@
 0FE98A,ai_UnpackPhotoTiles,
 0FEA52,ai_LoadHomeCenterIceLogo,
 0FEB54,ai_SlideToFaceoffSpot,
+0FEC5E,ai_FindLoudestCrowdTeam,
 0FEC98,getFgtbyte,"clear d0"
 0FECA2,chkFgtBit1,
 0FED2A,ai_BuildPlayoffCursorSprites,

@@ -9207,8 +9207,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8250" END="0x827F" />
             <TYPEINFO_CMT>sub_8250</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8280">
+        <FUNCTION ENTRY_POINT="0x8280" NAME="ai_PrintSelectPlayerArrows">
             <ADDRESS_RANGE START="0x8280" END="0x82BB" />
+            <REGULAR_CMT>[AI 0.6] same shape as ai_PrintScrollArrows: chooses one of the four strings at word_82BC (none / down / up / both) from VertLineScrolling against $D5B2 and prints it in the '{Select  Player}' header of the edit-lines player picker; caller sub_8198</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8280</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x84CE" NAME="PrintAttribHeader">
@@ -9300,8 +9301,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9112" END="0x9129" />
             <TYPEINFO_CMT>sub_9112</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x93C4">
+        <FUNCTION ENTRY_POINT="0x93C4" NAME="ai_PrintSummaryScrollArrows">
             <ADDRESS_RANGE START="0x93C4" END="0x93FF" />
+            <REGULAR_CMT>[AI 0.6] same shape as ai_PrintScrollArrows for the scoring-summary list: chooses one of the four strings at word_9400 from VertLineScrolling against $D5B2 and prints it at column 4 row 9; caller sub_8FB8 (summary page handler)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_93C4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9428">
@@ -9403,8 +9405,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0xA41E" END="0xA447" />
             <TYPEINFO_CMT>getpzjoy</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xA448">
+        <FUNCTION ENTRY_POINT="0xA448" NAME="ai_DrawRinkAuxBitmap">
             <ADDRESS_RANGE START="0xA448" END="0xA489" />
+            <REGULAR_CMT>[AI 0.3] game init (sub_A528): sets $DEB4 = $F0 and draws an 8x4-tile bitmap at column $20 row $55 (beyond the visible rows of the plane) from the second block of off_5605A, or off_B5180 when $C2F4 bit 4 is set, at tile base rinkvrcset; which on-screen element this becomes is not identified; caller sub_A528</REGULAR_CMT>
             <TYPEINFO_CMT>sub_A448</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xA48A">
@@ -9948,8 +9951,9 @@ d7 = elapse frames since last call</REGULAR_CMT>
             <REGULAR_CMT>check for offsides penalty</REGULAR_CMT>
             <TYPEINFO_CMT>ChkOffsides</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x100A6">
+        <FUNCTION ENTRY_POINT="0x100A6" NAME="ai_CheckZoneCleared">
             <ADDRESS_RANGE START="0x100A6" END="0x100E5" />
+            <REGULAR_CMT>[AI 0.5] ChkOffsides helper: while $30(a2) bit 4 (team in the attacking zone) is set, scans team a2's six objects with a non-negative slot and clears the bit once none of them is deeper than y = $58 (after the side flip), i.e. the team has left the zone; caller ChkOffsides</REGULAR_CMT>
             <TYPEINFO_CMT>sub_100A6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x100E6" NAME="a2offsides">
@@ -10088,8 +10092,9 @@ d1 = new animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x10E88" END="0x10EB3" />
             <TYPEINFO_CMT>sub_10E88</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x10EB4">
+        <FUNCTION ENTRY_POINT="0x10EB4" NAME="ai_WeightedRandomIndex">
             <ADDRESS_RANGE START="0x10EB4" END="0x10EDF" />
+            <REGULAR_CMT>[AI 0.8] d0 = entry count: sums the weight words at $D036, draws a random number below the sum (sub_11086) and walks back through the weights until it goes negative, returning the chosen index in d0; caller getscore (shot outcome selection)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_10EB4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x10EE0" NAME="remap">
@@ -10293,8 +10298,9 @@ d5 = pal used bits (0-3) for color fam 1-4</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] body shared by LoadAsset / ai_LoadAssetInline: a2 = asset, d4 = destination tile: reads the count word; 0 ends, a negative count (&amp; $7FFF) is a compressed block decoded by sub_1177A, a positive count is raw 4bpp tiles sent by DoDMApro, or by remap when an inline nibble map pointer is set in $CF32; d4 is advanced by the tile count; caller ai_LoadAssetInline (and LoadAsset by fall-through)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1173C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1177A">
+        <FUNCTION ENTRY_POINT="0x1177A" NAME="ai_DecompressTiles">
             <ADDRESS_RANGE START="0x1177A" END="0x117B1" />
+            <REGULAR_CMT>[AI 0.7] tile decompressor used by ai_LoadTilesCore for negative-count blocks: with the scratch buffer $CF36, the inline map slot $CF32 and the writers remap / DoDMApro in a5/a6, reads control bytes from a0 and dispatches on their high nibble through the jump table word_117B2 until the block is done; caller ai_LoadTilesCore</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1177A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11924">
@@ -10584,8 +10590,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x12DA6" END="0x12DDD" />
             <TYPEINFO_CMT>sub_12DA6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12DDE">
+        <FUNCTION ENTRY_POINT="0x12DDE" NAME="ai_PrintPenaltyList">
             <ADDRESS_RANGE START="0x12DDE" END="0x12E11" />
+            <REGULAR_CMT>[AI 0.7] walks the penalized-player list $9A(a2) twice, printing minors (status $66 bit 6 clear) first and majors second with ai_PrintPenaltyRow; caller loc_12DA6 (penalty box display)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12DDE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12E12" NAME="ai_PrintPenaltyRow">
@@ -11714,8 +11721,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7B66" END="0xF7BF9" />
             <TYPEINFO_CMT>GameSetUp_4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7BFA">
+        <FUNCTION ENTRY_POINT="0xF7BFA" NAME="ai_PrintSetupModeRow">
             <ADDRESS_RANGE START="0xF7BFA" END="0xF7C51" />
+            <REGULAR_CMT>[AI 0.5] setup screen: prints at column 2 row $19 the 'Continue Playoffs' text off_F7C5A (when the scroll is at 3 or the playoff state is 4) or 'Regular Season' off_F7C56, then at row $F the off_F7C5A / off_F7C52 line depending on whether the menu is scrolled; caller ai_RedrawSetupValues</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7BFA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF8070" NAME="ai_PrintSetupMenuLabels">
@@ -12065,8 +12073,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB8EC" END="0xFB919" />
             <TYPEINFO_CMT>sub_FB8EC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFB91A">
+        <FUNCTION ENTRY_POINT="0xFB91A" NAME="ai_PrintNameEntryField">
             <ADDRESS_RANGE START="0xFB91A" END="0xFB95B" />
+            <REGULAR_CMT>[AI 0.7] name-entry screen: builds a 12-character string in $CF36 from the letters typed so far (a1, count $D4E8) padded with '-' and prints it; the character set 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' sits next to it; caller loc_FB822</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FB91A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB97C">
@@ -12138,8 +12147,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] after each shootout attempt: when the shootout is enabled ($D595 bit 0), at least 5 rounds are done ($D578) and the round scores $D574/$D576 differ, sets $C2FA bit 3 and runs ai_ShootoutWinnersCelebrate; otherwise toggles the shooting side $D594 and, once both sides have shot, advances the shooter index $D586 (wrapping at 5) and the round counter; caller ai_EndShootoutAttempt</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC516</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC570">
+        <FUNCTION ENTRY_POINT="0xFC570" NAME="ai_LoadShootoutShooters">
             <ADDRESS_RANGE START="0xFC570" END="0xFC5AD" />
+            <REGULAR_CMT>[AI 0.6] shootout setup: takes the six-entry lineup list (team data offset +6) of HomeTeam, or VisTeam when the side flag $D594 is set, and stores the six player indexes (minus 1) as words below $D586 or $D594, the shooter lists that ai_AdvanceShootoutRound indexes with $D586; caller sub_FC47C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC570</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC5AE" NAME="ai_PrintShootoutWinner">
@@ -12175,8 +12185,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFCB1A" END="0xFCB23" />
             <TYPEINFO_CMT>sub_FCB1A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCB9A">
+        <FUNCTION ENTRY_POINT="0xFCB9A" NAME="ai_BuildCrowdRecordText">
             <ADDRESS_RANGE START="0xFCB9A" END="0xFCBD7" />
+            <REGULAR_CMT>[AI 0.6] ticker helper: reads the home team's record (ReadTeamRecord into $CFFE), takes the loudest-crowd byte 8 (defaulting to $50 when unset) and converts it to decimal text in $BF20 with NumberToDecimalText for the 'by' phrase; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCB9A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCC76" NAME="ai_MatchupsScreen">
@@ -12370,8 +12381,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] updateplayers helper: for six specific animation states of $58(a3) ($1776, $185A, $17E8, $1A00, $18CC, $193E) eases the player's y ($14(a3)) toward $124/$116 or -$124/-$116 (chosen by whether the faceoff x $D41C is within +-$56) or the x toward +-$82/$88 by half the remaining distance each frame, i.e. the crouch/positioning animations used at faceoffs; caller updateplayers</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEB54</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEC5E">
+        <FUNCTION ENTRY_POINT="0xFEC5E" NAME="ai_FindLoudestCrowdTeam">
             <ADDRESS_RANGE START="0xFEC5E" END="0xFEC97" />
+            <REGULAR_CMT>[AI 0.7] scans the 28 team records (ReadTeamRecord into $CF36) for the highest crowd byte 8 (unset counts as $50) and returns d0 = that team and d7 = the value; caller loc_9B4A (crowd meter / records display)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEC5E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEC98" NAME="getFgtbyte">
