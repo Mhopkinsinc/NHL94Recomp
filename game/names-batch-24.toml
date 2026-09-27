@@ -1,0 +1,86 @@
+# Names batch 24 - see docs/names/names-batch-24.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-24.toml
+
+[[name]]
+addr = 0x0F9A64
+name = "BuildRecordByUserText"
+confidence = 0.6
+evidence = "copies the ' by' label word_F9AA6 into the string at a1 and appends the record holder's user name (ai_AppendRecordUserName via $BF20); when the record is empty (length 2) the output string is emptied instead"
+
+[[name]]
+addr = 0x0F9AAC
+name = "BuildRecordVsText"
+confidence = 0.6
+evidence = "copies the ' vs.' label word_F9ADE into the string at a1 and appends the record holder's user name and opponent team (ai_AppendRecordHolderText via $BF20)"
+
+[[name]]
+addr = 0x0123DE
+name = "CountAvailableSkaters"
+confidence = 0.6
+evidence = "team a2: for the 26 status words $66+2i with a positive value clears bit 5 and, unless bit 6 (major) or bit 4 is set, decrements the count from 6 (floor 4); stores the result as the active skater count $24(a2)"
+
+[[name]]
+addr = 0x0FC47C
+name = "InitShootout"
+confidence = 0.7
+evidence = "clears the object area $B04A ($400 words) and $DED0, sets round 1 ($D578), clears the decided flag ($C2FA bit 3), both round scores $D574/$D576, the shooter index $D586 and side $D594, then loads the shooter lists for both sides with ai_LoadShootoutShooters"
+
+[[name]]
+addr = 0x0FE6D2
+name = "ClearUserRecordsSram"
+confidence = 0.7
+evidence = "zeroes the wins/games bytes 8..$B of the eight 16-byte user records in $CF36 and writes the $80-byte block back to SRAM $D20 (WriteSRAM), then sub_1A206"
+
+[[name]]
+addr = 0x0FEE60
+name = "CountPassAttempt"
+confidence = 0.4
+evidence = "unless $C2EA bit 0: increments the attempt counter at $DEA4 (or $DEAC when d4 is set) and, when the direction code in $BF12 is not 8 and differs from the player's facing $54(a3), also the second counter at +4; a pass/shot direction statistic"
+
+[[name]]
+addr = 0x0FBBDE
+name = "SkipOwnUserEntry"
+confidence = 0.5
+evidence = "user selection: if the entry $D4EA equals the user already chosen by the other controller ($D042 or $D044 by $D4EE), steps $D4EA one further in the direction of the sign of d0 and returns d0 = 0 (consumed); otherwise leaves d0"
+
+[[name]]
+addr = 0x008198
+name = "ScrollPlayerPicker"
+confidence = 0.6
+evidence = "player picker scroll step with a 24-pixel pitch: applies PlayerScrollCtr to VertLineScrolling within 0..$D5B2; at a row boundary redraws the arrows (ai_PrintSelectPlayerArrows) and stops, otherwise continues in sub_81CA"
+
+[[name]]
+addr = 0x010E88
+name = "UnpackNibblesToWords"
+confidence = 0.7
+evidence = "expands d0 + 1 nibbles from a0 (high nibble first) into words at the weight table $D036, the table ai_WeightedRandomIndex draws from"
+
+[[name]]
+addr = 0x008898
+name = "SwapLineSlot"
+confidence = 0.6
+evidence = "edit lines: puts player d0 into slot d2 of team a2's line table $16A; if that player already occupies another slot of the same 8-byte line, the displaced player is moved into the vacated slot (a swap)"
+
+[[name]]
+addr = 0x0FBFA0
+name = "EraseUserListArea"
+confidence = 0.6
+evidence = "erases the 40x18 user list area from row $A (inline position string) while preserving printx/printy/printm; used by the user records screens"
+
+[[name]]
+addr = 0x00A4A8
+name = "DrawPauseMenuBackdrop"
+confidence = 0.5
+evidence = "sets $DEB4 = -1 and draws the 16x11-tile bitmap off_BB4EE at (0,0) with tile base ExtraChars ($B026), the base the pause menu tiles were loaded at"
+
+[[name]]
+addr = 0x00A4F6
+name = "StepReplayBack"
+confidence = 0.5
+evidence = "replay playback: moves the frame pointer a4 back one $62-byte frame, wrapping from $FF0000 to $AF54 when $C2EC bit 4 allows it; stops (without stepping) when it would reach the write pointer recbpr, and shows the frame with sub_A68C; returns d7 = 0"
+
+[[name]]
+addr = 0x0FA2A2
+name = "WrapRecordsIndex"
+confidence = 0.5
+evidence = "wraps the records-page index at (a0): to 0 when it reaches $D4F8 + 1 (the entry count), and to the last entry when it goes negative"
