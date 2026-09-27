@@ -1,4 +1,7 @@
-# Verified NHL 94 disassembly (MarkeyJester 2016); regenerate with tools/nhl94_disassembly.py
+# addr,name,notes - function names for the generated C. Names come from the
+# IDA Pro export game/nhl94.xml (FUNCTIONS with a human name, entry comment as
+# notes), falling back to the MarkeyJester 2016 listing's named labels.
+# Regenerate with tools/nhl94_disassembly.py (rerun after every IDA export).
 000200,SetupGame,
 00020E,SG_Reset,
 00022E,SG_NoTMSS,
@@ -11,34 +14,342 @@
 00027A,SG_SetupPSG,
 00028C,SG_SkipSetup,
 0002FA,SG_PSG_End,
-0076B2,VBlankInt,
-0076B8,RunGame,
+0076B2,VBjsr,
+0076B8,Begin,"Disable interrupts"
+007742,StartGame,
+0077F4,restoreteams,"team 1"
+007814,ResetClock,
+00784E,ClockLength,
+007938,GameLoop,
+00794E,DoGameFrame,
+00799E,periodiceevents,
+007A76,UpdateCwdExcite,
+007A9E,updatecrowdf,
+007B30,clockcont,"#gmclock"
+007C58,demoread,
+007CF8,PauseMode,
+0080BA,vcountwait,
+0084CE,PrintAttribHeader,
+008D4E,getNameandAttrib,
+008E40,DispAttribValue,"mult by 100 dec"
+00A41E,getpzjoy,
+00A67C,RevReplayAdj,"check if reverse angle replay"
+00A68C,SetRCords,
+00A8CA,updatereplay,"check if highlight"
+00A9D6,updateplayers,"check if screen is in horiz mode"
+00AEE4,updateanim,"test SPA"
+00AFB6,freezewindow,
+00AFCA,checkwindow,
+00B0E8,doinput,"B button"
+00B86A,getGoalieSCnum,
+00B8F0,fightinput,"controller processing for fighting"
+00B8F2,SetLCmode,
+00B9C2,setlccords,
+00BA04,getlchoice,
+00BA88,lineinput,
+00BB06,lcfound,
+00BB36,lcfound2,
+00BB62,burst,"get players energy"
+00BBB6,holdplayer,"lock animation"
+00BC06,setpassmode,"facedir; default pass direction"
+00BC40,passmode,"has b button changed?"
+00BE26,passto,
+00BFBC,changeplayer,
+00C0AE,Sweepcheck,
+00C0BC,setc1player,
+00C0DA,setc2player,
+00C0F8,restorep1,
+00C198,Findhittype,
+00C1B8,SetShotMode,"check for PS or SO"
+00C224,ShotMode,
+00C274,prepshot,
+00C2F2,doshot,
+00C566,shotdiradj,"check if shooting one timer"
+00C644,shotdirmath,"sub puckx from post X"
+00C67A,check4bench,
+00C710,assbench,
+00C882,assben,
+00C8F0,asspenalty,
+00CA2A,assdopen,
+00CA50,assepen,
+00CAE0,assgoaliebreakwait,"check if animation locked"
+00CB3A,assfaceoff,
+00CB50,assfaceoffpl,
 00CBE0,nullsub_4,
 00CBE2,nullsub_5,
-010F86,WaitVBlank,
+00CBE4,assnothing,"#pfalock"
+00CBFA,assstanley,
+00CC4E,assscore,
+00CD00,assdefo,
+00CDE0,assdefd,"check if locked in animiation"
+00CF9A,asswingd,"check if locked in animation"
+00D09C,asswingo,"check if locked in animation"
+00D1E8,asscenterd,"pfalock - locked animation"
+00D294,asscentero,"pfalock"
+00D3C6,assgoaliectrl,"is player joystick controlled?"
+00D51C,assgoaliecpu,"is goalie joystick controlled?"
+00DBBA,goaliesave,"puckcross x frames into d0"
+00DD2E,assgoalietopuck,
+00DDC4,breakaway,
+00DE2A,BreakawayOffsidesFlagSet,"check for new assignment"
+00DEEE,chkpuckc,
+00DF18,asspuckc,
+00E264,chkpk,"#sf2pwrplay - check if power play in progress"
+00E274,chkpk2,
+00E292,chk4shot,
+00E412,compshoot?,
+00E444,chk4pass,
+00E594,EvadePC,
+00E62E,checkob,
+00E6CE,assbreakaway,"Move SCnum into d0"
+00E6F4,assnearest,
+00EACE,check4check,"check if goalie"
+00EB84,asspassrec,"pfalock - animation lock"
+00EC82,assshoot,"pfalock - animation locked"
+00EF92,puckpenshot,
+00F3E4,puckfaceoff,
+00F6AA,ChkGoalies,"check if clock running"
+00F712,ReturnGoalies,
+00F746,CPgoalie,"check if 3rd period"
+00F790,CompLine,
+00F88E,puckfaceoff2,
+00FD22,setchgplayer,
+00FDBE,updatefaceoff,
+00FE18,Endfaceoff,
+00FF0C,pucknorm,"check if flag is clear (normal play)"
+00FFEA,ChkOffsides,
+0100E6,a2offsides,
+01013E,a2touchpuck,"move Xpos to last touch X"
+010246,puckIChk,"#ifok"
+0102A8,puckunflip,
+0102D2,puckflip,
+0102EC,puckshadow,"#SPFpuck; frame"
+010346,findpc,
+0103C8,skateto,"sub d7 from temp2"
+010488,avdgoal,
+010588,skatetopuckinit,
+0105A2,skatetopuck,
+010646,assexit,"add 1 to current assignment index"
+010658,assinsert,"$36 = assnum"
+010662,assreplace,"push on stack"
+010676,vtoa,
+0106E0,GetHot,
+01073A,SetSPA,
+010750,doplayeracc,
+01090A,goalieacc,
+010BB4,noturn,
+010BC2,playeracc,
+010DB6,dostop,"Xvel"
+010E1A,stopna,"Xvel"
+010EE0,remap,
+010F32,forceblack,
+010F5C,forceblack2,
+010F86,forcefade,
+010FB6,cramfade,
 011044,VDP_FlushPalette,
+01107A,randomd0s,
+011086,randomd0,
+0110BE,sroot,
+011132,sfx,
+011156,song,
+011176,waitx,
+0111D0,waitxsr,
+0112AA,waitjoy,
+0112BC,orjoy,"check for 4-way play?"
+0112F0,nodiag,
+011340,ReadJoy1,
+011358,ReadJoy2,
+011370,ReadJoy3,
+011388,ReadJoy4,
+0113A0,ReadJoy,
+0113D0,DoDMApro,
+0113E4,DoDMA,
 01140E,VDP_TransferDMA,
-011582,VDP_WaitDMA,
+011544,DoFill,
+011582,WaitDMA,
+011594,setvram,
 0115AA,VDP_InitialSetup,
-011680,VDP_SetAddress,
+011680,Vmaddr,
+01169A,dobitmap,
+011952,xyVmMap,
+01197E,eraser,
+0119B8,Framer,
+011A36,printz2,
+011A48,print2,
+011B92,printz,
+011BA4,print,
+011CA2,PushTime,
+011D06,PushNumber,
+011D3A,DeterStrLength?,"push to stack"
+011D96,appendz,
+011D9E,appstring,
+011DF4,printbig,
+011F2C,AddPenalty,"checks if no whistle gmclock(gmode)"
+011FF2,PenaltyManager,
+012002,chkprogress,
+01211A,PenShotChk,
+012174,getBAplayerInfo,
+012418,checkfornewpen,"horiz mode (sfhor)"
+0124A6,Stop4Pen,"#gmclock"
+01257E,limitfo,
+0125E8,UpdatePA,
+012638,SetPA,
+01268A,setPA2,
+0126F8,PushRef,
+01277A,prefmes,
+0128A4,clrPenBuf,"1F = 31 decimal"
+0128B2,updatepentime,"clear pen timer flag"
+01299C,chkatop,
+012A2E,CalcPenTime,
+012A7C,updatepwrplay,
+012B40,ClrHor,
+012B94,SetHor,
+012C04,PrintScores1,
+012EB4,getlinee,
+012F30,ChkShotStat,"check if clock stopped"
+013040,loadTeamStruct,
+0130E6,Intermission,
+0131F4,InitScores,
+01323E,UpdateScores,
+013276,SetScore,
+0132E2,getscore,
+013378,NewTicker,
+013384,NewTicker2,
+013396,NewTicker3,
+0133B2,NewTicker3pt2,
+013510,Adda1Offset,
 01381E,VDP_ReadHVCounter,
-01454A,nullsub_1,
-015E6C,ExpReturn,
-0169D0,PSG_SetupNoise,
-018BFC,ErAddress,
-018C22,ErIllegal,
-018C4C,ErrDivide,
-01A264,Z80_MuteAllFM,
-01A370,ReadControls,
+0138AC,checkcoll,
+0139A6,checkplcoll,"check if in line change mode"
+013A1A,checkcx,
+013BB2,newcheck,
+013BD6,checkint,
+013BE8,checkint.ci,"test for goalie"
+013CC4,checkcheck,
+013CD8,CCStart,
+013E26,checkagr,"Start calculation with 40 decimal (28 hex)"
+013EE2,holdcheck,"#pfalock - locked animation"
+013FBC,Bcheck,"check if locked in animation"
+014062,FallDown,"0-11 are player structs"
+0144AC,setInjuryType,
+01454A,checkfight,
+01454C,checkwallcoll2,
+014620,checkgoal,"13 pix for zside = height of goal (puck only check)"
+014A54,setass,
+014B38,CheckBump,
+014BC2,wallcollb2,"#puckSCnum"
+014C70,wallcoll,"wallcos"
+014D8C,checkpuckcoll,"compare 190 hex to Ypos (back board?)"
+0150E4,puckstick,"a2 = player who collided a3 = puck"
+0153CA,puckbody,
+015466,puckgoalie,"check if highlight"
+015730,makepde,
+01575A,getpde,
+01577A,setpde,
+015788,SetPersonel,
+015832,SetPlList,
+0158F2,findAvailablePlayer,
+0159A8,forcepldata,
+015A24,ResetBench,"PBnum = HV00 H = home players in PB V = away players in PB"
+015A88,Setplass,
+015AA4,setplayer,"clear line change mode? (I believe pflags2 are 1 off because of fighting missing)"
+015D84,checkattriblimits,"test if d3 is zero or higher"
+015E6C,IRQ7,
+015E82,DoDMAlist,
+015EC0,setvideo,
+015F34,updatescroll,
+015FF0,showref,
+016044,checkfo,
+0160F4,showzam,
+016178,SetSframe,
+0161D0,showcrowd,"check if reverse angle replay"
+0162FE,showclock,
+016480,checksso,
+0165FC,setsortcords,"move OOlist into a4"
+01661A,setffo,
+016648,uppads,
+016782,addframe,
+0167AA,addframe2,"push attribute to stack"
+016920,find3d,
+016976,updatesound,
+0169D0,KillCrowd,
+0169FA,setupice,
+016DA2,defaultsprites,
+016E82,defaultsprites2,
+01702E,SprSort,
+0170B0,resetplstuff,
+017102,clearTeamStats,
+01720C,SetTeamColors,
+017236,PeriodOver,
+017336,PlayoffScreen,
+017A18,EASportsScreen,
+017C72,LoadDefMenuOptions,
+017D16,NewPO,"20 = 32 decimal"
+017D80,MakeTree,
+017E42,FigureJoy,
+018032,OptionRNG,
+01828A,GetShifter,
+0182A2,AddPOStats,
+018A56,box,
+018A90,getname,"push to stack"
+018BC8,getplayername,"offset $1E - ROM address of team data?"
+018BDC,d0toascii,"push to stack"
+018BFC,AdrErr,
+018C22,InvOpCode,
+018C4C,DivBy0,
+01A050,InitSaveRAM,
+01A14E,ValidateSRAM,"set iterator to  $1FFD"
+01A19C,ClearSRAM,
+01A1E4,WriteSRAM,
+01A206,MakeSRAMChecksum,
+01A244,ReadSRAM,
+01A264,AllSndOff,
+01A294,p_initfx,
+01A370,ReadJoyData,
+01A50A,MusicVB,
 01A574,Z80_WriteVolume,
 01A66E,Z80_ClearFlagUnknown,
 01A74E,Unk_PCMSampleWrite,
 01ACC2,Z80_LoadROM,
+0F66EE,puckvzadj,
+0F693E,assonetimer,"pfna - clear new assignment"
+0F6C0A,setonetimeranim,
+0F6CBA,onetimershot,
+0F6D22,noidea,"push d0 and d1 on stack"
 0F6D5E,Unk_ControlsSetRelated,
 0F6E38,nullsub_2,
+0F6E8A,LoadCrowdRec,
+0F6EBE,Crowd_Noise?,"screen is in horizontal mode"
+0F6F8C,stopna2,
+0F6FD6,checkwallcoll,"clears bit 4 in pflags3 (not used in 92)"
+0F709C,wallcollb,
+0F70A2,Create_HotCold_Table,
+0F70E4,AttributeCalc,
+0F739E,GameSetUp,
+0F76C8,j_NewPO,
+0F7942,GameSetUp_3,
+0F7B66,GameSetUp_4,
+0F8168,setoptions,
+0F8304,GameSetUp_2,
 0F84F8,nullsub_3,
+0F8B5A,wallcollduringcheck,"check if goalie"
+0F8BA0,setSlotBit,"clears Slot Bit"
+0F9BE2,clrCrowdRAM?,
 0FA934,nullsub_6,
-0FFAC0,CalcChecksum,
+0FA9F8,CalcAttrib,"push a6 to stack"
+0FE14C,updatePPTeamTime,"check if PP"
+0FE556,ChooseSong,
+0FE71C,PSandSOpassdir,
+0FEC98,getFgtbyte,"clear d0"
+0FECA2,chkFgtBit1,
+0FED70,HiScoreScreen,
+0FEF66,set_bit1_C2FE,
+0FEF7C,AttribAdjust,"compare $32 to d0"
+0FEFCC,ReadGoaliePulled,
+0FF042,newTitleScreen,
+0FF8C8,clrTmPdst,"19 = 25 decimal (max roster size)"
+0FF9A8,chgplayer,"Check bit 6. This is never set anywhere"
+0FFAC0,Calc_Checksum,
 0FFACA,SC_NextLong,
 0FFAD4,SC_NoProper,
 0FFAD6,SC_YesProper,

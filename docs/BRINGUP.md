@@ -60,6 +60,17 @@ since the earlier status below:
 Owner verified keyboard input, sound and a human-played game (2026-09-23).
 Not yet verified: timing against hardware, Sonic baselines after the engine changes.
 
+## 2026-09-26: function names from the owner's IDA database
+
+`game/nhl94.xml` (IDA Pro 7.7 XML export, 2026-09-03) now supplies the
+annotation names: `tools/nhl94_disassembly.py --ida-xml` takes its human
+function names (324 accepted, at listing-verified instruction starts) over
+the 2016 listing's 45, and carries the entry comment as the notes column.
+`annotations_from_disasm.csv` went from 45 to 353 entries; 343 generated
+functions now carry a name comment. Discovery inputs are unchanged (the XML
+adds no real entries and its code blocks are coarser than the listing's
+instruction starts). Details in `docs/DISASSEMBLY.md`.
+
 ## Fix 2026-09-24: player energy drained immediately (HV counter)
 
 Owner report: with line changes on, every skater's energy bar emptied within

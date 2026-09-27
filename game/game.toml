@@ -21,7 +21,8 @@ output_prefix = "nhl94"
 
 # Disassembly evidence (PRINCIPLES #16), generated from the byte-verified
 # asm68k listing by tools/nhl94_disassembly.py (see docs/DISASSEMBLY.md):
-#   annotations     - human-named code labels -> readable generated C
+#   annotations     - function names -> readable generated C (from the IDA Pro
+#                     export game/nhl94.xml, listing names as fallback)
 #   code_addrs_file - every instruction start; gates data-as-code promotion and
 #                     lets the recompiler resume callers past inline JSR
 #                     arguments (EA's `jsr Print; dc.b "text"` idiom)

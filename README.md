@@ -19,6 +19,8 @@ hardware is unverified. See `docs/BRINGUP.md` for the chronological log.
   serial `GM T-50656 -00`. Copy it to `game/NHL94.bin`. The ROM is never
   committed and is not distributed with this project.
 - Python 3.12+ for the discovery and probe tooling.
+- Optional: an IDA Pro XML export of the ROM database at `game/nhl94.xml`
+  supplies human function names for the generated C (see `docs/DISASSEMBLY.md`).
 
 ## Build
 

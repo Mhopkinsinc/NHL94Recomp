@@ -35,3 +35,28 @@ The listing rows are `ADDR BYTES  source`. Forward-referenced operands appear as
 the ROM, not from the listing. The engine's `gen_disasm_*` scripts expect
 Macroassembler AS rows (`NNNN/ HEXOFFS :`), so an adapter is required
 (bring-up step 2).
+
+## IDA Pro export (function names)
+
+`game/nhl94.xml` is an IDA Pro 7.7 XML export (File > Produce file > XML) of
+the owner's working database for this ROM. It is the source of the function
+names that appear as comments above the generated C functions: 320-odd
+human-named functions against the 45 named labels the 2016 listing carries,
+plus the end-of-line comment at each entry as the annotation's notes column.
+`tools/nhl94_disassembly.py` reads it (`--ida-xml`, default `game/nhl94.xml`)
+when regenerating `annotations_from_disasm.csv`, taking the XML name where
+one exists and the listing name otherwise. Only names at addresses the
+listing proves to be instruction starts are accepted; the rest are reported.
+
+The XML is used for names only. Discovery (the code-address oracle, entry and
+seed labels, jump tables) still comes from the reassembled listing, which is
+byte-verified and marks every instruction start; the XML's code blocks cover
+fewer instruction starts and its function list adds no real entries beyond
+the listing's (its four extras are IDA artefacts inside inline printer data
+or mid-function labels). Its 213 named RAM variables and 4500 comments are
+not consumed yet; emitting them into the generated C would need an engine
+addition to the annotation table.
+
+After every new export: copy it over `game/nhl94.xml`, rerun the tool with
+`--reuse`, rebuild.
+

@@ -209,6 +209,45 @@ def find_jump_tables(rom: bytes, code: set[int], labels: dict[int, str],
     return out
 
 
+def load_ida_names(xml_path: Path, code: set[int]) -> dict[int, tuple[str, str]]:
+    """Human function names (and the end-of-line comment at the entry, if any)
+    from an IDA Pro XML export (File > Produce > XML). Only FUNCTIONS entries
+    with a non-generated name are used, and only at addresses the listing
+    proves to be instruction starts; anything else is reported and skipped.
+    The XML is the owner's current database, so its names win over the 2016
+    listing's where both exist."""
+    import xml.etree.ElementTree as ET
+    root = ET.parse(xml_path).getroot()
+    comments = {}
+    cm = root.find("COMMENTS")
+    if cm is not None:
+        for c in cm:
+            try:
+                comments[int(c.attrib["ADDRESS"], 16)] = (c.text or "").strip()
+            except (KeyError, ValueError):
+                pass
+    names: dict[int, tuple[str, str]] = {}
+    skipped = []
+    fn = root.find("FUNCTIONS")
+    for f in (fn if fn is not None else []):
+        name = f.attrib.get("NAME", "")
+        try:
+            addr = int(f.attrib["ENTRY_POINT"], 16)
+        except (KeyError, ValueError):
+            continue
+        if not name or GENERATED_NAME_RE.match(name) or name.startswith(".") or name.startswith("nullsub_"):
+            continue
+        if addr not in code:
+            skipped.append((addr, name))
+            continue
+        note = comments.get(addr, "").replace('"', "'").replace(",", ";").replace("\n", " ")
+        names[addr] = (name, note)
+    if skipped:
+        print(f"[ida] {len(skipped)} named functions skipped (not instruction starts in the listing): "
+              + ", ".join(f"${a:06X} {n}" for a, n in skipped[:8]))
+    return names
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -219,6 +258,9 @@ def main() -> int:
     ap.add_argument("--scratch", type=Path,
                     default=Path(tempfile.gettempdir()) / "nhl94_disasm_build")
     ap.add_argument("--reuse", action="store_true", help="reuse listings already in --scratch")
+    ap.add_argument("--ida-xml", type=Path,
+                    default=Path(__file__).resolve().parents[1] / "game" / "nhl94.xml",
+                    help="IDA Pro XML export supplying function names (skipped if absent)")
     args = ap.parse_args()
 
     rom = args.rom.read_bytes()
@@ -264,7 +306,13 @@ def main() -> int:
             entries[a] = labels.get(a, f"ptr_{a:X}")
             pointer_targets[a] = refs
     seeds = {a: n for a, n in code_labels.items() if a not in entries}
-    named = {a: n for a, n in entries.items() if not GENERATED_NAME_RE.match(n)}
+    named = {a: (n, "") for a, n in entries.items() if not GENERATED_NAME_RE.match(n)}
+    ida_count = 0
+    if args.ida_xml and args.ida_xml.exists():
+        ida = load_ida_names(args.ida_xml, code)
+        named.update(ida)          # the owner's IDA names override the 2016 listing's
+        ida_count = len(ida)
+        print(f"[ida] {ida_count} function names from {args.ida_xml.name}")
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     nl = "\n"
@@ -303,8 +351,11 @@ def main() -> int:
                f"stride = {stride}", f'format = "{fmt}"   # {note}', ""]
     (args.out_dir / "nhl94.disasm_jumptables.toml").write_text(nl.join(jt), encoding="utf-8", newline=nl)
 
-    csv = ["# Verified NHL 94 disassembly (MarkeyJester 2016); regenerate with tools/nhl94_disassembly.py"]
-    csv += [f"{a:06X},{n}," for a, n in sorted(named.items())]
+    csv = ["# addr,name,notes - function names for the generated C. Names come from the",
+           "# IDA Pro export game/nhl94.xml (FUNCTIONS with a human name, entry comment as",
+           "# notes), falling back to the MarkeyJester 2016 listing's named labels.",
+           "# Regenerate with tools/nhl94_disassembly.py (rerun after every IDA export)."]
+    csv += [f"{a:06X},{n},\"{note}\"" if note else f"{a:06X},{n}," for a, (n, note) in sorted(named.items())]
     (args.out_dir / "annotations_from_disasm.csv").write_text(nl.join(csv) + nl, encoding="utf-8", newline=nl)
 
     print(f"[out] {len(code)} code addrs, {len(data)} data addrs")
