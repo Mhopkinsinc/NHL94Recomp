@@ -171,6 +171,8 @@
 0115AA,VDP_InitialSetup,
 011680,Vmaddr,
 01169A,dobitmap,
+01172C,ai_LoadAssetInline,
+011738,ai_LoadAsset,
 011952,xyVmMap,
 01197E,eraser,
 0119B8,Framer,
@@ -183,6 +185,7 @@
 011D3A,DeterStrLength?,"push to stack"
 011D96,appendz,
 011D9E,appstring,
+011DE2,ai_PrintBigInline,
 011DF4,printbig,
 011F2C,AddPenalty,"checks if no whistle gmclock(gmode)"
 011FF2,PenaltyManager,
@@ -217,6 +220,7 @@
 013384,NewTicker2,
 013396,NewTicker3,
 0133B2,NewTicker3pt2,
+013508,ai_PrintNextString,
 013510,Adda1Offset,
 01381E,VDP_ReadHVCounter,
 0138AC,checkcoll,
@@ -306,6 +310,7 @@
 01A264,AllSndOff,
 01A294,p_initfx,
 01A370,ReadJoyData,
+01A4EE,ai_Z80_ResetAndRequestBus,
 01A50A,MusicVB,
 01A574,Z80_WriteVolume,
 01A66E,Z80_ClearFlagUnknown,
@@ -334,6 +339,9 @@
 0F84F8,nullsub_3,
 0F8B5A,wallcollduringcheck,"check if goalie"
 0F8BA0,setSlotBit,"clears Slot Bit"
+0F997A,ai_CopyLenString,
+0F998E,ai_NumberToDecimalText,
+0F9B94,ai_SaveRecordField,
 0F9BE2,clrCrowdRAM?,
 0FA934,nullsub_6,
 0FA9F8,CalcAttrib,"push a6 to stack"

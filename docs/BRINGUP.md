@@ -60,6 +60,16 @@ since the earlier status below:
 Owner verified keyboard input, sound and a human-played game (2026-09-23).
 Not yet verified: timing against hardware, Sonic baselines after the engine changes.
 
+## 2026-09-27: naming tool for the unnamed routines
+
+`tools/nhl94_names.py` edits `game/nhl94.xml` in place (status / dossier /
+apply / accept / export-idc). Machine-derived names carry an `ai_` prefix and
+an `[AI confidence] evidence` comment so they are distinguishable from the
+human names in every consumer; accepting drops the prefix. First batch of
+eight applied from the dossier (asset loader, inline printers, decimal
+formatter, string copy, Z80 bus grab, save-record field access). Counts:
+325 human, 8 ai, 370 unnamed of 703.
+
 ## 2026-09-26: function names from the owner's IDA database
 
 `game/nhl94.xml` (IDA Pro 7.7 XML export, 2026-09-03) now supplies the

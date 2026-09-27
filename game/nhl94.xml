@@ -10247,12 +10247,14 @@ d4 = start char
 d5 = pal used bits (0-3) for color fam 1-4</REGULAR_CMT>
             <TYPEINFO_CMT>dobitmap</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1172C">
+        <FUNCTION ENTRY_POINT="0x1172C" NAME="ai_LoadAssetInline">
             <ADDRESS_RANGE START="0x1172C" END="0x11737" />
+            <REGULAR_CMT>[AI 0.7] stores its return address in $CF32 (asset pointer follows the jsr), calls the loader at $1173C, then addq.l #8,(sp) to skip the inline longword pair; 7 callers incl. setupice, setoptions, newTitleScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1172C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11738">
+        <FUNCTION ENTRY_POINT="0x11738" NAME="ai_LoadAsset">
             <ADDRESS_RANGE START="0x11738" END="0x1173B" />
+            <REGULAR_CMT>[AI 0.7] clears the inline-pointer slot $CF32 then falls into the tile loader at $1173C (u16 count + raw/compressed tiles -&gt; VRAM at tile d4, d4 advanced by count); 24 callers incl. setupice, Intermission, PlayoffScreen, dobitmap</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11738</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1173C">
@@ -10368,8 +10370,9 @@ yy = y coord to print at</REGULAR_CMT>
             <REGULAR_CMT>append string a1 to string a3</REGULAR_CMT>
             <TYPEINFO_CMT>appstring</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11DE2">
+        <FUNCTION ENTRY_POINT="0x11DE2" NAME="ai_PrintBigInline">
             <ADDRESS_RANGE START="0x11DE2" END="0x11DF3" />
+            <REGULAR_CMT>[AI 0.8] same shape as printz ($11B92): takes the text after the jsr via 4(sp), calls the big-font printer $11DF4, writes the advanced pointer back to 4(sp); callers are the error screens AdrErr/DivBy0/InvOpCode and stats screens</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11DE2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11DF4" NAME="printbig">
@@ -10639,8 +10642,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x134E4" END="0x13507" />
             <TYPEINFO_CMT>sub_134E4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x13508">
+        <FUNCTION ENTRY_POINT="0x13508" NAME="ai_PrintNextString">
             <ADDRESS_RANGE START="0x13508" END="0x1350F" />
+            <REGULAR_CMT>[AI 0.6] bsr Adda1Offset (advance a1 by its length word) then bra sub_11A48 (print at printx/printy); 12 callers incl. PrintScores1, NewTicker3pt2, puckfaceoff2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13508</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x13510" NAME="Adda1Offset">
@@ -11408,8 +11412,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A470" END="0x1A4DD" />
             <TYPEINFO_CMT>sub_1A470</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A4EE">
+        <FUNCTION ENTRY_POINT="0x1A4EE" NAME="ai_Z80_ResetAndRequestBus">
             <ADDRESS_RANGE START="0x1A4EE" END="0x1A509" />
+            <REGULAR_CMT>[AI 0.9] writes $100 to $A11200 (Z80 reset release) and $A11100 (bus request) then spins on bit 0 of $A11100; called from the five sound-driver upload routines</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A4EE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A50A" NAME="MusicVB">
@@ -11687,12 +11692,14 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF98C6" END="0xF994F" />
             <TYPEINFO_CMT>sub_F98C6</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF997A">
+        <FUNCTION ENTRY_POINT="0xF997A" NAME="ai_CopyLenString">
             <ADDRESS_RANGE START="0xF997A" END="0xF998D" />
+            <REGULAR_CMT>[AI 0.8] copies (a1) bytes from a1 to a3 (length word first), preserving d0; used by the stats/records text builders</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F997A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF998E">
+        <FUNCTION ENTRY_POINT="0xF998E" NAME="ai_NumberToDecimalText">
             <ADDRESS_RANGE START="0xF998E" END="0xF99F1" />
+            <REGULAR_CMT>[AI 0.8] divu #100 / #10 chains on d0 writing ASCII digits ('0'+) into the string at a1+2 and counting them in d1; 5 callers in the records/stats screens</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F998E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF99F2">
@@ -11715,8 +11722,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF9B2A" END="0xF9B8F" />
             <TYPEINFO_CMT>sub_F9B2A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9B94">
+        <FUNCTION ENTRY_POINT="0xF9B94" NAME="ai_SaveRecordField">
             <ADDRESS_RANGE START="0xF9B94" END="0xF9BD9" />
+            <REGULAR_CMT>[AI 0.6] computes a byte offset from d0*4 plus word_F9CA4[d1]*4 and reads or writes it through ReadSRAM/WriteSRAM depending on bit 6 of $C2F8; callers are the user-records screens</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9B94</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9BDA">

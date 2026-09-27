@@ -1,0 +1,52 @@
+# AI-derived name proposals for unnamed NHL 94 routines (batch 1, 2026-09-27).
+# Applied to game/nhl94.xml with tools/nhl94_names.py apply; every name lands
+# with the ai_ prefix and an [AI <confidence>] comment carrying the evidence.
+# Accepting one (human confirmed) = `tools/nhl94_names.py accept <addr>`.
+
+[[name]]
+addr = 0x011738
+name = "LoadAsset"
+confidence = 0.7
+evidence = "clears the inline-pointer slot $CF32 then falls into the tile loader at $1173C (u16 count + raw/compressed tiles -> VRAM at tile d4, d4 advanced by count); 24 callers incl. setupice, Intermission, PlayoffScreen, dobitmap"
+
+[[name]]
+addr = 0x01172C
+name = "LoadAssetInline"
+confidence = 0.7
+evidence = "stores its return address in $CF32 (asset pointer follows the jsr), calls the loader at $1173C, then addq.l #8,(sp) to skip the inline longword pair; 7 callers incl. setupice, setoptions, newTitleScreen"
+
+[[name]]
+addr = 0x011DE2
+name = "PrintBigInline"
+confidence = 0.8
+evidence = "same shape as printz ($11B92): takes the text after the jsr via 4(sp), calls the big-font printer $11DF4, writes the advanced pointer back to 4(sp); callers are the error screens AdrErr/DivBy0/InvOpCode and stats screens"
+
+[[name]]
+addr = 0x013508
+name = "PrintNextString"
+confidence = 0.6
+evidence = "bsr Adda1Offset (advance a1 by its length word) then bra sub_11A48 (print at printx/printy); 12 callers incl. PrintScores1, NewTicker3pt2, puckfaceoff2"
+
+[[name]]
+addr = 0x0F998E
+name = "NumberToDecimalText"
+confidence = 0.8
+evidence = "divu #100 / #10 chains on d0 writing ASCII digits ('0'+) into the string at a1+2 and counting them in d1; 5 callers in the records/stats screens"
+
+[[name]]
+addr = 0x0F997A
+name = "CopyLenString"
+confidence = 0.8
+evidence = "copies (a1) bytes from a1 to a3 (length word first), preserving d0; used by the stats/records text builders"
+
+[[name]]
+addr = 0x01A4EE
+name = "Z80_ResetAndRequestBus"
+confidence = 0.9
+evidence = "writes $100 to $A11200 (Z80 reset release) and $A11100 (bus request) then spins on bit 0 of $A11100; called from the five sound-driver upload routines"
+
+[[name]]
+addr = 0x0F9B94
+name = "SaveRecordField"
+confidence = 0.6
+evidence = "computes a byte offset from d0*4 plus word_F9CA4[d1]*4 and reads or writes it through ReadSRAM/WriteSRAM depending on bit 6 of $C2F8; callers are the user-records screens"

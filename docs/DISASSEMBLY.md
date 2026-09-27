@@ -60,3 +60,32 @@ addition to the annotation table.
 After every new export: copy it over `game/nhl94.xml`, rerun the tool with
 `--reuse`, rebuild.
 
+## Naming the unnamed routines (`tools/nhl94_names.py`)
+
+`game/nhl94.xml` is the source of truth for names, and it is edited in place
+rather than round-tripping through IDA. Provenance is visible in the name
+itself: human names from IDA are plain (`getpde`); machine-derived names carry
+the `ai_` prefix (`ai_LoadAsset`) and an `[AI <confidence>] <evidence>`
+function comment in the XML. The prefix follows the name everywhere, into the
+annotations CSV and the generated C, so a guess is never mistaken for a fact.
+
+Workflow:
+
+```
+python tools/nhl94_names.py status                 # human / ai / unnamed counts
+python tools/nhl94_names.py dossier --out d.md     # evidence per unnamed routine
+python tools/nhl94_names.py apply proposals.toml   # write ai_ names into nhl94.xml
+python tools/nhl94_names.py accept 0x11738 ...     # drop the prefix once a human agrees
+python tools/nhl94_names.py export-idc             # optional: IDC to push ai_ names into IDA
+python tools/nhl94_disassembly.py --rom game/NHL94.bin --reuse   # regenerate the CSV
+```
+
+The dossier lists, per routine in priority order (distinct callers, then
+size): callers and callees by name, inline printer strings, named RAM
+variables touched, and hardware ports touched. Proposals are TOML tables
+(`addr`, `name`, `confidence`, `evidence`); `apply` refuses to overwrite a
+human name. The XML edits are minimal text changes (a `NAME` attribute and a
+`REGULAR_CMT` child), so the diff stays reviewable and IDA's XML import still
+reads the file. `game/nhl94.names.proposed.toml` holds the batches applied so
+far.
+
