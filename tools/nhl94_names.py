@@ -13,6 +13,9 @@ Provenance rule
 Commands
   status                      counts: human / ai / unnamed functions
   dossier [--out FILE] [-n N] evidence table for the unnamed functions, priority order
+                              (default output game/nhl94.dossier.md, tracked, regenerate per batch)
+  review PROPOSALS.toml       reviewer's document for a batch: each proposal with its evidence,
+                              callers/callees and the routine's assembly (docs/names/<batch>.md)
   apply PROPOSALS.toml        write ai_ names (+ evidence comments) into game/nhl94.xml
   accept ADDR [ADDR...]       drop the ai_ prefix (human confirmed) for those entries
   export-idc [--out FILE]     IDC script that applies the XML's ai_ names in IDA, if wanted
@@ -127,7 +130,8 @@ def cmd_status(_args):
     return 0
 
 
-def cmd_dossier(args):
+def collect_evidence():
+    """Static evidence for every function: callers, callees, strings, RAM, hw, size."""
     text = read_xml()
     names = xml_names(text)
     syms = symbol_names(text)
@@ -202,6 +206,14 @@ def cmd_dossier(args):
     def nm(a):
         return names.get(a) or labels.get(a) or f"${a:06X}"
 
+    return dict(text=text, names=names, labels=labels, callers=callers, callees=callees,
+                strings=strings, ramrefs=ramrefs, hwrefs=hwrefs, size=size, nm=nm, ext=ext)
+
+
+def cmd_dossier(args):
+    ev = collect_evidence()
+    text, labels, callers, callees = ev["text"], ev["labels"], ev["callers"], ev["callees"]
+    strings, ramrefs, hwrefs, size, nm = ev["strings"], ev["ramrefs"], ev["hwrefs"], ev["size"], ev["nm"]
     unnamed = [a for a, n, _ in functions(text) if not n]
     # priority: many distinct callers first, then size
     unnamed.sort(key=lambda a: (-len(callers[a]), -size[a]))
@@ -221,11 +233,69 @@ def cmd_dossier(args):
         if hwrefs[a]:
             out.append("hw      : " + ", ".join(sorted(hwrefs[a])))
     result = "\n".join(out) + "\n"
-    if args.out:
-        Path(args.out).write_text(result, encoding="utf-8")
-        print(f"wrote {args.out} ({len(unnamed)} routines)")
-    else:
-        print(result)
+    out_path = Path(args.out) if args.out else GAME / "nhl94.dossier.md"
+    out_path.write_text(result, encoding="utf-8", newline="\n")
+    print(f"wrote {out_path} ({len(unnamed)} routines)")
+    return 0
+
+
+def listing_body(addr: int, ext: dict, max_lines: int = 60) -> list[str]:
+    """Assembly rows of the function at addr (XML extent, else until the next rts)."""
+    lo, hi = ext.get(addr, (addr, addr + 0x400))
+    body = []
+    with open(LISTING, encoding="latin-1") as fh:
+        for line in fh:
+            m = ROW_RE.match(line.rstrip("\r\n"))
+            if not m:
+                continue
+            a = int(m.group(1), 16)
+            if a < lo:
+                continue
+            if a > hi:
+                break
+            src = m.group(3).strip()
+            if not src or src.startswith(";") or not m.group(2).strip():
+                continue
+            src = re.sub(r"\s*;.*$", "", src)
+            body.append(f"{a:06X}  {src}")
+            if len(body) >= max_lines:
+                body.append("...")
+                break
+    return body
+
+
+def cmd_review(args):
+    ev = collect_evidence()
+    props = parse_proposals(Path(args.proposals))
+    nm, callers, callees, strings, ramrefs, hwrefs, size, ext = (ev[k] for k in ("nm", "callers", "callees", "strings", "ramrefs", "hwrefs", "size", "ext"))
+    batch = Path(args.proposals).stem.replace("nhl94.names.", "")
+    out = [f"# Name review: {Path(args.proposals).name}", "",
+           "For each routine: the proposed `ai_` name, confidence, the evidence the",
+           "proposal rests on, who calls it and what it calls, and its assembly.",
+           "Accept with `python tools/nhl94_names.py accept <addr>`; to rename, edit the",
+           "XML (or the proposals file and re-apply).", ""]
+    for addr, name, conf, evidence in props:
+        out.append(f"## `${addr:06X}` -> `ai_{name}`  (confidence {conf:.1f}, {size[addr]} insns)")
+        out.append("")
+        out.append(f"**Evidence.** {evidence}")
+        out.append("")
+        out.append("**Callers.** " + (", ".join(sorted(nm(c) for c in callers[addr])) or "none found"))
+        out.append("**Callees.** " + (", ".join(sorted(nm(c) for c in callees[addr])) or "none"))
+        if strings[addr]:
+            out.append("**Strings.** " + " | ".join(strings[addr]))
+        if ramrefs[addr]:
+            out.append("**RAM.** " + ", ".join(sorted(ramrefs[addr])))
+        if hwrefs[addr]:
+            out.append("**Hardware.** " + ", ".join(sorted(hwrefs[addr])))
+        out.append("")
+        out.append("```")
+        out += listing_body(addr, ext)
+        out.append("```")
+        out.append("")
+    out_path = Path(args.out) if args.out else HERE.parent / "docs" / "names" / f"{batch}.md"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text("\n".join(out) + "\n", encoding="utf-8", newline="\n")
+    print(f"wrote {out_path} ({len(props)} proposals)")
     return 0
 
 
@@ -317,11 +387,12 @@ def main() -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("status")
     d = sub.add_parser("dossier"); d.add_argument("--out"); d.add_argument("-n", "--limit", type=int, default=0)
+    r = sub.add_parser("review"); r.add_argument("proposals"); r.add_argument("--out")
     a = sub.add_parser("apply"); a.add_argument("proposals")
     c = sub.add_parser("accept"); c.add_argument("addrs", nargs="+")
     e = sub.add_parser("export-idc"); e.add_argument("--out")
     args = ap.parse_args()
-    return {"status": cmd_status, "dossier": cmd_dossier, "apply": cmd_apply, "accept": cmd_accept, "export-idc": cmd_export_idc}[args.cmd](args)
+    return {"status": cmd_status, "dossier": cmd_dossier, "review": cmd_review, "apply": cmd_apply, "accept": cmd_accept, "export-idc": cmd_export_idc}[args.cmd](args)
 
 
 if __name__ == "__main__":

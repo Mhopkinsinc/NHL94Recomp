@@ -73,8 +73,9 @@ Workflow:
 
 ```
 python tools/nhl94_names.py status                 # human / ai / unnamed counts
-python tools/nhl94_names.py dossier --out d.md     # evidence per unnamed routine
-python tools/nhl94_names.py apply proposals.toml   # write ai_ names into nhl94.xml
+python tools/nhl94_names.py dossier                # evidence per unnamed routine -> game/nhl94.dossier.md
+python tools/nhl94_names.py review game/names-batch-NN.toml   # reviewer doc -> docs/names/names-batch-NN.md
+python tools/nhl94_names.py apply game/names-batch-NN.toml    # write ai_ names into nhl94.xml
 python tools/nhl94_names.py accept 0x11738 ...     # drop the prefix once a human agrees
 python tools/nhl94_names.py export-idc             # optional: IDC to push ai_ names into IDA
 python tools/nhl94_disassembly.py --rom game/NHL94.bin --reuse   # regenerate the CSV
@@ -86,6 +87,7 @@ variables touched, and hardware ports touched. Proposals are TOML tables
 (`addr`, `name`, `confidence`, `evidence`); `apply` refuses to overwrite a
 human name. The XML edits are minimal text changes (a `NAME` attribute and a
 `REGULAR_CMT` child), so the diff stays reviewable and IDA's XML import still
-reads the file. `game/nhl94.names.proposed.toml` holds the batches applied so
-far.
+reads the file. Batches live in `game/names-batch-NN.toml`, each with a
+reviewer document in `docs/names/`; the dossier is regenerated and committed
+with every batch so the remaining work is visible in the repository.
 
