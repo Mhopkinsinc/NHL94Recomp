@@ -1,0 +1,84 @@
+# Names batch 13 - see docs/names/names-batch-13.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-13.toml
+
+# ---- asset loading -----------------------------------------------------------------
+
+[[name]]
+addr = 0x01173C
+name = "LoadTilesCore"
+confidence = 0.7
+evidence = "body shared by LoadAsset / ai_LoadAssetInline: a2 = asset, d4 = destination tile: reads the count word; 0 ends, a negative count (& $7FFF) is a compressed block decoded by sub_1177A, a positive count is raw 4bpp tiles sent by DoDMApro, or by remap when an inline nibble map pointer is set in $CF32; d4 is advanced by the tile count; caller ai_LoadAssetInline (and LoadAsset by fall-through)"
+
+# ---- gameplay ------------------------------------------------------------------------
+
+[[name]]
+addr = 0x012EF6
+name = "AverageOnIceEnergy"
+confidence = 0.8
+evidence = "for the six objects of team a2 (from $22(a2)) with a positive position slot $34, sums the energy words $32(a2, 2*$66(obj)) and returns the average in d0 (0 when nobody is on the ice); caller ai_CpuLineChangeCheck"
+
+[[name]]
+addr = 0x00A88C
+name = "ClampCamera"
+confidence = 0.8
+evidence = "SetRCords helper: clamps Hpos ($BD1C) into -$3C..$3C and Vpos ($BD18) into -$C8..$100, the same limits ai_CenterCameraOnObject applies; caller SetRCords"
+
+# ---- playoff screen ------------------------------------------------------------------
+
+[[name]]
+addr = 0x017652
+name = "DrawPlayoffRoundLabel"
+confidence = 0.5
+evidence = "PlayoffScreen: d1 = label index; when it equals twice the current-round byte $CEF4[potreeteam] the palette is switched to $6000 (highlight), then draws the 2-row label bitmap from off_ABA14's second block with dobitmap at tile base 2 (the 'Playoffs' / 'Quarterfinals' / 'Semifinals' / 'Finals' / 'Champions' strings sit next to it); caller PlayoffScreen"
+
+[[name]]
+addr = 0x0FED2A
+name = "BuildPlayoffCursorSprites"
+confidence = 0.5
+evidence = "PlayoffScreen: builds the sprite list at $C018 from frame 1 of the sprite asset unk_F3098 with SetSframe at ($B8AE, $B8B0) (the scrolled bracket position) and tile base $B016 | $8000, terminates the list (clearing two longs when nothing was emitted) and stores the sprite count in $C2E8; caller PlayoffScreen"
+
+# ---- setup / pause / title screens ---------------------------------------------------
+
+[[name]]
+addr = 0x0F878C
+name = "DrawSetupPhotoFrame"
+confidence = 0.6
+evidence = "draws the 8x8-tile photo panel frame bitmap off_BF702 at column 8 row 5 with tile base $D438 (the entry at $F8796 is shared by ai_SetHomePhotoPanel / ai_SetAwayPhotoPanel, which set their own base and column first) under $C2F8 bit 0; caller ai_DrawSetupHomeLogo"
+
+[[name]]
+addr = 0x008008
+name = "PrintPauseMenuItem"
+confidence = 0.7
+evidence = "ai_PrintScrollingMenu item printer: an item whose third byte is 'x' is the goalie-control toggle and prints 'Manual Goalie' or 'Auto Goalie' according to the controlling team's option ($D05C for the second controller when sflags bit 1, else $D05A), any other item is printed as-is; caller ai_PrintScrollingMenu"
+
+[[name]]
+addr = 0x0FF3B0
+name = "InitTitleScrollTable"
+confidence = 0.4
+evidence = "newTitleScreen: sets Hscroll = $14 and $BF14 = $50, then fills the object area at $B04A with a table of 81 longs alternating $FD80/$FD7F (decrementing every other entry) followed by 97 longs counting up from $100 in steps of 4; the values feed the title screen's per-line scroll effect; caller newTitleScreen"
+
+# ---- rosters / records / HUD ---------------------------------------------------------
+
+[[name]]
+addr = 0x0FAFE4
+name = "SplitRosterByLineup"
+confidence = 0.6
+evidence = "a0 = team record, a1 = output: for the 26 roster indexes writes those that appear in the six-entry lineup list at team data offset +6 to a1 (starters) and the rest to a1+6 (bench); sub_FAFBA calls it for the home and away teams into $D4FA and $D514; caller sub_FAFBA"
+
+[[name]]
+addr = 0x0F9AE4
+name = "AppendRecordUserName"
+confidence = 0.6
+evidence = "given a record (a0, or fetched with ReadRecordField when a0 is null) appends the holder's user name (byte 1) to the string at a1 with ai_BuildUserNameString and trailing-space trimming ($C2F8 bit 7); caller sub_F9A64 (records text)"
+
+[[name]]
+addr = 0x0FC136
+name = "PrintRankedUserName"
+confidence = 0.6
+evidence = "user-records list: prints the rank as a digit (7 - d7 + '0') followed by '. ' in $BFA4, then the user name of the entry byte -1(a0) via ai_BuildUserNameString without trimming; caller loc_FBEA4 (user list screen)"
+
+[[name]]
+addr = 0x012D30
+name = "PrintTeamScoreBlock"
+confidence = 0.7
+evidence = "PrintScores1: draws the team banner tiles (ai_DrawTeamBannerTiles, five columns left of printx) then the team's score $C(a2) two rows down, converted with PushNumber and centred (one column left when 10 or more) in the big font via printbig; caller PrintScores1"

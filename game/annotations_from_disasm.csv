@@ -32,6 +32,7 @@
 007E72,ai_SetPauseMenuColumn,
 007E88,ai_PauseMenuInput,
 007EF2,ai_PrintScrollingMenu,
+008008,ai_PrintPauseMenuItem,
 008078,ai_DrawTeamBannerTiles,
 0080BA,vcountwait,
 0084CE,PrintAttribHeader,
@@ -54,6 +55,7 @@
 00A616,ai_CenterCameraOnObject,
 00A67C,RevReplayAdj,"check if reverse angle replay"
 00A68C,SetRCords,
+00A88C,ai_ClampCamera,
 00A8CA,updatereplay,"check if highlight"
 00A9D6,updateplayers,"check if screen is in horiz mode"
 00AEE4,updateanim,"test SPA"
@@ -201,6 +203,7 @@
 01169A,dobitmap,
 01172C,ai_LoadAssetInline,
 011738,ai_LoadAsset,
+01173C,ai_LoadTilesCore,
 011952,xyVmMap,
 01197E,eraser,
 0119B8,Framer,
@@ -242,10 +245,12 @@
 012B40,ClrHor,
 012B94,SetHor,
 012C04,PrintScores1,
+012D30,ai_PrintTeamScoreBlock,
 012D70,ai_DrawHudPanel,
 012E12,ai_PrintPenaltyRow,
 012E66,ai_DrawLineEnergyBar,
 012EB4,getlinee,
+012EF6,ai_AverageOnIceEnergy,
 012F30,ChkShotStat,"check if clock stopped"
 013040,loadTeamStruct,
 0130BE,ai_ResetLineEnergy,
@@ -336,6 +341,7 @@
 017236,PeriodOver,
 017336,PlayoffScreen,
 017572,ai_ScrollPlayoffBracket,
+017652,ai_DrawPlayoffRoundLabel,
 017730,ai_RunTickerMessage,
 0179D2,ai_ScrollTickerRows,
 017A18,EASportsScreen,
@@ -430,6 +436,7 @@
 0F8608,ai_DrawSetupHomeLogo,
 0F8762,ai_SetHomePhotoPanel,
 0F877E,ai_SetAwayPhotoPanel,
+0F878C,ai_DrawSetupPhotoFrame,
 0F87D2,ai_ResetPhotoRotateTimer,
 0F87EA,ai_TickSetupPhotoRotation,
 0F8868,ai_ShowNextSetupPhoto,
@@ -438,6 +445,7 @@
 0F997A,ai_CopyLenString,
 0F998E,ai_NumberToDecimalText,
 0F99F2,ai_ReadPlayerRecordValue,
+0F9AE4,ai_AppendRecordUserName,
 0F9B2A,ai_AppendRecordHolderText,
 0F9B94,ai_ReadRecordField,
 0F9BDA,ai_WriteRecordField,
@@ -460,9 +468,11 @@
 0FAE26,ai_GetPlayerPhoto,
 0FAF50,ai_GetRecordsTeam,
 0FAF66,ai_TrimTrailingSpaces,
+0FAFE4,ai_SplitRosterByLineup,
 0FB992,ai_CopyUserNameDashed,
 0FBA76,ai_PurgeUserFromRecords,
 0FBB88,ai_PromptUserRecordSelect,
+0FC136,ai_PrintRankedUserName,
 0FC516,ai_AdvanceShootoutRound,
 0FC5AE,ai_PrintShootoutWinner,
 0FCC76,ai_MatchupsScreen,
@@ -497,6 +507,7 @@
 0FEB54,ai_SlideToFaceoffSpot,
 0FEC98,getFgtbyte,"clear d0"
 0FECA2,chkFgtBit1,
+0FED2A,ai_BuildPlayoffCursorSprites,
 0FED70,HiScoreScreen,
 0FEEC8,ai_BuildPlayedByString,
 0FEF66,set_bit1_C2FE,
@@ -505,6 +516,7 @@
 0FEFF0,ai_ClearOneTimer,
 0FF042,newTitleScreen,
 0FF2C8,ai_PrintTitleTextBlock,
+0FF3B0,ai_InitTitleScrollTable,
 0FF7E2,ai_StartPowerPlaySong,
 0FF8C8,clrTmPdst,"19 = 25 decimal (max roster size)"
 0FF8DE,ai_DrawBestWorstPlayerIcon,

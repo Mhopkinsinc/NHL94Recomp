@@ -9176,8 +9176,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] generic options list: $CF20 = cursor index (wrapped to the item count), $CF22 = first visible item (kept within 3 of the cursor), $CF24 = length-prefixed item list installed by sub_7E36; walks to the first visible item and prints from row $D using the print2/inline control strings; callers loc_7E46 and loc_7E88 (menu refresh)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7EF2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8008">
+        <FUNCTION ENTRY_POINT="0x8008" NAME="ai_PrintPauseMenuItem">
             <ADDRESS_RANGE START="0x8008" END="0x804F" />
+            <REGULAR_CMT>[AI 0.7] ai_PrintScrollingMenu item printer: an item whose third byte is 'x' is the goalie-control toggle and prints 'Manual Goalie' or 'Auto Goalie' according to the controlling team's option ($D05C for the second controller when sflags bit 1, else $D05A), any other item is printed as-is; caller ai_PrintScrollingMenu</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8008</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8078" NAME="ai_DrawTeamBannerTiles">
@@ -9445,8 +9446,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>a4 = current replay frame address to convert into normal coordinates</REGULAR_CMT>
             <TYPEINFO_CMT>SetRCords</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xA88C">
+        <FUNCTION ENTRY_POINT="0xA88C" NAME="ai_ClampCamera">
             <ADDRESS_RANGE START="0xA88C" END="0xA8C9" />
+            <REGULAR_CMT>[AI 0.8] SetRCords helper: clamps Hpos ($BD1C) into -$3C..$3C and Vpos ($BD18) into -$C8..$100, the same limits ai_CenterCameraOnObject applies; caller SetRCords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_A88C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xA8CA" NAME="updatereplay">
@@ -10286,8 +10288,9 @@ d5 = pal used bits (0-3) for color fam 1-4</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] clears the inline-pointer slot $CF32 then falls into the tile loader at $1173C (u16 count + raw/compressed tiles -&gt; VRAM at tile d4, d4 advanced by count); 24 callers incl. setupice, Intermission, PlayoffScreen, dobitmap</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11738</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1173C">
+        <FUNCTION ENTRY_POINT="0x1173C" NAME="ai_LoadTilesCore">
             <ADDRESS_RANGE START="0x1173C" END="0x11779" />
+            <REGULAR_CMT>[AI 0.7] body shared by LoadAsset / ai_LoadAssetInline: a2 = asset, d4 = destination tile: reads the count word; 0 ends, a negative count (&amp; $7FFF) is a compressed block decoded by sub_1177A, a positive count is raw 4bpp tiles sent by DoDMApro, or by remap when an inline nibble map pointer is set in $CF32; d4 is advanced by the tile count; caller ai_LoadAssetInline (and LoadAsset by fall-through)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1173C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1177A">
@@ -10567,8 +10570,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x12D0E" END="0x12D2F" />
             <TYPEINFO_CMT>sub_12D0E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12D30">
+        <FUNCTION ENTRY_POINT="0x12D30" NAME="ai_PrintTeamScoreBlock">
             <ADDRESS_RANGE START="0x12D30" END="0x12D6F" />
+            <REGULAR_CMT>[AI 0.7] PrintScores1: draws the team banner tiles (ai_DrawTeamBannerTiles, five columns left of printx) then the team's score $C(a2) two rows down, converted with PushNumber and centred (one column left when 10 or more) in the big font via printbig; caller PrintScores1</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12D30</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12D70" NAME="ai_DrawHudPanel">
@@ -10598,8 +10602,9 @@ a3 = team struct on PP</REGULAR_CMT>
             <ADDRESS_RANGE START="0x12EB4" END="0x12EF5" />
             <TYPEINFO_CMT>getlinee</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12EF6">
+        <FUNCTION ENTRY_POINT="0x12EF6" NAME="ai_AverageOnIceEnergy">
             <ADDRESS_RANGE START="0x12EF6" END="0x12F2F" />
+            <REGULAR_CMT>[AI 0.8] for the six objects of team a2 (from $22(a2)) with a positive position slot $34, sums the energy words $32(a2, 2*$66(obj)) and returns the average in d0 (0 when nobody is on the ice); caller ai_CpuLineChangeCheck</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12EF6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x12F30" NAME="ChkShotStat">
@@ -11186,8 +11191,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17626" END="0x17651" />
             <TYPEINFO_CMT>sub_17626</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17652">
+        <FUNCTION ENTRY_POINT="0x17652" NAME="ai_DrawPlayoffRoundLabel">
             <ADDRESS_RANGE START="0x17652" END="0x17691" />
+            <REGULAR_CMT>[AI 0.5] PlayoffScreen: d1 = label index; when it equals twice the current-round byte $CEF4[potreeteam] the palette is switched to $6000 (highlight), then draws the 2-row label bitmap from off_ABA14's second block with dobitmap at tile base 2 (the 'Playoffs' / 'Quarterfinals' / 'Semifinals' / 'Finals' / 'Champions' strings sit next to it); caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17652</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17718">
@@ -11759,8 +11765,9 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] loads d4 = tile base $D438 and printx = 3, then joins the shared photo-panel drawing at loc_F8796; called by ai_ShowNextSetupPhoto for the away side</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F877E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF878C">
+        <FUNCTION ENTRY_POINT="0xF878C" NAME="ai_DrawSetupPhotoFrame">
             <ADDRESS_RANGE START="0xF878C" END="0xF87D1" />
+            <REGULAR_CMT>[AI 0.6] draws the 8x8-tile photo panel frame bitmap off_BF702 at column 8 row 5 with tile base $D438 (the entry at $F8796 is shared by ai_SetHomePhotoPanel / ai_SetAwayPhotoPanel, which set their own base and column first) under $C2F8 bit 0; caller ai_DrawSetupHomeLogo</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F878C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF87D2" NAME="ai_ResetPhotoRotateTimer">
@@ -11815,8 +11822,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF9AAC" END="0xF9ADD" />
             <TYPEINFO_CMT>sub_F9AAC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9AE4">
+        <FUNCTION ENTRY_POINT="0xF9AE4" NAME="ai_AppendRecordUserName">
             <ADDRESS_RANGE START="0xF9AE4" END="0xF9B29" />
+            <REGULAR_CMT>[AI 0.6] given a record (a0, or fetched with ReadRecordField when a0 is null) appends the holder's user name (byte 1) to the string at a1 with ai_BuildUserNameString and trailing-space trimming ($C2F8 bit 7); caller sub_F9A64 (records text)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9AE4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9B2A" NAME="ai_AppendRecordHolderText">
@@ -12000,8 +12008,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFAFBA" END="0xFAFE3" />
             <TYPEINFO_CMT>sub_FAFBA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAFE4">
+        <FUNCTION ENTRY_POINT="0xFAFE4" NAME="ai_SplitRosterByLineup">
             <ADDRESS_RANGE START="0xFAFE4" END="0xFB017" />
+            <REGULAR_CMT>[AI 0.6] a0 = team record, a1 = output: for the 26 roster indexes writes those that appear in the six-entry lineup list at team data offset +6 to a1 (starters) and the rest to a1+6 (bench); sub_FAFBA calls it for the home and away teams into $D4FA and $D514; caller sub_FAFBA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAFE4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFB4C4">
@@ -12103,8 +12112,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFBFA0" END="0xFBFDD" />
             <TYPEINFO_CMT>sub_FBFA0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFC136">
+        <FUNCTION ENTRY_POINT="0xFC136" NAME="ai_PrintRankedUserName">
             <ADDRESS_RANGE START="0xFC136" END="0xFC183" />
+            <REGULAR_CMT>[AI 0.6] user-records list: prints the rank as a digit (7 - d7 + '0') followed by '. ' in $BFA4, then the user name of the entry byte -1(a0) via ai_BuildUserNameString without trimming; caller loc_FBEA4 (user list screen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FC136</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFC184">
@@ -12380,8 +12390,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFECF8" END="0xFED29" />
             <TYPEINFO_CMT>sub_FECF8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFED2A">
+        <FUNCTION ENTRY_POINT="0xFED2A" NAME="ai_BuildPlayoffCursorSprites">
             <ADDRESS_RANGE START="0xFED2A" END="0xFED6F" />
+            <REGULAR_CMT>[AI 0.5] PlayoffScreen: builds the sprite list at $C018 from frame 1 of the sprite asset unk_F3098 with SetSframe at ($B8AE, $B8B0) (the scrolled bracket position) and tile base $B016 | $8000, terminates the list (clearing two longs when nothing was emitted) and stores the sprite count in $C2E8; caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FED2A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFED70" NAME="HiScoreScreen">
@@ -12441,8 +12452,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFF318" END="0xFF347" />
             <TYPEINFO_CMT>sub_FF318</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF3B0">
+        <FUNCTION ENTRY_POINT="0xFF3B0" NAME="ai_InitTitleScrollTable">
             <ADDRESS_RANGE START="0xFF3B0" END="0xFF3F7" />
+            <REGULAR_CMT>[AI 0.4] newTitleScreen: sets Hscroll = $14 and $BF14 = $50, then fills the object area at $B04A with a table of 81 longs alternating $FD80/$FD7F (decrementing every other entry) followed by 97 longs counting up from $100 in steps of 4; the values feed the title screen's per-line scroll effect; caller newTitleScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF3B0</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF3F8">
