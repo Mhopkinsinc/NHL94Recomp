@@ -9,7 +9,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets attribute $BE at (0,0) and erases a 40x10 area with eraser; caller loc_86F8 (edit-lines screen)
 
-**Callers.** loc_86F8
+**Callers.** ai_PrintEditLinesScreen
 **Callees.** eraser, printz
 
 ```
@@ -29,7 +29,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** byte-identical to ai_EraseEditLinesBody: attribute $BE at (0,0) then a 40x10 erase; caller loc_FC986 (records/stats screen)
 
-**Callers.** loc_FC986
+**Callers.** ai_PrintShootoutScreen
 **Callees.** eraser, printz
 
 ```
@@ -49,7 +49,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** advances a4 by one $62-byte replay frame and wraps it from $AF54 back to $FF0000: the low-RAM ring of recorded frames whose write pointer is recbpr ($B036); ai_ReinitRinkAndReplay compares the advanced pointer with recbpr to detect the ring wrapping (batch 21 corrected this from 'AdvanceLowRamRecord'); caller ai_ReinitRinkAndReplay
 
-**Callers.** sub_A528
+**Callers.** ai_ReinitRinkAndReplay
 **Callees.** none
 
 ```
@@ -108,7 +108,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints the player stat row for slot VertLineScrolling / 16 with ai_PrintPlayerStatRow; caller sub_9588
 
-**Callers.** sub_9588
+**Callers.** ai_ScrollStatsList
 **Callees.** ai_PrintPlayerStatRow
 **RAM.** VertLineScrolling
 
@@ -122,7 +122,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints the player stat row for slot VertLineScrolling / 16 + 6 with ai_PrintPlayerStatRow; caller sub_9588
 
-**Callers.** sub_9588
+**Callers.** ai_ScrollStatsList
 **Callees.** ai_PrintPlayerStatRow
 **RAM.** VertLineScrolling
 

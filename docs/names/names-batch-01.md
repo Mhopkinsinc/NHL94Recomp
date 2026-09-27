@@ -9,7 +9,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** clears the inline-pointer slot $CF32 then falls into the tile loader at $1173C (u16 count + raw/compressed tiles -> VRAM at tile d4, d4 advanced by count); 24 callers incl. setupice, Intermission, PlayoffScreen, dobitmap
 
-**Callers.** ClrHor, Endfaceoff, Intermission, PlayoffScreen, chkprogress, dobitmap, loc_9CDC, loc_FCC76, puckfaceoff2, puckpenshot, setoptions, setupice, sub_11F04, sub_11F12, sub_11F20, sub_16CC4, sub_16CD2, sub_16CE0, sub_16CEE, sub_16CFC, sub_16D0A, sub_16D18, sub_FE2C8, sub_FEA52
+**Callers.** ClrHor, Endfaceoff, Intermission, PlayoffScreen, ai_LoadCrowdSpriteTiles, ai_LoadFontTiles, ai_LoadFrameTiles, ai_LoadHomeCenterIceLogo, ai_LoadHudTiles, ai_LoadMenuTiles55BFE, ai_LoadMenuTiles5C410, ai_LoadPauseMenuTiles, ai_LoadPlayoffTiles, ai_LoadRinkGraphics, ai_LoadTeamBanners, ai_LoadTilesA78B6, ai_MatchupsScreen, ai_UpdateTileAnimation, chkprogress, dobitmap, puckfaceoff2, puckpenshot, setoptions, setupice
 **Callees.** none
 
 ```
@@ -20,8 +20,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** stores its return address in $CF32 (asset pointer follows the jsr), calls the loader at $1173C, then addq.l #8,(sp) to skip the inline longword pair; 7 callers incl. setupice, setoptions, newTitleScreen
 
-**Callers.** loc_16CAC, loc_9BD8, loc_9CDC, loc_FCC76, newTitleScreen, setoptions, setupice
-**Callees.** sub_1173C
+**Callers.** ai_LoadRinkGraphics, ai_LoadRinkTiles, ai_MatchupsScreen, ai_SetupStatsScreenVideo, newTitleScreen, setoptions, setupice
+**Callees.** ai_LoadTilesCore
 
 ```
 01172C  move.l	(sp),($FFFFCF32).w
@@ -34,7 +34,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** same shape as printz ($11B92): takes the text after the jsr via 4(sp), calls the big-font printer $11DF4, writes the advanced pointer back to 4(sp); callers are the error screens AdrErr/DivBy0/InvOpCode and stats screens
 
-**Callers.** AdrErr, DivBy0, InvOpCode, loc_86F8, loc_945C, loc_FC5AE, loc_FC986, loc_FCC76
+**Callers.** AdrErr, DivBy0, InvOpCode, ai_MatchupsScreen, ai_PrintEditLinesScreen, ai_PrintShootoutScreen, ai_PrintShootoutWinner, ai_PrintStatsScreen
 **Callees.** printbig
 
 ```
@@ -50,7 +50,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** bsr Adda1Offset (advance a1 by its length word) then bra sub_11A48 (print at printx/printy); 12 callers incl. PrintScores1, NewTicker3pt2, puckfaceoff2
 
-**Callers.** NewTicker3pt2, PrintScores1, loc_8280, loc_85EE, loc_961A, puckfaceoff2, sub_11C72, sub_81F2, sub_907C, sub_93C4, sub_99C6, sub_B92E
+**Callers.** NewTicker3pt2, PrintScores1, ai_PrintLineChangeMenu, ai_PrintLineRoster, ai_PrintPeriodAndTime, ai_PrintPlayerStatsList, ai_PrintScoringSummaryRow, ai_PrintScrollArrows, ai_PrintSelectPlayerArrows, ai_PrintSeriesMatchup, ai_PrintSummaryScrollArrows, puckfaceoff2
 **Callees.** Adda1Offset, print2
 
 ```
@@ -62,7 +62,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** divu #100 / #10 chains on d0 writing ASCII digits ('0'+) into the string at a1+2 and counting them in d1; 5 callers in the records/stats screens
 
-**Callers.** loc_FACF0, sub_F98C6, sub_FA75C, sub_FA8AC, sub_FCB9A
+**Callers.** ai_BuildCrowdRecordText, ai_BuildPlayerRecordText, ai_PrintGoalRecordLine, ai_PrintGoalsAssistsBox, ai_PrintOverallRatingBox
 **Callees.** none
 
 ```
@@ -107,7 +107,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** copies (a1) bytes from a1 to a3 (length word first), preserving d0; used by the stats/records text builders
 
-**Callers.** sub_F98C6, sub_F9A64, sub_F9AAC, sub_FA014, sub_FEEC8
+**Callers.** ai_BuildPlayedByString, ai_BuildPlayerRecordText, ai_BuildRecordByUserText, ai_BuildRecordVsText, ai_BuildUserNameString
 **Callees.** none
 
 ```
@@ -124,7 +124,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** writes $100 to $A11200 (Z80 reset release) and $A11100 (bus request) then spins on bit 0 of $A11100; called from the five sound-driver upload routines
 
-**Callers.** sub_1A3B2, sub_1A3DC, sub_1A406, sub_1A430, sub_1A470
+**Callers.** ai_ReadFourWayPad1, ai_ReadFourWayPad2, ai_ReadFourWayPad3, ai_ReadFourWayPad4, ai_ReadPad1Hardware
 **Callees.** none
 **Hardware.** Z80 busreq, Z80 reset
 
@@ -140,7 +140,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** clears bit 6 of $C2F8 (SRAM write flag) then computes field offset d0*4 + word_F9CA4[d1]*4 and reads 4 bytes via ReadSRAM; the write twin sub_F9BDA sets the same bit and jumps into the shared body at loc_F9B9A
 
-**Callers.** sub_F99F2, sub_F9AE4, sub_F9B2A, sub_F9F50
+**Callers.** ai_AppendRecordHolderText, ai_AppendRecordUserName, ai_ReadPlayerRecordValue, ai_UpdateScorerRecords
 **Callees.** ReadSRAM, WriteSRAM, loc_F9BD4
 
 ```
@@ -168,7 +168,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets bit 6 of $C2F8 and branches into ReadRecordField's body at loc_F9B9A, where the bit selects WriteSRAM over ReadSRAM; called from sub_F9F50 (records screen)
 
-**Callers.** sub_F9F50
+**Callers.** ai_UpdateScorerRecords
 **Callees.** loc_F9B9A
 
 ```

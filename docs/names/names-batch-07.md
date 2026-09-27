@@ -145,7 +145,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** GameSetUp cursor handling: d7 = cursor row, d0 = signed step; scrolls the menu offset $D422 (0..3, previous value in $D424, $C2F6 bit 2 flags a scroll) so the cursor stays within 5 rows of the window, skips row 6 outside playoff mode ($D048), then redraws the menu window from off_BEFB8 with dobitmap, positions via loc_F7864 and draws the cursor box with sub_119B8 in palette $6000; caller GameSetUp
 
 **Callers.** GameSetUp
-**Callees.** Framer, dobitmap, loc_F7766, loc_F780C, loc_F7864
+**Callees.** Framer, ai_PositionSetupCursor, ai_SetupCursorBoxDefault, dobitmap, loc_F7766
 **RAM.** OptPlayMode, printa, printx, printy
 
 ```
@@ -217,7 +217,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** PeriodOver's MATCHUPS screen: reads the user names, rates both starting sixes, installs sub_15E4C as the V-blank routine, prepares both team records (sub_F70A2), loads the setup tiles (unk_A9A18), font (ai_LoadFontTiles), frame tiles (unk_55B86) and prints the 'MATCHUPS' / 'ADVANTAGE:' headers before the ratings and ticker routines; caller PeriodOver
 
 **Callers.** PeriodOver
-**Callees.** Create_HotCold_Table, Framer, ai_BuildRatingsStartingSix, ai_DrawRatingsPictures, ai_LoadAsset, ai_LoadAssetInline, ai_LoadFontTiles, ai_PrintBigInline, ai_PrintTeamRatingsScreen, ai_ReadUserNames, ai_RunTickerMessage, ai_SelectRatingsPlayers, clearTeamStats, dobitmap, loc_FCF4C, printz, setvram, song, sub_17718, sub_F7318, sub_FCF86, sub_FD4C0, sub_FD4CA, waitx
+**Callees.** Create_HotCold_Table, Framer, ai_AnimateAdvantageBar, ai_BuildRatingsStartingSix, ai_ChangeRatingsPosition, ai_ComputeTeamAdvantage, ai_DrawRatingsPictures, ai_LoadAsset, ai_LoadAssetInline, ai_LoadFontTiles, ai_PrintBigInline, ai_PrintTeamRatingsScreen, ai_ReadUserNames, ai_ResetAdvantageBar, ai_ResetTickerState, ai_RunTickerMessage, ai_SelectRatingsPlayers, clearTeamStats, dobitmap, loc_FCF4C, printz, setvram, song, waitx
 **Strings.** MATCHUPS | ADVANTAGE:
 **RAM.** HomeTeam, Map1col1, Map2col1, OptNOP, VisTeam, asv, disflags, framercset, palcount, vbint
 
@@ -290,7 +290,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** intermission ticker: every time the $D5B4 delay expires takes the next line of the message text at aWelcomeToASoldOut_Ton ('Welcome to a sold out ^. Tonight's ...', lines separated by $D, line offsets in the $D5B8 table indexed by $D5B2), scrolls the display with ai_ScrollTickerRows and interprets the placeholder characters _ + $ { } [ ] < > | \ to insert team, player and stat text; caller ai_MatchupsScreen
 
 **Callers.** ai_MatchupsScreen
-**Callees.** ai_ScrollTickerRows, loc_1778E, loc_17890, loc_17982, loc_17986, loc_17994, loc_179B4, loc_179B8, print, printz, sub_F7144, sub_F7172, sub_F727C, sub_F72AA, sub_FCB9A, sub_FD5AE, sub_FD5F4, sub_FEEC8, sub_FEF5A
+**Callees.** ai_BuildCrowdRecordText, ai_BuildPlayedByString, ai_BuildPlayedByString2, ai_GetTeamNameOrSide, ai_GetTeamNameString3, ai_NextAwayBestPlayer, ai_NextAwayWorstPlayer, ai_NextHomeBestPlayer, ai_NextHomeWorstPlayer, ai_ScrollTickerRows, loc_1778E, loc_17890, loc_17982, loc_17986, loc_17994, loc_179B4, loc_179B8, print, printz
 **RAM.** DispAttribCtr, PlayerScrollCtr, VertLineScrolling, asv, mesarea, printx, printy
 
 ```
@@ -407,7 +407,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** stats screen body: prints the 'Player' header and the five column titles from word_990E (Saves Shots Save %, G, A, Pts, SOG, PIM, highlighting column DispAttribCtr in palette $C000), the category banner from word_9942 ('[ Goals ]' etc.), then walks the roster (ai_CountRosterPlayers) repeatedly picking the player with the highest remaining value of the selected column (ai_GetPlayerAttributeChecked, ties broken by the roster byte) to print the rows sorted; caller loc_945C
 
-**Callers.** loc_945C
+**Callers.** ai_PrintStatsScreen
 **Callees.** Framer, ai_CountRatingNibbles, ai_CountRosterPlayers, ai_GetPlayerAttributeChecked, ai_PrintNextString, ai_PrintPlayerStatRow, loc_95DC, loc_96FC, print2, printz, printz2
 **Strings.** Player
 **RAM.** DispAttribCtr, VertLineScrolling, printa
@@ -565,7 +565,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** stores d4 in $B01E and loads asset unk_55B86 there; $B01E is the tile base that the box drawer sub_119B8 (asset unk_55B7E, same family) and eraser add to their tiles, so unk_55B86 holds the menu frame/blank tiles; callers loc_9CDC and setupice (ai_MatchupsScreen loads the same asset inline)
 
-**Callers.** loc_9CDC, setupice
+**Callers.** ai_LoadRinkGraphics, setupice
 **Callees.** ai_LoadAsset
 **RAM.** framercset
 
@@ -722,7 +722,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** user-name deletion: for the $2D8 four-byte SRAM records from offset 0 and the $1C sixteen-byte records from $B60, reads each with ReadSRAM into $CF36, clears every user-index byte (odd offsets) equal to the user being deleted ($D4EA) and writes the record back with WriteSRAM when changed; caller sub_FB9D4 (delete user name)
 
-**Callers.** sub_FB9D4
+**Callers.** ai_SaveUserName
 **Callees.** MakeSRAMChecksum, ReadSRAM, WriteSRAM
 
 ```

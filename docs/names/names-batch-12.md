@@ -145,7 +145,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** for the setup rows -2..$10 in steps of 2 calls GameSetUp_3 (option value logic) and, when the row is within the scrolled window ($D422), GameSetUp_4 (prints the value), then sub_F7BFA (the team names / 'Regular Season' / 'Continue Playoffs' entries), ai_RefreshSetupTeamLogos and, unless $D42E bit 0, ai_ResetPhotoRotateTimer; caller ai_RefreshSetupOptions
 
 **Callers.** ai_RefreshSetupOptions
-**Callees.** GameSetUp_3, GameSetUp_4, ai_RefreshSetupTeamLogos, ai_ResetPhotoRotateTimer, sub_F7BFA
+**Callees.** GameSetUp_3, GameSetUp_4, ai_PrintSetupModeRow, ai_RefreshSetupTeamLogos, ai_ResetPhotoRotateTimer
 
 ```
 0F7B20  move.w	d7,d6

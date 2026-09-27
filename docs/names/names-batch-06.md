@@ -30,7 +30,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** clears $C2F8 bit 6 (the SRAM write flag) and transfers $80 bytes between SRAM offset $DA0 and the user-name table $D45A; because the flag was just cleared the test picks ReadSRAM, the WriteSRAM path exists for a twin that sets the flag and jumps past the bclr (the bset at $F9C5E/$F9C56); callers GameSetUp and loc_FCC76
 
-**Callers.** GameSetUp, loc_FCC76
+**Callers.** GameSetUp, ai_MatchupsScreen
 **Callees.** ReadSRAM, WriteSRAM, loc_F9C9E
 
 ```
@@ -52,7 +52,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** returns d0 = byte unk_FE18E[$28(a2)] where +$28 is the team id in the team record; the table starts $33, $4C, $49, $4B, $4E, $43 (51, 76, 73, 75, 78, 67), the overall team ratings printed as a number by sub_FABDC ('Team Rating') and by sub_FCFB8 on the ratings screen
 
-**Callers.** ai_PrintTeamRatingBox, sub_FCFB8
+**Callers.** ai_PrintTeamOverallRating, ai_PrintTeamRatingBox
 **Callees.** none
 
 ```
@@ -70,8 +70,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** at (d0,d1) prints 'Team' and 'Rating' then the overall rating of the home or away team (ai_GetRecordsTeam logic on $D4F6) from ai_GetTeamOverallRating as a 2-digit number; caller loc_FA550 (records screen)
 
-**Callers.** loc_FA550
-**Callees.** DeterStrLength?, ai_GetTeamOverallRating, print2, printz2
+**Callers.** ai_PrintRecordsScreen
+**Callees.** NumberToPaddedText, ai_GetTeamOverallRating, print2, printz2
 **Strings.** Team | Rating
 **RAM.** printx, printy
 
@@ -105,7 +105,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** returns a0 = home team record $C6CE, or the away record $CA32 when the records-screen side toggle $D4F6 is non-zero; callers loc_FACF0 and sub_FAD84 (Saves / Save % printer)
 
-**Callers.** loc_FACF0, sub_FAD84
+**Callers.** ai_PrintGoalsAssistsBox, ai_PrintSavesBox
 **Callees.** none
 
 ```
@@ -120,7 +120,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** returns a2 = home team record $C6CE when the pausing controller's team selection (cont2team when sflags bit 1, else cont1team) equals 1, otherwise the away record (+$364); callers PauseMode and loc_7E88 (pause menu)
 
-**Callers.** PauseMode, loc_7E88
+**Callers.** PauseMode, ai_PauseMenuInput
 **Callees.** loc_7E2C
 **RAM.** cont1team, cont2team, sflags
 
@@ -140,7 +140,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a2 = team record: for the 26 player slots sets the energy word at +$32+2i to $1000 (full) unless the status word at +$66+2i is -4, and demotes a -3 status to -2; callers sub_13068 (period/line reset, which then picks line 3 or 5 for $16(a3)) and sub_137FC
 
-**Callers.** sub_13068, sub_137FC
+**Callers.** ai_ResetLinesForFaceoff, ai_SelectSpecialTeamsLine
 **Callees.** none
 
 ```
@@ -160,7 +160,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** for the home and away records calls ai_GetLineupPlayerForPosition and stores the resulting player indexes in $D59C/$D59E, which ai_DrawRatingsPictures and ai_PrintTeamRatingsScreen use for the per-position comparison; callers loc_FCC76 and sub_FCF86
 
-**Callers.** loc_FCC76, sub_FCF86
+**Callers.** ai_ChangeRatingsPosition, ai_MatchupsScreen
 **Callees.** ai_GetLineupPlayerForPosition
 
 ```
@@ -200,7 +200,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints the 4-byte control string word_FCFF6 with print2 while preserving printx and a1; callers ai_PrintTeamRatingsScreen and sub_FCFB8
 
-**Callers.** ai_PrintTeamRatingsScreen, sub_FCFB8
+**Callers.** ai_PrintTeamOverallRating, ai_PrintTeamRatingsScreen
 **Callees.** print2
 **Strings.** Shooting | Skating | Passing | Defense | Checking | Fighting
 **RAM.** printx
@@ -219,7 +219,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** d0 = player, d1 = attribute column: returns d2 = 0 when the column is not below ai_CountRatingNibbles for the team, otherwise tail-calls sub_988E to fetch the value; callers ai_PrintPlayerStatRow and loc_961A
 
-**Callers.** ai_PrintPlayerStatRow, loc_961A
+**Callers.** ai_PrintPlayerStatRow, ai_PrintPlayerStatsList
 **Callees.** ai_CountRatingNibbles
 
 ```
@@ -275,7 +275,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets the print position for the intermission ticker (column 3 row $17, a second attribute string unless sflags bit 0) and returns the erase size d0 = $1A, d1 = 5 that its callers pass to eraser; callers NewTicker3pt2 and sub_134D8 (Intermission)
 
-**Callers.** NewTicker3pt2, sub_134D8
+**Callers.** NewTicker3pt2, ai_EraseTickerArea
 **Callees.** printz
 **RAM.** sflags
 
@@ -303,7 +303,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets printx = 5, or 9 when disflags bit 1 (rink screen) is set; callers ai_PrintScrollingMenu and loc_7E46 (pause menu refresh)
 
-**Callers.** ai_PrintScrollingMenu, loc_7E46
+**Callers.** ai_PrintScrollingMenu, ai_RedrawPauseMenu
 **Callees.** none
 **RAM.** disflags, printx
 

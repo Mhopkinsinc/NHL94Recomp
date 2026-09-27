@@ -7945,7 +7945,7 @@ FFFF = none
         <SYMBOL ADDRESS="0xE292" NAME="chk4shot" />
         <SYMBOL ADDRESS="0xE2CC" NAME=".cmphome" TYPE="local" />
         <SYMBOL ADDRESS="0xE2E4" NAME=".pkill" TYPE="local" />
-        <SYMBOL ADDRESS="0xE412" NAME="compshoot?" />
+        <SYMBOL ADDRESS="0xE412" NAME="CompShoot" />
         <SYMBOL ADDRESS="0xE444" NAME="chk4pass" />
         <SYMBOL ADDRESS="0xE594" NAME="EvadePC" />
         <SYMBOL ADDRESS="0xE60A" NAME=".0" TYPE="local" />
@@ -8243,7 +8243,7 @@ FFFF = none
         <SYMBOL ADDRESS="0x11C5A" NAME=".1" TYPE="local" />
         <SYMBOL ADDRESS="0x11CA2" NAME="PushTime" />
         <SYMBOL ADDRESS="0x11D06" NAME="PushNumber" />
-        <SYMBOL ADDRESS="0x11D3A" NAME="DeterStrLength?" />
+        <SYMBOL ADDRESS="0x11D3A" NAME="NumberToPaddedText" />
         <SYMBOL ADDRESS="0x11D4E" NAME=".loop" TYPE="local" />
         <SYMBOL ADDRESS="0x11D54" NAME=".loop2" TYPE="local" />
         <SYMBOL ADDRESS="0x11D6A" NAME=".0" TYPE="local" />
@@ -8728,7 +8728,7 @@ FFFF = none
         <SYMBOL ADDRESS="0xF6E38" NAME="nullsub_2" />
         <SYMBOL ADDRESS="0xF6E8A" NAME="LoadCrowdRec" />
         <SYMBOL ADDRESS="0xF6EB4" NAME=".ex" TYPE="local" />
-        <SYMBOL ADDRESS="0xF6EBE" NAME="Crowd_Noise?" />
+        <SYMBOL ADDRESS="0xF6EBE" NAME="UpdateCrowdMeter" />
         <SYMBOL ADDRESS="0xF6EFA" NAME=".ex2" TYPE="local" />
         <SYMBOL ADDRESS="0xF6F82" NAME=".stack" TYPE="local" />
         <SYMBOL ADDRESS="0xF6F8A" NAME=".ex1" TYPE="local" />
@@ -9835,7 +9835,7 @@ d3 = goalline of goalie</REGULAR_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xE1F4" NAME="ai_CpuLineChangeCheck">
             <ADDRESS_RANGE START="0xE1F4" END="0xE263" />
-            <REGULAR_CMT>[AI 0.6] asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter &amp; 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via compshoot?; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.6] asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter &amp; 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via CompShoot; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc</REGULAR_CMT>
             <TYPEINFO_CMT>sub_E1F4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xE264" NAME="chkpk">
@@ -9853,9 +9853,10 @@ return z flag clr if not</REGULAR_CMT>
             <REGULAR_CMT>player a3 looks for shot (computer controlled)</REGULAR_CMT>
             <TYPEINFO_CMT>chk4shot</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xE412" NAME="compshoot?">
+        <FUNCTION ENTRY_POINT="0xE412" NAME="CompShoot">
             <ADDRESS_RANGE START="0xE412" END="0xE443" />
-            <TYPEINFO_CMT>compshoot?</TYPEINFO_CMT>
+            <REGULAR_CMT>[renamed, was compshoot?] the question mark was warranted only by the name style: sets the shot power $42(a3) from the distance to the net (($108 - relative puck y) / 8, capped at $14) and starts the shooting animation $12 through sub_10662; callers asspuckc, chk4shot and ai_CpuLineChangeCheck (the CPU dump); the human name was right</REGULAR_CMT>
+            <TYPEINFO_CMT>CompShoot</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xE444" NAME="chk4pass">
             <ADDRESS_RANGE START="0xE444" END="0xE593" />
@@ -10446,9 +10447,10 @@ yy = y coord to print at</REGULAR_CMT>
             <ADDRESS_RANGE START="0x11D06" END="0x11D39" />
             <TYPEINFO_CMT>PushNumber</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11D3A" NAME="DeterStrLength?">
+        <FUNCTION ENTRY_POINT="0x11D3A" NAME="NumberToPaddedText">
             <ADDRESS_RANGE START="0x11D3A" END="0x11D95" />
-            <TYPEINFO_CMT>DeterStrLength?</TYPEINFO_CMT>
+            <REGULAR_CMT>[renamed, was DeterStrLength?] d0 = value, d1 = digit count: writes the decimal digits into the string at $C008 (length word, text at $C00A) with leading zeros shown as spaces and the length padded to even; every caller prints $C008 straight after, so it formats a number rather than measuring a string length</REGULAR_CMT>
+            <TYPEINFO_CMT>NumberToPaddedText</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11D96" NAME="appendz">
             <ADDRESS_RANGE START="0x11D96" END="0x11D9D" />
@@ -11704,9 +11706,10 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF6E8A" END="0xF6EBD" />
             <TYPEINFO_CMT>LoadCrowdRec</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF6EBE" NAME="Crowd_Noise?">
+        <FUNCTION ENTRY_POINT="0xF6EBE" NAME="UpdateCrowdMeter">
             <ADDRESS_RANGE START="0xF6EBE" END="0xF6F8B" />
-            <TYPEINFO_CMT>Crowd_Noise?</TYPEINFO_CMT>
+            <REGULAR_CMT>[renamed, was Crowd_Noise?] setvideo hook: after the $C304 hold expires compares a quadratic of the crowd base $C310/$C312 with CwdExciteLvl to set or clear the crowd-roar flag $C2F6 bit 7, and every $14 frames recomputes CurCrowdMeter = sqrt(4 * CwdExciteLvl) + $41, tracks CrowdPeak and the average; it drives the crowd meter, not the noise itself</REGULAR_CMT>
+            <TYPEINFO_CMT>UpdateCrowdMeter</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF6F8C" NAME="stopna2">
             <ADDRESS_RANGE START="0xF6F8C" END="0xF6FD5" />

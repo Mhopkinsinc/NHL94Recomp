@@ -88,7 +88,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** d0 = player index, d1 = stat column: for the regular stats (d7 = 0) reads the column's one or two byte offsets from unk_98FA and returns the sum of those roster bytes of team a2 in d2; for playoff stats (d7 != 0) sums two entries through sub_98CE and halves the result; caller ai_PrintPlayerStatRow
 
 **Callers.** ai_PrintPlayerStatRow
-**Callees.** sub_98CE
+**Callees.** ai_SumPlayoffStatColumn
 
 ```
 00988E  tst.w	d7
@@ -157,7 +157,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** penalty list line (only while printy <= $A): takes player d0's line-status word $66(a2,d0) & $7FF as the remaining time, finds his roster record (name part + 8 bytes) to print the jersey number (sub_18BDC into $BFA6), then the time with PushTime, and moves to the next row; caller sub_12DDE, which walks the penalized list $9A(a2)
 
-**Callers.** sub_12DDE
+**Callers.** ai_PrintPenaltyList
 **Callees.** PushTime, d0toascii, print
 **RAM.** printx, printy
 
@@ -292,7 +292,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** d0 = team id, a2 = team record: stores the id at +$28 and the team data pointer (table $30E) at +$1E, then copies the line table from data offset +6 into +$16A: with OptLine set the 8-byte goalie entry plus 12 longs, otherwise the 14 longs after it; caller sub_17190 (team initialisation)
 
-**Callers.** sub_17190
+**Callers.** ai_InitBothTeamRecords
 **Callees.** none
 **RAM.** OptLine
 
@@ -402,7 +402,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** printbig helper: maps the character d0 - $20 through unk_1916A to a glyph index (negative = single-tile glyph), then writes the glyph's tiles from the big-font map off_A9A10 in two rows through sub_11EDA (VRAM name table at $B004 + $B02E), advancing d4; caller printbig
 
 **Callers.** printbig
-**Callees.** sub_11EDA
+**Callees.** ai_WriteBigFontTile
 
 ```
 011E8E  sub.w	#$20,d0

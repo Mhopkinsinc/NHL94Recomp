@@ -166,7 +166,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** scoring summary page: prints entry (d0 high word + 4) * 6 of ScoreSum at the row derived from VertLineScrolling (/8 + $10, mod 32) through ai_PrintScoringSummaryRow; caller sub_8FB8 (summary page handler, together with sub_9020 for row 30)
 
-**Callers.** sub_8FB8
+**Callers.** ai_ScrollSummaryList
 **Callees.** ai_PrintScoringSummaryRow, printz
 **RAM.** VertLineScrolling, printy
 
@@ -246,7 +246,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** NewTicker3pt2 helper: at the column passed on the stack and the next row prints team d0's name (team table $30E, name at +4) and, $15 columns to the right, the score d1 as a 2-digit number; caller NewTicker3pt2
 
 **Callers.** NewTicker3pt2
-**Callees.** DeterStrLength?, print
+**Callees.** NumberToPaddedText, print
 **Strings.** EA Hockey Night | Stanley Cup Qualifier | Quarterfinal | Stanley Cup Semifinal
 **RAM.** printx, printy
 
@@ -296,7 +296,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** user list screen: if a previous selection $D4EC exists, reprints that row (row 8 + index - 1) with the text at a1 and the following string at column $12 (restoring its unhighlighted look), then records the current selection $D4EA as the previous one; caller sub_FB874
 
-**Callers.** sub_FB874
+**Callers.** ai_MoveUserListCursor
 **Callees.** print, printz
 **RAM.** printx, printy
 

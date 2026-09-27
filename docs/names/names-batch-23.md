@@ -264,7 +264,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** crowd meter page tail: finds the loudest team (ai_FindLoudestCrowdTeam), reads its record byte 8 (default $50) and prints 'League Record' with the value as a 3-digit number followed by 'dB'
 
 **Callers.** none found
-**Callees.** DeterStrLength?, ReadTeamRecord, ai_FindLoudestCrowdTeam, print, printz, printz2
+**Callees.** NumberToPaddedText, ReadTeamRecord, ai_FindLoudestCrowdTeam, print, printz, printz2
 **Strings.** League Record | dB
 
 ```
@@ -355,7 +355,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** prints ' (' + player d0's goal total (team column +$B4, 1..3 digits) + ')' then moves to the next row at column $E; used by the ticker/scoring text
 
 **Callers.** none found
-**Callees.** DeterStrLength?, print, printz
+**Callees.** NumberToPaddedText, print, printz
 **RAM.** printx, printy
 
 ```

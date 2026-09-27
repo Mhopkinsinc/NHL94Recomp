@@ -53,7 +53,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a3 = five-word password value (sub_180FC passes the entry buffer $D176): saves it, then peels mixed-radix digits with BigNumDivMod into the eight playoff series records $CE66..$CED6 ($10 bytes each: wins at +4/+6 in base 5, bit 2 of +$E when a side reached 4), then $CEF2 (base $4000 check value), pojoy (base 8, forced to 4 unless FourWayPlay when 1 or 2), potreeteam ($10), gamelevel (4), bosgames (8), postarts ($20); restores the buffer. ai_EncodePlayoffPassword ($18192) is the exact inverse. Callers GameSetUp, sub_17CA0, sub_180FC
 
-**Callers.** GameSetUp, sub_17CA0, sub_180FC
+**Callers.** GameSetUp, ai_AdvancePlayoffsAfterGame, ai_ApplyPlayoffPassword
 **Callees.** ai_BigNumDivMod
 **RAM.** FourWayPlay, bosgames, gamelevel, pojoy, postarts, potreeteam
 
@@ -173,7 +173,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** copies a 2-row x 11-tile name-table block from the buffer at $C334+d0 to (printx,printy) via xyVmMap, with $BF78 bit 2 held during the copy and printx advanced by 11; the buffer is filled at $16D20 from asset off_ABA14 for the home team ($C330) at offset 0 and the away team ($C332) at offset $2C, and every caller passes d0 = 0 or $2C
 
-**Callers.** loc_945C, loc_FC986, sub_12D30
+**Callers.** ai_PrintShootoutScreen, ai_PrintStatsScreen, ai_PrintTeamScoreBlock
 **Callees.** xyVmMap
 **RAM.** disflags, printx, printy
 
@@ -201,8 +201,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** edit-lines/roster screen row: a4 = Satt+d3 (player slot), sets printy from d3, erases the 40-column row, returns if the slot byte is negative, prints the jersey/slot number and the player name (sub_18B26), then either the five attribute values (loc_9872 per attribute, the DispAttribCtr-selected one in palette $C000) or, when DispAttribCtr is negative, two stat counters (sub_988E) and their percentage with a '%' suffix; callers sub_9604, sub_960E, loc_961A
 
-**Callers.** loc_961A, sub_9604, sub_960E
-**Callees.** DeterStrLength?, ai_FormatPlayerNumberName, eraser, loc_9872, locret_9870, print, printz, sub_988E
+**Callers.** ai_PrintPlayerStatsList, ai_PrintStatRowFromScroll, ai_PrintStatRowFromScrollPlus6
+**Callees.** NumberToPaddedText, ai_FormatPlayerNumberName, ai_GetPlayerAttributeChecked, ai_GetPlayerStatValue, eraser, locret_9870, print, printz
 **RAM.** DispAttribCtr, printa, printx, printy
 
 ```
@@ -273,7 +273,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a2 = player record, $1E(a2) = pointer to the player's data block; adds the word at +$A, takes the word there and counts how many left shifts by 4 it survives before becoming zero (1..4), returned in d0; used by loc_9872 (attribute lookup for PrintPlayerStatRow) as an upper bound and by sub_9F5C which adds it to a nibble of the next field
 
-**Callers.** ai_DrawEditLinesHeader, loc_961A, loc_9872, sub_1867E, sub_9F5C, sub_F9FC0
+**Callers.** ai_CacheAttributeCounts, ai_CountRatingNibblesPlusGoalies, ai_DrawEditLinesHeader, ai_GetPlayerAttributeChecked, ai_PrintPlayerStatsList, ai_ScorePlayerForStars
 **Callees.** none
 
 ```
@@ -315,7 +315,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** when d2 != 0 copies the 12-byte user-name entry $D45A + d2*12 into the string at a1 (length word $E, zero bytes shown as spaces) and, if $C2F8 bit 7 is set, trims trailing spaces with sub_FAF66; when d2 == 0 copies the empty default string word_FA07C instead; callers are the user-records screens sub_F9AE4, sub_F9B2A, sub_FA75C, sub_FC136
 
-**Callers.** sub_F9AE4, sub_F9B2A, sub_FA75C, sub_FC136
+**Callers.** ai_AppendRecordHolderText, ai_AppendRecordUserName, ai_PrintGoalRecordLine, ai_PrintRankedUserName
 **Callees.** ai_CopyLenString, ai_TrimTrailingSpaces, loc_FA076
 
 ```
@@ -377,7 +377,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** decodes a player-photo image: reads the tile count word from (a2) into $DA1E, then for count*8 rows takes 3 packed bytes (eight 3-bit pixels), expands each pixel to a 4bpp nibble equal to pixel+5 (palette entries 5..12) and writes the longword row after the count at $DA1E; $DEA0 is scratch. Called by sub_FD14A after ai_GetPlayerPhoto chose the image, and by loc_F8868 / loc_FAEBC. Batch 4 corrected this from 'Unpack3BitRatings'
 
-**Callers.** loc_F8868, loc_FAEBC, sub_FD14A
+**Callers.** ai_DrawRecordsPlayerPhoto, ai_LoadPlayerPhoto, ai_ShowNextSetupPhoto
 **Callees.** none
 
 ```

@@ -52,7 +52,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** stats screen frame: ai_SetupStatsScreenVideo, clears the scroll/selection counters, draws the 30x6 header box, prints 'Playoff  Stats' (d7 != 0, from sub_9428) or 'Player  Stats' with the 'Switch^Teams' hint, then the list via ai_PrintPlayerStatsList; callers sub_9428 and the player-stats menu
 
-**Callers.** sub_9428
+**Callers.** ai_ShowPlayoffStats
 **Callees.** Framer, ai_DrawTeamBannerTiles, ai_PrintBigInline, ai_PrintPlayerStatsList, ai_PrintScrollArrows, ai_SetupStatsScreenVideo, getpzjoy, loc_94EA, nodiag, printz, printz2, vcountwait
 **Strings.** Playoff  Stats | Switch^Teamsù | Player  Stats
 **RAM.** DispAttribCtr, PlayerScrollCtr, VertLineScrolling
@@ -125,7 +125,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** edit-lines screen: for line d5 prints the line name from word_191A6 plus ' Line' at the position from word_879E (shifted one entry when $D058 is set), then the line's player slots from the team's line table $16A(a2) (8 bytes per line) as padded surnames (ai_FormatPlayerSurnamePadded), highlighting the slot equal to the cursor $D5B8; caller loc_8566 (per-line refresh)
 
-**Callers.** loc_8566
+**Callers.** ai_RefreshEditLinesRows
 **Callees.** ai_FormatPlayerSurnamePadded, ai_PrintNextString, print2, printz2
 **Strings.** Line
 **RAM.** OptLine, printa, printx, printy
@@ -183,7 +183,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** d0 = team, d1 = player index: walks the team's roster to the player, reads his record field with ReadRecordField into (a0), returns d0 = the record's value byte and d1 = 1 when the player index is above the team's attribute-column count (the goalie slot) else 0; caller sub_F98C6 (prints 'Record ... goals/saves' lines)
 
-**Callers.** sub_F98C6
+**Callers.** ai_BuildPlayerRecordText
 **Callees.** ai_ReadRecordField, loc_F9A10, loc_F9A5E
 
 ```
@@ -320,7 +320,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** called by sub_FC516 when the shootout is decided ($D595 bit 0, at least 5 rounds in $D578 and the round scores $D574/$D576 differ): sets $C2EE bit 2, $DED0 = $60, then for the five skaters of the team with the higher score (object block $B04A or +6*$80) sets slot $34 = 2, places them at x = 0 and y = Vpos +-$F0, starts animation 7 (sub_10658) and clears their state flags; caller sub_FC516
 
-**Callers.** sub_FC516
+**Callers.** ai_AdvanceShootoutRound
 **Callees.** assinsert, freezewindow, loc_FD6A4, setplayer
 **RAM.** Vpos, sflags2
 
@@ -409,7 +409,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** puckfaceoff2 helper: compares the active skater counts $24 of the home and away records; when they differ (a power play) and the state bit $C2EE bit 6 changes, sets HmTeam = HomeTeam and SongIndex = 1 (home power play) or 4 (away) and calls ChooseSong, guarded by $C2EE bit 5 so the song starts once; skipped in $C2FA bit 1 mode; caller puckfaceoff2
 
 **Callers.** puckfaceoff2
-**Callees.** ChooseSong, loc_FF83A, loc_FF85E, loc_FF884, sub_FF87C
+**Callees.** ChooseSong, ai_ClearPowerPlaySongLatch, loc_FF83A, loc_FF85E, loc_FF884
 **RAM.** HmTeam, HomeTeam, SongIndex, sflags2
 
 ```

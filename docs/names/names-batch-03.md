@@ -100,7 +100,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a2 = team record; follows $1E(a2) to the team data block and its first offset word to the player list, then walks the length-prefixed player records (name part + 8 attribute bytes) counting them in d0 until the terminator record whose length word is 2; callers SetPlList, loc_961A (edit lines), sub_F9FEA (records)
 
-**Callers.** SetPlList, ai_PrintPlayerStatsList, sub_F9FEA
+**Callers.** SetPlList, ai_CacheRosterSizes, ai_PrintPlayerStatsList
 **Callees.** none
 
 ```
@@ -121,7 +121,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** indexes the logo table off_FEA74 by HomeTeam ($C330), skips the 8-byte header and loads the tiles with LoadAsset at tile d4-$18; the same table was confirmed as the centre-ice logo art while prototyping the HUD overlay; callers ClrHor, loc_9CDC, setupice (rink setup)
 
-**Callers.** ClrHor, loc_9CDC, setupice
+**Callers.** ClrHor, ai_LoadRinkGraphics, setupice
 **Callees.** ai_LoadAsset
 **RAM.** HomeTeam
 
@@ -161,7 +161,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** builds the string at $BFA4: jersey number (sub_18BDC from the byte after the name), a space, then the player's name from the record found by sub_18BC8, copied from after its first space (the surname), and closes it with FinishNameBuffer; callers ai_PrintPlayerStatRow and sub_FD89A (team ratings screen)
 
-**Callers.** ai_PrintPlayerStatRow, sub_FD89A
+**Callers.** ai_PrintPlayerStatRow, ai_PrintRatingsPlayerName
 **Callees.** ai_FinishNameBuffer, d0toascii, getplayername
 
 ```
@@ -190,7 +190,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** same as FormatPlayerNumberName but writes the first letter of the name, then '. ' ($2E20), then the surname after the first space; callers sub_18AC6, sub_9112
 
-**Callers.** sub_18AC6, sub_9112
+**Callers.** ai_FormatCheckedPlayerName, ai_PrintSummaryPlayerName
 **Callees.** ai_FinishNameBuffer, d0toascii, getplayername
 
 ```
@@ -221,7 +221,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** builds the string at $BFA4 as a space followed by the surname (text after the first space of the record's name), then pads with spaces up to $BFB2 (12 characters) before FinishNameBuffer; caller loc_85EE
 
-**Callers.** loc_85EE
+**Callers.** ai_PrintLineRoster
 **Callees.** ai_FinishNameBuffer, getplayername, loc_18B9E
 
 ```
@@ -251,7 +251,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** copies 16 longwords (64 bytes = two CRAM lines) from ROM $59924 (off_5605A plus its own offset word) to $BD28; $BD28 also receives colour $EEE elsewhere and is cleared at reset, so it is a palette buffer; callers loc_9CDC, setupice, sub_16BAC, all rink setup
 
-**Callers.** loc_9CDC, setupice, sub_16BAC
+**Callers.** ai_InitRinkScreen, ai_LoadRinkGraphics, setupice
 **Callees.** none
 
 ```
@@ -268,7 +268,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** loads asset unk_B3538 at the tile base $B020 via ai_LoadAssetInline with the inline nibble map $7123 $4567 $89AB $CDEF; same three callers as LoadRinkPalette (loc_9CDC, setupice, sub_16BAC) during rink setup
 
-**Callers.** loc_9CDC, setupice, sub_16BAC
+**Callers.** ai_InitRinkScreen, ai_LoadRinkGraphics, setupice
 **Callees.** ai_LoadAssetInline
 
 ```
@@ -286,7 +286,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** stores d4 in $B012 and loads asset unk_AAC5A there with LoadAsset; $B012 is the tile base the text printer (print, $11C4E) adds to every character index, so unk_AAC5A is the text font; callers PlayoffScreen, loc_9BD8, loc_FCC76
 
-**Callers.** PlayoffScreen, ai_MatchupsScreen, loc_9BD8
+**Callers.** PlayoffScreen, ai_MatchupsScreen, ai_SetupStatsScreenVideo
 **Callees.** ai_LoadAsset
 
 ```
@@ -299,7 +299,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** reloads the setup-screen photo rotation countdown $D43C with $AA, or $53 when $D42E bit 5 is set; ai_TickSetupPhotoRotation decrements it every frame, flips the home/away side ($D42E bit 1) at $52 and shows the next player photo (ai_ShowNextSetupPhoto) when it expires; callers GameSetUp_2, sub_F7B20, ai_TickSetupPhotoRotation (batch 7 identified the countdown's purpose)
 
-**Callers.** GameSetUp_2, ai_TickSetupPhotoRotation, sub_F7B20
+**Callers.** GameSetUp_2, ai_RedrawSetupValues, ai_TickSetupPhotoRotation
 **Callees.** none
 
 ```
@@ -314,8 +314,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints the pre-game team comparison: the category labels from word_FCFFA (Shooting, Skating, Passing, Defense, Checking, Fighting, Goalkeeping, Power Play Adv., Home Team Adv., Overall), the home ($C6CE) and away ($CA32) team names via sub_FCFB8 with the overall values kept in $D5A0/$D5A2; when $D598 is non-zero it prints the per-position comparison (center, left forward, right forward, ...) instead; callers loc_FCC76, sub_FCF86
 
-**Callers.** ai_MatchupsScreen, sub_FCF86
-**Callees.** AttribAdjust, CalcAttrib, DeterStrLength?, ai_PrintRatingsSpacer, loc_FD252, loc_FD2E4, locret_FD3FE, print2, printz, printz2, sub_FCFB8, sub_FD89A
+**Callers.** ai_ChangeRatingsPosition, ai_MatchupsScreen
+**Callees.** AttribAdjust, CalcAttrib, NumberToPaddedText, ai_PrintRatingsPlayerName, ai_PrintRatingsSpacer, ai_PrintTeamOverallRating, loc_FD252, loc_FD2E4, locret_FD3FE, print2, printz, printz2
 **Strings.**  |  | center | left forward | right forward | left defenseman
 **RAM.** printx, printy
 
@@ -387,7 +387,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** edit-lines screen: prints the line title from word_8CBE indexed by $D5B2 (Goalies, Scoring 1, Scoring 2, Checking, Power Play 1, Power Play 2), the attribute column headers from word_193F8/word_1955A chosen by DispAttribCtr, erases the 40x16 body, and initialises the slot list at $C018 from the team's line table at $16A(a2); callers sub_8B84, sub_8B94
 
-**Callers.** sub_8B84, sub_8B94
+**Callers.** ai_ShowEditLinesPage, ai_ShowEditLinesPageNext
 **Callees.** Adda1Offset, ai_CountRatingNibbles, eraser, getNameandAttrib, loc_8BD6, loc_8BF6, print, print2, printz2
 **Strings.** Goalies    } | {  Scoring  1  } | {  Scoring  2  } | {   Checking   } | { Power Play 1 } | { Power Play 2 }
 **RAM.** DispAttribCtr, printx, printy

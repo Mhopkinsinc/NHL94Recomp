@@ -76,7 +76,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints one long inline control string (attribute/position codes with embedded tile data) that lays out the edit-lines screen furniture; caller loc_8566
 
-**Callers.** loc_8566
+**Callers.** ai_RefreshEditLinesRows
 **Callees.** printz2
 
 ```
@@ -386,7 +386,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** prints the seven ranked users from $D542: rank and name (ai_PrintRankedUserName) at column 2, percentage (3 digits) at $13, wins at $1A, losses (games - wins - ties, computed into $BF4C) at $1F and ties at $24, skipping users with no games
 
 **Callers.** none found
-**Callees.** DeterStrLength?, ai_PrintRankedUserName, loc_FBF8C, print2, printz2
+**Callees.** NumberToPaddedText, ai_PrintRankedUserName, loc_FBF8C, print2, printz2
 **RAM.** printx, printy
 
 ```

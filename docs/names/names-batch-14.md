@@ -9,7 +9,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** name-entry screen: builds a 12-character string in $CF36 from the letters typed so far (a1, count $D4E8) padded with '-' and prints it; the character set 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' sits next to it; caller loc_FB822
 
-**Callers.** loc_FB822
+**Callers.** ai_PrintUserNameList
 **Callees.** print
 **Strings.** ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -
 
@@ -37,7 +37,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** shootout setup: takes the six-entry lineup list (team data offset +6) of HomeTeam, or VisTeam when the side flag $D594 is set, and stores the six player indexes (minus 1) as words below $D586 or $D594, the shooter lists that ai_AdvanceShootoutRound indexes with $D586; caller sub_FC47C
 
-**Callers.** sub_FC47C
+**Callers.** ai_InitShootout
 **Callees.** none
 **RAM.** HomeTeam, VisTeam
 
@@ -94,7 +94,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** scans the 28 team records (ReadTeamRecord into $CF36) for the highest crowd byte 8 (unset counts as $50) and returns d0 = that team and d7 = the value; caller loc_9B4A (crowd meter / records display)
 
-**Callers.** $009B4A
+**Callers.** ai_PrintLeagueCrowdRecord
 **Callees.** ReadTeamRecord
 
 ```
@@ -121,7 +121,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** same shape as ai_PrintScrollArrows: chooses one of the four strings at word_82BC (none / down / up / both) from VertLineScrolling against $D5B2 and prints it in the '{Select  Player}' header of the edit-lines player picker; caller sub_8198
 
-**Callers.** sub_8198
+**Callers.** ai_ScrollPlayerPicker
 **Callees.** ai_PrintNextString, printz2
 **Strings.** {Select  Player}
 **RAM.** VertLineScrolling
@@ -158,7 +158,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** same shape as ai_PrintScrollArrows for the scoring-summary list: chooses one of the four strings at word_9400 from VertLineScrolling against $D5B2 and prints it at column 4 row 9; caller sub_8FB8 (summary page handler)
 
-**Callers.** sub_8FB8
+**Callers.** ai_ScrollSummaryList
 **Callees.** ai_PrintNextString, printz2
 **RAM.** VertLineScrolling
 
@@ -246,7 +246,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** walks the penalized-player list $9A(a2) twice, printing minors (status $66 bit 6 clear) first and majors second with ai_PrintPenaltyRow; caller loc_12DA6 (penalty box display)
 
-**Callers.** loc_12DA6
+**Callers.** ai_PrintPenaltyBoxes
 **Callees.** ai_PrintPenaltyRow, loc_12DE2, loc_12DFC
 
 ```
@@ -300,7 +300,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** game init (sub_A528): sets $DEB4 = $F0 and draws an 8x4-tile bitmap at column $20 row $55 (beyond the visible rows of the plane) from the second block of off_5605A, or off_B5180 when $C2F4 bit 4 is set, at tile base rinkvrcset; which on-screen element this becomes is not identified; caller sub_A528
 
-**Callers.** sub_A528
+**Callers.** ai_ReinitRinkAndReplay
 **Callees.** dobitmap, printz
 **RAM.** rinkvrcset
 

@@ -10,7 +10,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** body shared by LoadAsset / ai_LoadAssetInline: a2 = asset, d4 = destination tile: reads the count word; 0 ends, a negative count (& $7FFF) is a compressed block decoded by sub_1177A, a positive count is raw 4bpp tiles sent by DoDMApro, or by remap when an inline nibble map pointer is set in $CF32; d4 is advanced by the tile count; caller ai_LoadAssetInline (and LoadAsset by fall-through)
 
 **Callers.** ai_LoadAssetInline
-**Callees.** remap, sub_1177A
+**Callees.** ai_DecompressTiles, remap
 
 ```
 01173C  movem.l	d0-d1/a0-a6,-(sp)
@@ -242,7 +242,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a0 = team record, a1 = output: for the 26 roster indexes writes those that appear in the six-entry lineup list at team data offset +6 to a1 (starters) and the rest to a1+6 (bench); sub_FAFBA calls it for the home and away teams into $D4FA and $D514; caller sub_FAFBA
 
-**Callers.** sub_FAFBA
+**Callers.** ai_SplitBothRostersByLineup
 **Callees.** loc_FB00E
 **Strings.** NAME  ENTRYa
 
@@ -271,7 +271,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** given a record (a0, or fetched with ReadRecordField when a0 is null) appends the holder's user name (byte 1) to the string at a1 with ai_BuildUserNameString and trailing-space trimming ($C2F8 bit 7); caller sub_F9A64 (records text)
 
-**Callers.** sub_F9A64
+**Callers.** ai_BuildRecordByUserText
 **Callees.** ai_BuildUserNameString, ai_ReadRecordField
 
 ```
@@ -300,7 +300,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** user-records list: prints the rank as a digit (7 - d7 + '0') followed by '. ' in $BFA4, then the user name of the entry byte -1(a0) via ai_BuildUserNameString without trimming; caller loc_FBEA4 (user list screen)
 
-**Callers.** loc_FBEA4
+**Callers.** ai_PrintUserStandings
 **Callees.** ai_BuildUserNameString, print2
 
 ```

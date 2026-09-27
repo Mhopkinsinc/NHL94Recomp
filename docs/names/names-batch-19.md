@@ -85,7 +85,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets the edit-lines page $D5B2 from the high word of d0 and draws it with ai_DrawEditLinesHeader; caller sub_8B1C
 
-**Callers.** sub_8B1C
+**Callers.** ai_ScrollEditLinesPages
 **Callees.** ai_DrawEditLinesHeader
 
 ```
@@ -101,7 +101,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets the edit-lines page $D5B2 to the high word of d0 plus one and draws it with ai_DrawEditLinesHeader; caller sub_8B1C
 
-**Callers.** sub_8B1C
+**Callers.** ai_ScrollEditLinesPages
 **Callees.** ai_DrawEditLinesHeader
 
 ```
@@ -154,7 +154,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** writes Hscroll ($BD1E) to the horizontal scroll table (VSCRLPM + 2) and Vscroll ($BD20) to VSRAM entry 1 (command $40020010); caller sub_15E6E (the attract-mode V-blank routine)
 
-**Callers.** sub_15E6E
+**Callers.** ai_AttractVBlankScroll
 **Callees.** Vmaddr
 **RAM.** Hscroll, VSCRLPM, Vscroll
 

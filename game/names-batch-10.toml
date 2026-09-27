@@ -59,7 +59,7 @@ evidence = "uppads helper: from the packed value d1 (tens digit in bits 4..7, un
 addr = 0x00E1F4
 name = "CpuLineChangeCheck"
 confidence = 0.6
-evidence = "asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter & 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via compshoot?; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc"
+evidence = "asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter & 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via CompShoot; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc"
 
 [[name]]
 addr = 0x00F2F4

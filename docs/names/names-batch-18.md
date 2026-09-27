@@ -89,8 +89,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** crowd meter: prints sqrt(4 * d0) + $41 (sroot) as a 3-digit number followed by the inline ' dB' string; caller loc_9A84 (crowd meter display)
 
-**Callers.** loc_9A84
-**Callees.** DeterStrLength?, print, printz, sroot
+**Callers.** ai_PrintCrowdMeterLevels
+**Callees.** NumberToPaddedText, print, printz, sroot
 
 ```
 009BB4  ext.l	d0
@@ -114,7 +114,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** PrintScores1: prints team a2's name (record +$1E data, name via the +4 offset) then its score $C(a2) as a 2-digit number at column $1C; caller PrintScores1
 
 **Callers.** PrintScores1
-**Callees.** DeterStrLength?, print
+**Callees.** NumberToPaddedText, print
 **RAM.** printx
 
 ```
@@ -269,7 +269,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** records screen: at row d1 prints the selected team's name (home, or away when $D4F6) through sub_FAC78; caller ai_PrintRecordsScreen
 
 **Callers.** ai_PrintRecordsScreen
-**Callees.** sub_FAC78
+**Callees.** ai_PrintCentredAtColumn20
 **RAM.** printy
 
 ```

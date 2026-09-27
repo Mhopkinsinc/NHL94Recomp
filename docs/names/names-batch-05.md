@@ -9,7 +9,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** decodes the SRAM password copy at $D088 with ai_DecodePlayoffPassword; if gamelevel or bosgames is non-zero it rebuilds the bracket (sub_17D80), normalises pojoy (2..7 minus 2 without FourWayPlay, 1->3 and 2->4 with it) and sets $D04A = rounds remaining as 7 (or $B for 4-way play) minus pojoy; callers GameSetUp_3 and sub_F76CE (a jmp thunk used by GameSetUp)
 
-**Callers.** GameSetUp_3, sub_F76CE
+**Callers.** GameSetUp_3, ai_ApplyPlayoffPasswordThunk
 **Callees.** MakeTree, ai_DecodePlayoffPassword, loc_17D08
 **RAM.** FourWayPlay, OptNOP, bosgames, gamelevel, pojoy
 
@@ -48,7 +48,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** bit-stream reader: unpacks 104 words into $CD96 from the packed block ending at $D092 (reads a long at $D092-$22+$100-2*(bit>>4), shifts by bit&15), with field widths cycling through byte_18336 = $C, $E, $A, $A; the packer sub_182A2 uses the same width table; callers AddPOStats and sub_9428 (PeriodOver's playoff stats print)
 
-**Callers.** AddPOStats, sub_9428
+**Callers.** AddPOStats, ai_ShowPlayoffStats
 **Callees.** none
 
 ```
@@ -83,7 +83,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints the setup menu's row labels from word_F80D4 (Play Mode, Players, Team 1, Team 2, Per. Length, Goalies) at column 3, two rows apart starting at row $F - 2*$D422 (the scroll offset), skipping rows above $F and stopping past $19; $C2F8 bit 3 held while printing; callers GameSetUp and sub_F78A2
 
-**Callers.** GameSetUp, sub_F78A2
+**Callers.** GameSetUp, ai_RefreshSetupOptions
 **Callees.** loc_F8090, loc_F80C2, print2
 **Strings.** Play Mode | Players | Team 1 | Team 2 | Per. Length | Goalies
 **RAM.** printa, printm, printx, printy
@@ -119,7 +119,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** away-side twin of ai_DrawSetupHomeLogo: after ai_ClearSetupLogoPanels sets $D42E bits 2 (away) and 6, calls sub_F8770, prints the caption at column 8 or $19 and jumps into the shared logo-drawing tail at loc_F865C, which picks tile base $D432 because bit 2 is set; callers GameSetUp, GameSetUp_2
 
 **Callers.** GameSetUp, GameSetUp_2
-**Callees.** ai_ClearSetupLogoPanels, loc_F865C, printz, sub_F8770
+**Callees.** ai_ClearSetupLogoPanels, ai_SetAwayLogoPanel, loc_F865C, printz
 **RAM.** printx, printy
 
 ```
@@ -189,7 +189,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** reads the current frame's (frame index, duration) byte pair from the script at $D6B6 + 2*$D6B0 into $D6AE/$D6B2; -1 restarts the script from frame 0, -2 calls sub_FE548 (script end); only caller ai_UpdateTileAnimation
 
 **Callers.** ai_UpdateTileAnimation
-**Callees.** sub_FE548
+**Callees.** ai_StopTileAnimation
 
 ```
 0FE326  move.l	($FFFFD6B6).w,a0
@@ -234,7 +234,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** picks a random script 0..6 (sub_11086 with d0 = 7) into $DA12, clears $C2FC bit 3, resets the step index $DA14 to -1 and the current x $DA16, and loads the first point via ai_NextWaypoint; only caller sub_FC4C0
 
-**Callers.** sub_FC4C0
+**Callers.** ai_StartShootoutAttempt
 **Callees.** ai_NextWaypoint, randomd0
 
 ```
@@ -256,7 +256,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** advances $DA14 and reads the next 8-byte entry of script off_FE788[$DA12]: relative x into $DA16 (negated when bit 0 of $76(a3) is set) and y into $DA18; an entry whose byte 4 is $80 ends the script, setting $C2FC bit 3 and copying its bytes 5..7 into $DA1D/$DA1A; sub_FE864 (from asspuckc) steers the player toward the point and calls this when within reach; callers ai_StartWaypointScript, sub_FE864
 
-**Callers.** ai_StartWaypointScript, sub_FE864
+**Callers.** ai_StartWaypointScript, ai_SteerToWaypoint
 **Callees.** none
 
 ```
@@ -391,7 +391,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** copies the 12-byte user-name entry $D45A + $D4EA*12 to a1, writing '-' for zero bytes and counting only the real characters in $D4E8; used by the name-entry screen loc_FB822 and by sub_FEEC8 for the '(played by ...)' credit
 
-**Callers.** loc_FB822, sub_FEEC8
+**Callers.** ai_BuildPlayedByString, ai_PrintUserNameList
 **Callees.** loc_FB9C2
 
 ```
@@ -418,7 +418,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** d0 = team index, a1 = destination string: looks up the team record via the table at $30E, follows its +4 offset to the team name string and appends it with appstring; callers sub_F9B2A and sub_FA75C (user records text)
 
-**Callers.** sub_F9B2A, sub_FA75C
+**Callers.** ai_AppendRecordHolderText, ai_PrintGoalRecordLine
 **Callees.** appstring
 
 ```
@@ -442,7 +442,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** edit-lines roster: prints one of the four control strings at word_9A02 chosen by d0 = (VertLineScrolling > 0) + 2*(VertLineScrolling < $D5B2), i.e. whether the list can scroll up and/or down, at the header position set by the inline print2 string; callers loc_945C and sub_9588
 
-**Callers.** loc_945C, sub_9588
+**Callers.** ai_PrintStatsScreen, ai_ScrollStatsList
 **Callees.** ai_PrintNextString, printz2
 **Strings.** Crowd  Meter
 **RAM.** VertLineScrolling

@@ -10,7 +10,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** Intermission hook, skipped unless ValidSRAM and OptUserRec is off: caches both rosters' attribute counts and sizes (sub_F9FC0/sub_F9FEA), then for the home and away sides updates the per-team records (sub_F9F50 for the scorer fields, ai_UpdateTeamRecords), the user records for the two controllers ($D042/$D044) via ai_UpdateUserWinLoss, and finally sub_1A206; all record I/O goes through the SRAM record helpers with $CF36 as the 16-byte scratch record
 
 **Callers.** Intermission
-**Callees.** MakeSRAMChecksum, ai_UpdateTeamRecords, ai_UpdateUserWinLoss, sub_F9F50, sub_F9FC0, sub_F9FEA
+**Callees.** MakeSRAMChecksum, ai_CacheAttributeCounts, ai_CacheRosterSizes, ai_UpdateScorerRecords, ai_UpdateTeamRecords, ai_UpdateUserWinLoss
 **RAM.** HomeTeam, OptUserRec, ValidSRAM, VisTeam
 
 ```
@@ -82,7 +82,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** reads the user's 16-byte record from SRAM $D20 + user*16 (sub_F9C20) into a0: increments games played (+$A/+$B, capped at 9000) and, from the goal totals $C(a1) vs $C(a2), wins (+8/+9) or ties (+$C/+$D); then refreshes the best-goals (bytes 0..3) and best-margin (bytes 4..7) entries with the opponent team/user ids and writes the record back with sub_F9C56; caller ai_UpdateGameRecords for each side
 
 **Callers.** ai_UpdateGameRecords
-**Callees.** ai_ReadUserRecord, loc_F9E4C, sub_F9C56
+**Callees.** ai_ReadUserRecord, ai_WriteUserRecord, loc_F9E4C
 
 ```
 0F9DDA  movem.l	d0-a6,-(sp)
@@ -244,8 +244,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (ReadTeamRecord with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0
 
-**Callers.** sub_FA2C0
-**Callees.** ReadTeamRecord, ai_PrintGoalRecordLine, ai_PrintTeamRatingBox, loc_FA936, printz, printz2, sub_FA66E, sub_FA6E8, sub_FA708, sub_FAC3E
+**Callers.** ai_PrintRecordsPage
+**Callees.** ReadTeamRecord, ai_DrawRecordsTeamLogo, ai_PrintCrowdRecordLine, ai_PrintGoalRecordLine, ai_PrintRecordsTeamName, ai_PrintSaveRecordLine, ai_PrintTeamRatingBox, loc_FA936, printz, printz2
 **Strings.** Records | -----------
 **RAM.** HomeTeam, VisTeam, palcount, printx, printy
 
@@ -391,7 +391,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** post-game 'Stars of the Game' panel: once RefCnt is above $40 and $C2EA bit 7 was clear, waits a frame, draws a 28x9 box, prints the title, draws the star bitmap from off_5605A at tile base $B018, scores every player with sub_18620 / ai_ScorePlayerForStars and prints the three stars with sub_185E0; caller UpdatePA
 
 **Callers.** UpdatePA
-**Callees.** Framer, dobitmap, getname, print, printz, song, sub_185E0, sub_18620
+**Callees.** Framer, ai_ScoreAllPlayersForStars, ai_TakeTopStar, dobitmap, getname, print, printz, song
 **Strings.** Stars of the Game
 **RAM.** AwGoals, HmGoals, RefCnt, disflags, gmode, printx, printy, rinkvrcset, vcount
 
@@ -463,7 +463,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** computes a player's star-of-the-game value into (a4): base = team score difference (d3), then for skaters goals (+$B4 column) * $2AF8, assists (+$CE) * $2774, shots (+$E8) * 10 (* 100 more for a losing side) plus the +$136 rating; for the goalie slot (index above the attribute count) awards $7D00 when the save percentage is high and $124F8 more for a shutout; caller sub_18620 (from ai_StarsOfTheGameScreen)
 
-**Callers.** sub_18620
+**Callers.** ai_ScoreAllPlayersForStars
 **Callees.** ai_CountRatingNibbles, loc_18710
 **Strings.** Injury to: | Out for period | Injury to: | Out for game | the game
 
@@ -524,7 +524,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** if the player $DEE8 is the first (best) entry of the team's rating-sorted list $BF5C/$BF5E draws the bitmap unk_F5AF6 at tile base $DEE4, if he is the first of the reverse (worst) list $BF60/$BF62 draws unk_F5D1C at $DEE6, otherwise erases the 8x3 area; column 2 for the away record, $20 for home, row $19; caller sub_FD89A (per-position ratings)
 
-**Callers.** sub_FD89A
+**Callers.** ai_PrintRatingsPlayerName
 **Callees.** dobitmap, eraser, loc_FF978, loc_FF9A2
 **RAM.** printx, printy
 
@@ -583,8 +583,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sets up a stored playoff game as a highlight: after sub_13848/sub_13396/sub_133B2, draws a 24x3 box and prints 'Highlight from game:', waits $B4 frames (abort on button bit 7), then loads HomeTeam/VisTeam, the period gsp, HmGoals/AwGoals and a random clock (gameclock = $3C + random 0..$77) from the series record a0, clears the controller teams and reinitialises the teams (sub_17102, sub_77F4); caller sub_1351C, which runs it for every finished series flagged in $CE66..$CED6 bit 1 of +$E
 
-**Callers.** sub_1351C
-**Callees.** Framer, NewTicker3, NewTicker3pt2, clearTeamStats, printz, randomd0, sub_13848, waitxsr
+**Callers.** ai_PlayFinishedSeriesHighlights
+**Callees.** Framer, NewTicker3, NewTicker3pt2, ai_SnapshotGameState, clearTeamStats, printz, randomd0, waitxsr
 **Strings.** Highlight from game:
 **RAM.** AwGoals, CwdExciteLvl, HmGoals, HomeTeam, VisTeam, c1playernum, c2playernum, cont1team, cont2team, gameclock, gsp, printx, printy, sflags3, zamx
 
@@ -763,7 +763,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** loc_945C helper: after sub_10F32, resets the plane scroll (VDP address $B002 and 0 written as zero, registers $8C81/$8D00, $B00E = 6), loads the frame tiles (unk_55B86 at $B01E with nibble map $9123...) and the font (ai_LoadFontTiles), then draws the background bitmap off_54E24 with dobitmap; caller loc_945C (edit lines / stats screens)
 
-**Callers.** loc_945C
+**Callers.** ai_PrintStatsScreen
 **Callees.** Vmaddr, ai_LoadAssetInline, ai_LoadFontTiles, dobitmap, eraser, forceblack, printz
 **RAM.** Map3col1, VSPRITES, disflags, framercset, palcount, printy
 

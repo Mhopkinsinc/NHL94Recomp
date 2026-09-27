@@ -9,8 +9,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints team d0's name (team table $30E, name at +4) at column 6 and the 2-digit value d1 at column $18 on the same row; caller sub_81F2 (edit-lines team header)
 
-**Callers.** sub_81F2
-**Callees.** DeterStrLength?, print
+**Callers.** ai_PrintSeriesMatchup
+**Callees.** NumberToPaddedText, print
 **RAM.** printx
 
 ```
@@ -236,7 +236,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** ratings screen: prints the spacer (ai_PrintRatingsSpacer) then team a0's overall rating (ai_GetTeamOverallRating) as a 2-digit number, returning it in d0 for the $D5A0/$D5A2 comparison; caller ai_PrintTeamRatingsScreen
 
 **Callers.** ai_PrintTeamRatingsScreen
-**Callees.** DeterStrLength?, ai_GetTeamOverallRating, ai_PrintRatingsSpacer, print2
+**Callees.** NumberToPaddedText, ai_GetTeamOverallRating, ai_PrintRatingsSpacer, print2
 
 ```
 0FCFB8  bsr.w	sub_FCFDC

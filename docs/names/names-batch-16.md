@@ -9,7 +9,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** twin of ai_PrintSummaryRowAt: prints ScoreSum entry (d0 high word) * 6 at the row VertLineScrolling/8 - 3 (mod 32), i.e. the entry scrolling in at the top of the summary list; caller sub_8FB8
 
-**Callers.** sub_8FB8
+**Callers.** ai_ScrollSummaryList
 **Callees.** ai_PrintScoringSummaryRow, printz
 **RAM.** VertLineScrolling, printy
 
@@ -202,7 +202,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sub_13056 helper: refills the energy (ai_ResetLineEnergy), sets team a3's line $16 to 0, and with automatic lines (OptLine = 0) picks line 3 when a3 has more skaters than a2 (power play) or line 5 when fewer (penalty kill); caller sub_13056
 
-**Callers.** sub_13056
+**Callers.** ai_SelectSpecialTeamsLinesBoth
 **Callees.** ai_ResetLineEnergy
 **RAM.** OptLine
 
@@ -270,7 +270,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** records screen: takes entry $D4F4 - 1 of the starters/bench list for the selected side ($D4FA home, $D514 away by $D4F6, built by ai_SplitRosterByLineup) and stores the player index in $D52E; caller loc_FAEBC
 
-**Callers.** loc_FAEBC
+**Callers.** ai_DrawRecordsPlayerPhoto
 **Callees.** none
 
 ```
@@ -292,7 +292,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** returns d0 = the index of character d0 in the name-entry alphabet 'ABCDEFGHIJKLMNOPQRSTUVWXYZ.12 -' (30 when absent); caller sub_FB722 (name entry)
 
-**Callers.** sub_FB722
+**Callers.** ai_SnapEntryCharToAlphabet
 **Callees.** none
 
 ```

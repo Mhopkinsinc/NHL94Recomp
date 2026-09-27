@@ -166,7 +166,7 @@
 00E264,chkpk,"#sf2pwrplay - check if power play in progress"
 00E274,chkpk2,
 00E292,chk4shot,
-00E412,compshoot?,
+00E412,CompShoot,
 00E444,chk4pass,
 00E594,EvadePC,
 00E62E,checkob,
@@ -269,7 +269,7 @@
 011C72,ai_PrintPeriodAndTime,
 011CA2,PushTime,
 011D06,PushNumber,
-011D3A,DeterStrLength?,"push to stack"
+011D3A,NumberToPaddedText,"push to stack"
 011D96,appendz,
 011D9E,appstring,
 011DE2,ai_PrintBigInline,
@@ -520,7 +520,7 @@
 0F6D5E,Unk_ControlsSetRelated,
 0F6E38,ai_NopForcePlData,
 0F6E8A,LoadCrowdRec,
-0F6EBE,Crowd_Noise?,"screen is in horizontal mode"
+0F6EBE,UpdateCrowdMeter,"screen is in horizontal mode"
 0F6F8C,stopna2,
 0F6FD6,checkwallcoll,"clears bit 4 in pflags3 (not used in 92)"
 0F709C,wallcollb,

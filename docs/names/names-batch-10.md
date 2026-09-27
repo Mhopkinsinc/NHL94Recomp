@@ -10,7 +10,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** PauseMode: d1 = new pad bits; Start (bit 7) returns with the carry flag toggled (exit), Down/Up (bits 1/0) move the cursor $CF20 and redraw via ai_PrintScrollingMenu, C (bit 5) resolves the controlling team (ai_GetControllingTeam), walks the item list $CF24 to entry $CF20 and calls its handler, then redraws the menu unless $C2F6 bit 1 was set; returns Z from the cursor value; caller PauseMode
 
 **Callers.** PauseMode
-**Callees.** ai_GetControllingTeam, ai_PrintScrollingMenu, loc_7E46, loc_7ECE
+**Callees.** ai_GetControllingTeam, ai_PrintScrollingMenu, ai_RedrawPauseMenu, loc_7ECE
 
 ```
 007E88  btst	#7,d1
@@ -50,7 +50,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** GameSetUp helper: forces OptUserRec on in playoff state 4 or outside playoffs ($D04A = 0), resets the OptGoalie/$D05A/$D05C options to 1 outside playoffs, reprints the row labels (ai_PrintSetupMenuLabels) when the scroll offset $D422 changed, then redraws the option values with sub_F7B20 under $C2F8 bit 3; caller GameSetUp
 
 **Callers.** GameSetUp
-**Callees.** ai_PrintSetupMenuLabels, sub_F7B20
+**Callees.** ai_PrintSetupMenuLabels, ai_RedrawSetupValues
 **RAM.** OptGoalie, OptNOP, OptPlayMode, OptUserRec
 
 ```
@@ -86,8 +86,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sub_F7B20 helper: in playoff state 0 or 4 copies Opt1Team/Opt2Team into HomeTeam/VisTeam, then for the away and home teams loads the logo palette from word_F8BF4 (64 bytes per team: +$26 away, +2 home) into $BD4E/$BD4A, draws the logo bitmap from off_AFE12 with sub_17B78 at tile bases $D43A and 2, calls sub_17190 and starts a palette fade ($BD26 = $64); caller sub_F7B20
 
-**Callers.** sub_F7B20
-**Callees.** printz, sub_17190, sub_17B78
+**Callers.** ai_RedrawSetupValues
+**Callees.** ai_DrawSetupLogoBitmap, ai_InitBothTeamRecords, printz
 **RAM.** HomeTeam, Opt1Team, Opt2Team, OptPlayMode, VisTeam, palcount
 
 ```
@@ -211,8 +211,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** sub_A528 helper (game start): programs the scroll registers from VSCRLPM ($8D/$8C, $B00E = 5), loads the crowd tiles (unk_56062, or unk_B5188 when $C2F4 bit 4 is set) at rinkvrcset, the home centre-ice logo (ai_LoadHomeCenterIceLogo), the font, the frame tiles, the rink tiles and palette (ai_LoadRinkTiles, sub_16CC4, sub_16CD2, ai_LoadRinkPalette) and finishes in sub_1720C; caller sub_A528
 
-**Callers.** sub_A528
-**Callees.** SetTeamColors, Vmaddr, ai_LoadAsset, ai_LoadAssetInline, ai_LoadFrameTiles, ai_LoadHomeCenterIceLogo, ai_LoadRinkPalette, ai_LoadRinkTiles, sub_16CC4, sub_16CD2
+**Callers.** ai_ReinitRinkAndReplay
+**Callees.** SetTeamColors, Vmaddr, ai_LoadAsset, ai_LoadAssetInline, ai_LoadCrowdSpriteTiles, ai_LoadFrameTiles, ai_LoadHomeCenterIceLogo, ai_LoadHudTiles, ai_LoadRinkPalette, ai_LoadRinkTiles
 **Strings.** Timeout |  | no goalie
 **RAM.** Map3col1, VSCRLPM, disflags, framercset, rinkvrcset
 
@@ -296,7 +296,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** uppads helper: from the packed value d1 (tens digit in bits 4..7, units in bits 0..3, position code in bits 8..10) emits three sprite-tile entries at a5 via sub_1674A (tile pointer into Art_BoardText, size $10, x from $12(a0)): the two jersey digits (blank when the tens digit is 0 or the units are $F, narrowing 2(a0)) and the position letter from unk_1677A (' ', 'D', 'D', 'L', ...; suppressed by $C2FC bit 7); caller uppads (the jersey number / position labels over the players)
 
 **Callers.** uppads
-**Callees.** sub_1674A
+**Callees.** ai_EmitLabelTile
 
 ```
 0166E6  lea	unk_1677A(pc),a4
@@ -332,10 +332,10 @@ XML (or the proposals file and re-apply).
 
 ## `$00E1F4` -> `ai_CpuLineChangeCheck`  (confidence 0.6, 26 insns)
 
-**Evidence.** asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter & 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via compshoot?; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc
+**Evidence.** asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter & 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via CompShoot; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc
 
 **Callers.** asspuckc
-**Callees.** CompLine, PrintScores1, SetPersonel, compshoot?, sub_12EF6
+**Callees.** CompLine, CompShoot, PrintScores1, SetPersonel, ai_AverageOnIceEnergy
 **RAM.** pucky
 **Hardware.** HV counter
 
@@ -458,7 +458,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** given a record (a0, or fetched with ReadRecordField when a0 is null): appends the holder's user name (byte 3, ai_BuildUserNameString with trimming), the separator word_F9B90 and the opponent team name (byte 2, ai_AppendTeamName) to the string at a1; caller sub_F9AAC (records text)
 
-**Callers.** sub_F9AAC
+**Callers.** ai_BuildRecordVsText
 **Callees.** ai_AppendTeamName, ai_BuildUserNameString, ai_ReadRecordField, appstring
 
 ```

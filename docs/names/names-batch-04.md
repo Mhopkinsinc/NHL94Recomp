@@ -9,7 +9,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** exact inverse of ai_DecodePlayoffPassword: clears the five-word number at a3 (ai_BigNumClear), then folds in postarts (radix $20), bosgames (8), gamelevel (4), potreeteam ($10), pojoy (8), $CEF2 ($4000) and the +4/+6 win counts of the eight playoff series at $CE66 (radix 5 each) with ai_BigNumMulAdd; sub_180FC calls it with a3 = $D088 after a playoff game and then saves the result with ai_SavePlayoffPassword; callers sub_180FC, sub_18380
 
-**Callers.** ai_AdvancePlayoffSeries, sub_180FC
+**Callers.** ai_AdvancePlayoffSeries, ai_AdvancePlayoffsAfterGame
 **Callees.** ai_BigNumClear, ai_BigNumMulAdd
 **RAM.** bosgames, gamelevel, pojoy, postarts, potreeteam
 
@@ -50,7 +50,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** number = number * d1 + d0 on the five-word number at a3 (swaps the registers, multiplies via sub_18236, adds via sub_1821A); the mixed-radix accumulator used only by ai_EncodePlayoffPassword
 
 **Callers.** ai_EncodePlayoffPassword
-**Callees.** sub_1821A, sub_18236
+**Callees.** ai_BigNumAdd, ai_BigNumMul
 
 ```
 0181F6  movem.l	d0-d1,-(sp)
@@ -67,7 +67,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** zeroes the five words at a3; callers sub_180FC (before saving an empty password) and ai_EncodePlayoffPassword
 
-**Callers.** ai_EncodePlayoffPassword, sub_180FC
+**Callers.** ai_AdvancePlayoffsAfterGame, ai_EncodePlayoffPassword
 **Callees.** none
 
 ```
@@ -82,7 +82,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** after a playoff game: stores the home and away scores ($C6DA, $CA3E) into the current series record at $CE66 + $CEE6*$10 (+$A/+$C), then credits the win to the side at +4 or +6 chosen by the score difference and the home/away bit 0 of +$E unless a side already has 4 wins; when bosgames is 7 it takes the loc_184D0 path; only caller sub_180FC (from PeriodOver)
 
-**Callers.** sub_180FC
+**Callers.** ai_AdvancePlayoffsAfterGame
 **Callees.** GetShifter, ai_EncodePlayoffPassword, loc_18438, randomd0
 **RAM.** AwGoals, HmGoals, bosgames, gamelevel, gamenum, sflags3
 
@@ -154,7 +154,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** WriteSRAM of $100 bytes from $D076 (the buffer holding the encoded password at $D088) to SRAM offset $1EF6, then sub_1A206, clears $C2EC bit 4 and resets $C016/$B036; only caller sub_180FC right after ai_EncodePlayoffPassword
 
-**Callers.** sub_180FC
+**Callers.** ai_AdvancePlayoffsAfterGame
 **Callees.** MakeSRAMChecksum, WriteSRAM
 **RAM.** lastsfx, recbpr, sflags
 
@@ -176,7 +176,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** d0 = player index, d1 = team index: scans the per-team table off_F92F4[team] of (photo pointer, player index) pairs and returns the photo in a0 when the player has one; otherwise walks the team's roster (team table $30E) to the player record and returns one of four generic images (unk_C6F02, unk_C726C, unk_C6B98, unk_C682E) chosen by bit 0 of the record's +4 byte and by whether the index is below the count derived from the +$A word (goalie vs skater); callers loc_FAEBC and ai_DrawRatingsPictures, whose sub_FD14A then decodes the image with ai_UnpackPhotoTiles
 
-**Callers.** ai_DrawRatingsPictures, loc_FAEBC
+**Callers.** ai_DrawRatingsPictures, ai_DrawRecordsPlayerPhoto
 **Callees.** loc_FAE50, loc_FAE70, loc_FAEB6
 
 ```
@@ -230,8 +230,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** team ratings screen pictures: when $D598 is zero draws the away ($C332) and home ($C330) team logos through ai_GetTeamLogoAsset + ai_DrawTeamLogo6x6 at tile bases $D432/$D430 and columns 2/$20, row $F; otherwise draws the selected away/home player photos ($D59E/$D59C) through ai_GetPlayerPhoto + sub_FD14A; sets the palette-fade counter $BD26 to $64; callers loc_FCC76, sub_FCF86
 
-**Callers.** loc_FCC76, sub_FCF86
-**Callees.** ai_DrawTeamLogo6x6, ai_GetPlayerPhoto, ai_GetTeamLogoAsset, loc_FD144, sub_FD14A
+**Callers.** ai_ChangeRatingsPosition, ai_MatchupsScreen
+**Callees.** ai_DrawTeamLogo6x6, ai_GetPlayerPhoto, ai_GetTeamLogoAsset, ai_LoadPlayerPhoto, loc_FD144
 **RAM.** HomeTeam, VisTeam, palcount, printa, printx, printy
 
 ```
@@ -337,7 +337,7 @@ XML (or the proposals file and re-apply).
 **Evidence.** game-setup screen, home side: after ai_ClearSetupLogoPanels clears $D42E bit 2 (away) and sets bits 3/7, calls sub_F878C, prints the panel caption at column $18, loads $D440 = $B4, then (shared tail loc_F865C) draws the logo of team $D428 from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (or $D432 when bit 2 is set, the away entry ai_DrawSetupAwayLogo), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2
 
 **Callers.** GameSetUp, GameSetUp_2
-**Callees.** ai_ClearSetupLogoPanels, dobitmap, loc_F86AE, printz, sub_F878C
+**Callees.** ai_ClearSetupLogoPanels, ai_DrawSetupPhotoFrame, dobitmap, loc_F86AE, printz
 **RAM.** palcount, printx, printy
 
 ```
@@ -521,7 +521,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** runs ai_RateStartingSix for team a0 and returns d1 = the sum of the six rating totals at $BF20; sub_F7318 calls it for home and away, stores them in $BF12/$BF14 and derives the stronger side in $BF50 and an advantage bracket
 
-**Callers.** sub_F7318
+**Callers.** ai_ComputeTeamAdvantage
 **Callees.** ai_RateStartingSix
 
 ```
@@ -541,8 +541,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** clears $BF54/$BF56, then for the home ($C6CE) and away ($CA32) teams runs ai_RateStartingSix and copies the sorted index list to $BF5E/$BF5C (sub_F72DA) and the sums to $BF62/$BF60 (sub_F72FA); caller loc_FCC76 (ratings screen setup)
 
-**Callers.** loc_FCC76
-**Callees.** ai_RateStartingSix, sub_F72DA, sub_F72FA
+**Callers.** ai_MatchupsScreen
+**Callees.** ai_CopyBestSixIndexes, ai_CopyWorstSixIndexes, ai_RateStartingSix
 
 ```
 0F71A2  clr.w	($FFFFBF54).w
@@ -568,8 +568,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** row of the scoring summary: entry d3 of ScoreSum ($C474; word time, byte team flag bit 7 = away and goal type in the low bits, then scorer and two assist indexes): erases the 40x4 row, prints the time (sub_11C72), the team name from the team record ($C6CE or +$364), the goal-type tag from word_912A (SH2, SH, PP, PP2) and the three player names via sub_9112; callers sub_9020 (row 30) and sub_904C
 
-**Callers.** sub_9020, sub_904C
-**Callees.** ai_PrintNextString, eraser, print, sub_11C72, sub_9112
+**Callers.** ai_PrintSummaryRowAbove, ai_PrintSummaryRowAt
+**Callees.** ai_PrintNextString, ai_PrintPeriodAndTime, ai_PrintSummaryPlayerName, eraser, print
 **RAM.** printa, printx, printy
 
 ```
@@ -612,8 +612,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** in-game line change box: prints the header (sub_B9C2, plus sub_18A56 when printy < $F), then for lines 2..0 asks getlchoice for the line state, prints 'line N' from the text at unk_44120 with the digit added, the line label from word_191A6 and the line energy (sub_12E66), marking the active line $16(a2) or the pending one $2E(a2); ends by printing the team name; callers lineinput, sub_F64E
 
-**Callers.** lineinput, sub_F64E
-**Callees.** Framer, ai_PrintNextString, box, getlchoice, loc_B950, print, setlccords, sub_12E66
+**Callers.** ai_TickLineChangeTimer, lineinput
+**Callees.** Framer, ai_DrawLineEnergyBar, ai_PrintNextString, box, getlchoice, loc_B950, print, setlccords
 **RAM.** printx, printy, sflags3
 
 ```
@@ -660,8 +660,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** generic options list: $CF20 = cursor index (wrapped to the item count), $CF22 = first visible item (kept within 3 of the cursor), $CF24 = length-prefixed item list installed by sub_7E36; walks to the first visible item and prints from row $D using the print2/inline control strings; callers loc_7E46 and loc_7E88 (menu refresh)
 
-**Callers.** loc_7E46, loc_7E88
-**Callees.** loc_7F14, loc_7F8A, print2, printz2, sub_7E72, sub_8008
+**Callers.** ai_PauseMenuInput, ai_RedrawPauseMenu
+**Callees.** ai_PrintPauseMenuItem, ai_SetPauseMenuColumn, loc_7F14, loc_7F8A, print2, printz2
 **RAM.** printy
 
 ```
@@ -732,7 +732,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** d0 = crowd section (offset by $1F when $C2EC bit 7), a1 = section offset table, d4/d5 = camera x/y, d6 = sprite count, a6 = sprite table cursor: for every 8-byte crowd record (x, y, tile, attr, size) inside the camera window (x within -$90..+$80, y within -$80..+$70 of the camera) appends a 4-word hardware sprite (y, size/link d6, tile+$B01A, x) until 64 sprites; callers showcrowd and sub_16226
 
-**Callers.** showcrowd, sub_16226
+**Callers.** ai_EmitCrowdSections, showcrowd
 **Callees.** none
 **RAM.** sflags
 
@@ -800,7 +800,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** VRAM-to-VRAM DMA: d0 = length, d2 = source VRAM address, d1 = destination; programs registers $93..$96, $97 = $C0 (copy mode), autoincrement 1, issues the command $4000xxxx | $C0 with the Z80 bus held, waits with VDP_WaitDMA and restores reg 1 = $64 / autoinc 2; $BF78 bit 2 is held during the transfer; callers sub_16D64 (team banner build) and sub_179D2
 
-**Callers.** sub_16D64, sub_179D2
+**Callers.** ai_BuildTeamBannerTiles, ai_ScrollTickerRows
 **Callees.** WaitDMA
 **RAM.** disflags, dmaram?
 **Hardware.** VDP ctrl, Z80 busreq

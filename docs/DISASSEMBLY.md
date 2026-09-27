@@ -102,6 +102,10 @@ next step is a human review pass over the batch documents, accepting or
 renaming as it goes. Later batches corrected earlier guesses when a
 subsystem became clear (password codec, player photos, setup-screen photo
 rotation, 4-Way Play pad readers, replay ring); each correction is noted in
-the batch file that made it. One human name was corrected with `rename`
-(`clrCrowdRAM?` -> `ReadTeamRecord`).
+the batch file that made it. Four human names were corrected with `rename`, the old
+name kept in each routine's comment: `clrCrowdRAM?` -> `ReadTeamRecord`,
+`DeterStrLength?` -> `NumberToPaddedText`, `compshoot?` -> `CompShoot`,
+`Crowd_Noise?` -> `UpdateCrowdMeter`. The two remaining question-marked
+symbols (`.holdcheck?`, a local label, and `dmaram?`, a RAM variable) are
+not functions and were left alone.
 
