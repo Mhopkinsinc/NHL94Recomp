@@ -9321,8 +9321,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x960E" END="0x9619" />
             <TYPEINFO_CMT>sub_960E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x961A">
+        <FUNCTION ENTRY_POINT="0x961A" NAME="ai_PrintPlayerStatsList">
             <ADDRESS_RANGE START="0x961A" END="0x9743" />
+            <REGULAR_CMT>[AI 0.6] stats screen body: prints the 'Player' header and the five column titles from word_990E (Saves Shots Save %, G, A, Pts, SOG, PIM, highlighting column DispAttribCtr in palette $C000), the category banner from word_9942 ('[ Goals ]' etc.), then walks the roster (ai_CountRosterPlayers) repeatedly picking the player with the highest remaining value of the selected column (ai_GetPlayerAttributeChecked, ties broken by the roster byte) to print the rows sorted; caller loc_945C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_961A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9744" NAME="ai_PrintPlayerStatRow">
@@ -10410,8 +10411,9 @@ yy = y coord to print at</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.8] stores d4 in $B012 and loads asset unk_AAC5A there with LoadAsset; $B012 is the tile base the text printer (print, $11C4E) adds to every character index, so unk_AAC5A is the text font; callers PlayoffScreen, loc_9BD8, loc_FCC76</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11F04</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x11F12">
+        <FUNCTION ENTRY_POINT="0x11F12" NAME="ai_LoadFrameTiles">
             <ADDRESS_RANGE START="0x11F12" END="0x11F1F" />
+            <REGULAR_CMT>[AI 0.6] stores d4 in $B01E and loads asset unk_55B86 there; $B01E is the tile base that the box drawer sub_119B8 (asset unk_55B7E, same family) and eraser add to their tiles, so unk_55B86 holds the menu frame/blank tiles; callers loc_9CDC and setupice (ai_MatchupsScreen loads the same asset inline)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_11F12</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x11F20">
@@ -10489,8 +10491,9 @@ d0 = animation (pen number)</REGULAR_CMT>
             <REGULAR_CMT>print message for penalty</REGULAR_CMT>
             <TYPEINFO_CMT>prefmes</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x12828">
+        <FUNCTION ENTRY_POINT="0x12828" NAME="ai_ClearMessageLine">
             <ADDRESS_RANGE START="0x12828" END="0x12849" />
+            <REGULAR_CMT>[AI 0.7] prints 22 spaces at column 5, row $B with attribute $BF, i.e. blanks the in-game message line; callers UpdatePA and prefmes</REGULAR_CMT>
             <TYPEINFO_CMT>sub_12828</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1284A">
@@ -11167,12 +11170,14 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17718" END="0x1772F" />
             <TYPEINFO_CMT>sub_17718</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17730">
+        <FUNCTION ENTRY_POINT="0x17730" NAME="ai_RunTickerMessage">
             <ADDRESS_RANGE START="0x17730" END="0x179D1" />
+            <REGULAR_CMT>[AI 0.6] intermission ticker: every time the $D5B4 delay expires takes the next line of the message text at aWelcomeToASoldOut_Ton ('Welcome to a sold out ^. Tonight's ...', lines separated by $D, line offsets in the $D5B8 table indexed by $D5B2), scrolls the display with ai_ScrollTickerRows and interprets the placeholder characters _ + $ { } [ ] &lt; &gt; | \ to insert team, player and stat text; caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17730</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x179D2">
+        <FUNCTION ENTRY_POINT="0x179D2" NAME="ai_ScrollTickerRows">
             <ADDRESS_RANGE START="0x179D2" END="0x17A17" />
+            <REGULAR_CMT>[AI 0.6] clears $D5AC, advances the ticker row counter $D5AE and once it reaches 7 keeps it at 6 and shifts the eight 58-tile rows of the ticker window up by one row with ai_VDP_VramCopyDMA (plane rows $80 bytes apart starting at $B004 + $212); only caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_179D2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17A18" NAME="EASportsScreen">
@@ -11505,8 +11510,9 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF6778" END="0xF67E3" />
             <TYPEINFO_CMT>sub_F6778</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF67E4">
+        <FUNCTION ENTRY_POINT="0xF67E4" NAME="ai_ComputePassTarget">
             <ADDRESS_RANGE START="0xF67E4" END="0xF68DD" />
+            <REGULAR_CMT>[AI 0.6] passmode helper: picks a (dx, dy) pair by the passer's facing $54(a3) from unk_F691E for the goalie (slot $34 = 0), word_F68DE, or unk_F68FE when the passer is deep in the zone (y &gt;= $58 after side flip), overriding dy with $103 for a long centre pass, flips for the side, adds random 0..9 jitter to both (sub_11086) and stores the target x in $D414; caller passmode</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F67E4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF693E" NAME="assonetimer">
@@ -11631,8 +11637,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF76CE" END="0xF76D3" />
             <TYPEINFO_CMT>sub_F76CE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF76D4">
+        <FUNCTION ENTRY_POINT="0xF76D4" NAME="ai_MoveSetupCursor">
             <ADDRESS_RANGE START="0xF76D4" END="0xF780B" />
+            <REGULAR_CMT>[AI 0.6] GameSetUp cursor handling: d7 = cursor row, d0 = signed step; scrolls the menu offset $D422 (0..3, previous value in $D424, $C2F6 bit 2 flags a scroll) so the cursor stays within 5 rows of the window, skips row 6 outside playoff mode ($D048), then redraws the menu window from off_BEFB8 with dobitmap, positions via loc_F7864 and draws the cursor box with sub_119B8 in palette $6000; caller GameSetUp</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F76D4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF780C">
@@ -11700,34 +11707,38 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] game-setup screen, home side: after ai_ClearSetupLogoPanels clears $D42E bit 2 (away) and sets bits 3/7, calls sub_F878C, prints the panel caption at column $18, loads $D440 = $B4, then (shared tail loc_F865C) draws the logo of team $D428 from off_F86F2 as a 6x6 tile map through sub_1169A at tile base $D430 (or $D432 when bit 2 is set, the away entry ai_DrawSetupAwayLogo), using the template at unk_FF462 and preserving the palette longs $BD4A/$BD4E; callers GameSetUp, GameSetUp_2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8608</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF8762">
+        <FUNCTION ENTRY_POINT="0xF8762" NAME="ai_SetHomePhotoPanel">
             <ADDRESS_RANGE START="0xF8762" END="0xF876F" />
+            <REGULAR_CMT>[AI 0.5] loads d4 = tile base $D436 and printx = $1C, then joins the shared photo-panel drawing at loc_F8796; called by ai_ShowNextSetupPhoto for the home side</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8762</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF8770">
             <ADDRESS_RANGE START="0xF8770" END="0xF877D" />
             <TYPEINFO_CMT>sub_F8770</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF877E">
+        <FUNCTION ENTRY_POINT="0xF877E" NAME="ai_SetAwayPhotoPanel">
             <ADDRESS_RANGE START="0xF877E" END="0xF878B" />
+            <REGULAR_CMT>[AI 0.5] loads d4 = tile base $D438 and printx = 3, then joins the shared photo-panel drawing at loc_F8796; called by ai_ShowNextSetupPhoto for the away side</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F877E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF878C">
             <ADDRESS_RANGE START="0xF878C" END="0xF87D1" />
             <TYPEINFO_CMT>sub_F878C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF87D2" NAME="ai_ResetCountdownD43C">
+        <FUNCTION ENTRY_POINT="0xF87D2" NAME="ai_ResetPhotoRotateTimer">
             <ADDRESS_RANGE START="0xF87D2" END="0xF87E9" />
-            <REGULAR_CMT>[AI 0.4] reloads the frame countdown $D43C with $AA, or $53 when $D42E bit 5 is set; sub_F87EA decrements it every frame and toggles $D42E bit 1 when it reaches $52 (what the countdown drives is not yet identified); callers GameSetUp_2, sub_F7B20, sub_F87EA</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.6] reloads the setup-screen photo rotation countdown $D43C with $AA, or $53 when $D42E bit 5 is set; ai_TickSetupPhotoRotation decrements it every frame, flips the home/away side ($D42E bit 1) at $52 and shows the next player photo (ai_ShowNextSetupPhoto) when it expires; callers GameSetUp_2, sub_F7B20, ai_TickSetupPhotoRotation (batch 7 identified the countdown's purpose)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F87D2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF87EA">
+        <FUNCTION ENTRY_POINT="0xF87EA" NAME="ai_TickSetupPhotoRotation">
             <ADDRESS_RANGE START="0xF87EA" END="0xF8867" />
+            <REGULAR_CMT>[AI 0.6] per-frame: counts $D440 down and, once it has expired and $D42E bit 0 is set, counts the photo timer $D43C down (with the $52/$50 wrap when bit 5 is set); at $52 it clears bits 2/3, flips the home/away side bit 1 and sets $D42A/$D42C, and when the timer goes negative it falls into ai_ShowNextSetupPhoto; caller GameSetUp_2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F87EA</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x1" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF8868">
+        <FUNCTION ENTRY_POINT="0xF8868" NAME="ai_ShowNextSetupPhoto">
             <ADDRESS_RANGE START="0xF8868" END="0xF89C6" />
+            <REGULAR_CMT>[AI 0.6] erases the two 8x8 photo panels and the 25x8 caption area (side chosen by $D42E bit 1), sets the panel through ai_SetHomePhotoPanel or ai_SetAwayPhotoPanel, advances the photo index $D43E (wrapping at 6), then takes entry $D43E of the team's photo list off_F92F4[HomeTeam or VisTeam] (player index into $D434), falls back to the generic image off_C63F8 when the entry has none, and decodes it with ai_UnpackPhotoTiles; reached from ai_TickSetupPhotoRotation</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F8868</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF8B5A" NAME="wallcollduringcheck">
@@ -12012,8 +12023,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFB9D4" END="0xFBA75" />
             <TYPEINFO_CMT>sub_FB9D4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFBA76">
+        <FUNCTION ENTRY_POINT="0xFBA76" NAME="ai_PurgeUserFromRecords">
             <ADDRESS_RANGE START="0xFBA76" END="0xFBB87" />
+            <REGULAR_CMT>[AI 0.7] user-name deletion: for the $2D8 four-byte SRAM records from offset 0 and the $1C sixteen-byte records from $B60, reads each with ReadSRAM into $CF36, clears every user-index byte (odd offsets) equal to the user being deleted ($D4EA) and writes the record back with WriteSRAM when changed; caller sub_FB9D4 (delete user name)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FBA76</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFBB88">
@@ -12104,8 +12116,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFCB9A" END="0xFCBD7" />
             <TYPEINFO_CMT>sub_FCB9A</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFCC76">
+        <FUNCTION ENTRY_POINT="0xFCC76" NAME="ai_MatchupsScreen">
             <ADDRESS_RANGE START="0xFCC76" END="0xFCF85" />
+            <REGULAR_CMT>[AI 0.7] PeriodOver's MATCHUPS screen: reads the user names, rates both starting sixes, installs sub_15E4C as the V-blank routine, prepares both team records (sub_F70A2), loads the setup tiles (unk_A9A18), font (ai_LoadFontTiles), frame tiles (unk_55B86) and prints the 'MATCHUPS' / 'ADVANTAGE:' headers before the ratings and ticker routines; caller PeriodOver</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FCC76</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFCF86">
@@ -12179,8 +12192,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFD73C" END="0xFD789" />
             <TYPEINFO_CMT>sub_FD73C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD78A">
+        <FUNCTION ENTRY_POINT="0xFD78A" NAME="ai_EmitAnimationSprites">
             <ADDRESS_RANGE START="0xFD78A" END="0xFD899" />
+            <REGULAR_CMT>[AI 0.6] setvideo hook: when a tile animation is active ($D6B4 &gt;= 0 with an asset in $D6BA) and no menu/pause/replay flag is set ($C2F4 bit 4, $C2EE bit 3, $C2EC bit 7), takes the sprite list of the current frame $D6AE from the asset's second block and appends the sprites inside the camera window (Hpos/Vpos) to the sprite table, using the same window and record layout as ai_EmitCrowdSprites; caller setvideo</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD78A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD89A">
@@ -12219,8 +12233,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE53C" END="0xFE547" />
             <TYPEINFO_CMT>sub_FE53C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE548">
+        <FUNCTION ENTRY_POINT="0xFE548" NAME="ai_StopTileAnimation">
             <ADDRESS_RANGE START="0xFE548" END="0xFE555" />
+            <REGULAR_CMT>[AI 0.8] sets the animation id $D6B4 to -1 and clears $C2FC bit 0; callers ai_TileAnimationStep (script end marker -2) and puckfaceoff2</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE548</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE556" NAME="ChooseSong">
@@ -12281,8 +12296,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFEAFA" END="0xFEB53" />
             <TYPEINFO_CMT>sub_FEAFA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEB54">
+        <FUNCTION ENTRY_POINT="0xFEB54" NAME="ai_SlideToFaceoffSpot">
             <ADDRESS_RANGE START="0xFEB54" END="0xFEC5D" />
+            <REGULAR_CMT>[AI 0.5] updateplayers helper: for six specific animation states of $58(a3) ($1776, $185A, $17E8, $1A00, $18CC, $193E) eases the player's y ($14(a3)) toward $124/$116 or -$124/-$116 (chosen by whether the faceoff x $D41C is within +-$56) or the x toward +-$82/$88 by half the remaining distance each frame, i.e. the crouch/positioning animations used at faceoffs; caller updateplayers</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEB54</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEC5E">

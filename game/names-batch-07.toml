@@ -1,0 +1,112 @@
+# Names batch 7 - see docs/names/names-batch-07.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-07.toml
+# Also renamed batch 3's ResetCountdownD43C to ResetPhotoRotateTimer: the
+# countdown drives the rotating player photos on the game-setup screen.
+
+# ---- game-setup screen photo rotation ---------------------------------------
+
+[[name]]
+addr = 0x0F87EA
+name = "TickSetupPhotoRotation"
+confidence = 0.6
+evidence = "per-frame: counts $D440 down and, once it has expired and $D42E bit 0 is set, counts the photo timer $D43C down (with the $52/$50 wrap when bit 5 is set); at $52 it clears bits 2/3, flips the home/away side bit 1 and sets $D42A/$D42C, and when the timer goes negative it falls into ai_ShowNextSetupPhoto; caller GameSetUp_2"
+
+[[name]]
+addr = 0x0F8868
+name = "ShowNextSetupPhoto"
+confidence = 0.6
+evidence = "erases the two 8x8 photo panels and the 25x8 caption area (side chosen by $D42E bit 1), sets the panel through ai_SetHomePhotoPanel or ai_SetAwayPhotoPanel, advances the photo index $D43E (wrapping at 6), then takes entry $D43E of the team's photo list off_F92F4[HomeTeam or VisTeam] (player index into $D434), falls back to the generic image off_C63F8 when the entry has none, and decodes it with ai_UnpackPhotoTiles; reached from ai_TickSetupPhotoRotation"
+
+[[name]]
+addr = 0x0F8762
+name = "SetHomePhotoPanel"
+confidence = 0.5
+evidence = "loads d4 = tile base $D436 and printx = $1C, then joins the shared photo-panel drawing at loc_F8796; called by ai_ShowNextSetupPhoto for the home side"
+
+[[name]]
+addr = 0x0F877E
+name = "SetAwayPhotoPanel"
+confidence = 0.5
+evidence = "loads d4 = tile base $D438 and printx = 3, then joins the shared photo-panel drawing at loc_F8796; called by ai_ShowNextSetupPhoto for the away side"
+
+[[name]]
+addr = 0x0F76D4
+name = "MoveSetupCursor"
+confidence = 0.6
+evidence = "GameSetUp cursor handling: d7 = cursor row, d0 = signed step; scrolls the menu offset $D422 (0..3, previous value in $D424, $C2F6 bit 2 flags a scroll) so the cursor stays within 5 rows of the window, skips row 6 outside playoff mode ($D048), then redraws the menu window from off_BEFB8 with dobitmap, positions via loc_F7864 and draws the cursor box with sub_119B8 in palette $6000; caller GameSetUp"
+
+# ---- matchups / intermission screens ----------------------------------------
+
+[[name]]
+addr = 0x0FCC76
+name = "MatchupsScreen"
+confidence = 0.7
+evidence = "PeriodOver's MATCHUPS screen: reads the user names, rates both starting sixes, installs sub_15E4C as the V-blank routine, prepares both team records (sub_F70A2), loads the setup tiles (unk_A9A18), font (ai_LoadFontTiles), frame tiles (unk_55B86) and prints the 'MATCHUPS' / 'ADVANTAGE:' headers before the ratings and ticker routines; caller PeriodOver"
+
+[[name]]
+addr = 0x017730
+name = "RunTickerMessage"
+confidence = 0.6
+evidence = "intermission ticker: every time the $D5B4 delay expires takes the next line of the message text at aWelcomeToASoldOut_Ton ('Welcome to a sold out ^. Tonight's ...', lines separated by $D, line offsets in the $D5B8 table indexed by $D5B2), scrolls the display with ai_ScrollTickerRows and interprets the placeholder characters _ + $ { } [ ] < > | \\ to insert team, player and stat text; caller ai_MatchupsScreen"
+
+[[name]]
+addr = 0x0179D2
+name = "ScrollTickerRows"
+confidence = 0.6
+evidence = "clears $D5AC, advances the ticker row counter $D5AE and once it reaches 7 keeps it at 6 and shifts the eight 58-tile rows of the ticker window up by one row with ai_VDP_VramCopyDMA (plane rows $80 bytes apart starting at $B004 + $212); only caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x012828
+name = "ClearMessageLine"
+confidence = 0.7
+evidence = "prints 22 spaces at column 5, row $B with attribute $BF, i.e. blanks the in-game message line; callers UpdatePA and prefmes"
+
+# ---- player stats screen ----------------------------------------------------
+
+[[name]]
+addr = 0x00961A
+name = "PrintPlayerStatsList"
+confidence = 0.6
+evidence = "stats screen body: prints the 'Player' header and the five column titles from word_990E (Saves Shots Save %, G, A, Pts, SOG, PIM, highlighting column DispAttribCtr in palette $C000), the category banner from word_9942 ('[ Goals ]' etc.), then walks the roster (ai_CountRosterPlayers) repeatedly picking the player with the highest remaining value of the selected column (ai_GetPlayerAttributeChecked, ties broken by the roster byte) to print the rows sorted; caller loc_945C"
+
+# ---- tile animation and sprites ----------------------------------------------
+
+[[name]]
+addr = 0x0FE548
+name = "StopTileAnimation"
+confidence = 0.8
+evidence = "sets the animation id $D6B4 to -1 and clears $C2FC bit 0; callers ai_TileAnimationStep (script end marker -2) and puckfaceoff2"
+
+[[name]]
+addr = 0x0FD78A
+name = "EmitAnimationSprites"
+confidence = 0.6
+evidence = "setvideo hook: when a tile animation is active ($D6B4 >= 0 with an asset in $D6BA) and no menu/pause/replay flag is set ($C2F4 bit 4, $C2EE bit 3, $C2EC bit 7), takes the sprite list of the current frame $D6AE from the asset's second block and appends the sprites inside the camera window (Hpos/Vpos) to the sprite table, using the same window and record layout as ai_EmitCrowdSprites; caller setvideo"
+
+# ---- assets --------------------------------------------------------------------
+
+[[name]]
+addr = 0x011F12
+name = "LoadFrameTiles"
+confidence = 0.6
+evidence = "stores d4 in $B01E and loads asset unk_55B86 there; $B01E is the tile base that the box drawer sub_119B8 (asset unk_55B7E, same family) and eraser add to their tiles, so unk_55B86 holds the menu frame/blank tiles; callers loc_9CDC and setupice (ai_MatchupsScreen loads the same asset inline)"
+
+# ---- gameplay ------------------------------------------------------------------
+
+[[name]]
+addr = 0x0FEB54
+name = "SlideToFaceoffSpot"
+confidence = 0.5
+evidence = "updateplayers helper: for six specific animation states of $58(a3) ($1776, $185A, $17E8, $1A00, $18CC, $193E) eases the player's y ($14(a3)) toward $124/$116 or -$124/-$116 (chosen by whether the faceoff x $D41C is within +-$56) or the x toward +-$82/$88 by half the remaining distance each frame, i.e. the crouch/positioning animations used at faceoffs; caller updateplayers"
+
+[[name]]
+addr = 0x0F67E4
+name = "ComputePassTarget"
+confidence = 0.6
+evidence = "passmode helper: picks a (dx, dy) pair by the passer's facing $54(a3) from unk_F691E for the goalie (slot $34 = 0), word_F68DE, or unk_F68FE when the passer is deep in the zone (y >= $58 after side flip), overriding dy with $103 for a long centre pass, flips for the side, adds random 0..9 jitter to both (sub_11086) and stores the target x in $D414; caller passmode"
+
+[[name]]
+addr = 0x0FBA76
+name = "PurgeUserFromRecords"
+confidence = 0.7
+evidence = "user-name deletion: for the $2D8 four-byte SRAM records from offset 0 and the $1C sixteen-byte records from $B60, reads each with ReadSRAM into $CF36, clears every user-index byte (odd offsets) equal to the user being deleted ($D4EA) and writes the record back with WriteSRAM when changed; caller sub_FB9D4 (delete user name)"

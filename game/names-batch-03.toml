@@ -84,9 +84,9 @@ evidence = "stores d4 in $B012 and loads asset unk_AAC5A there with LoadAsset; $
 
 [[name]]
 addr = 0x0F87D2
-name = "ResetCountdownD43C"
-confidence = 0.4
-evidence = "reloads the frame countdown $D43C with $AA, or $53 when $D42E bit 5 is set; sub_F87EA decrements it every frame and toggles $D42E bit 1 when it reaches $52 (what the countdown drives is not yet identified); callers GameSetUp_2, sub_F7B20, sub_F87EA"
+name = "ResetPhotoRotateTimer"
+confidence = 0.6
+evidence = "reloads the setup-screen photo rotation countdown $D43C with $AA, or $53 when $D42E bit 5 is set; ai_TickSetupPhotoRotation decrements it every frame, flips the home/away side ($D42E bit 1) at $52 and shows the next player photo (ai_ShowNextSetupPhoto) when it expires; callers GameSetUp_2, sub_F7B20, ai_TickSetupPhotoRotation (batch 7 identified the countdown's purpose)"
 
 [[name]]
 addr = 0x0FD1FE

@@ -100,7 +100,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** a2 = team record; follows $1E(a2) to the team data block and its first offset word to the player list, then walks the length-prefixed player records (name part + 8 attribute bytes) counting them in d0 until the terminator record whose length word is 2; callers SetPlList, loc_961A (edit lines), sub_F9FEA (records)
 
-**Callers.** SetPlList, loc_961A, sub_F9FEA
+**Callers.** SetPlList, ai_PrintPlayerStatsList, sub_F9FEA
 **Callees.** none
 
 ```
@@ -286,7 +286,7 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** stores d4 in $B012 and loads asset unk_AAC5A there with LoadAsset; $B012 is the tile base the text printer (print, $11C4E) adds to every character index, so unk_AAC5A is the text font; callers PlayoffScreen, loc_9BD8, loc_FCC76
 
-**Callers.** PlayoffScreen, loc_9BD8, loc_FCC76
+**Callers.** PlayoffScreen, ai_MatchupsScreen, loc_9BD8
 **Callees.** ai_LoadAsset
 
 ```
@@ -295,11 +295,11 @@ XML (or the proposals file and re-apply).
 011F0E  bra.w	sub_11738
 ```
 
-## `$0F87D2` -> `ai_ResetCountdownD43C`  (confidence 0.4, 5 insns)
+## `$0F87D2` -> `ai_ResetPhotoRotateTimer`  (confidence 0.6, 5 insns)
 
-**Evidence.** reloads the frame countdown $D43C with $AA, or $53 when $D42E bit 5 is set; sub_F87EA decrements it every frame and toggles $D42E bit 1 when it reaches $52 (what the countdown drives is not yet identified); callers GameSetUp_2, sub_F7B20, sub_F87EA
+**Evidence.** reloads the setup-screen photo rotation countdown $D43C with $AA, or $53 when $D42E bit 5 is set; ai_TickSetupPhotoRotation decrements it every frame, flips the home/away side ($D42E bit 1) at $52 and shows the next player photo (ai_ShowNextSetupPhoto) when it expires; callers GameSetUp_2, sub_F7B20, ai_TickSetupPhotoRotation (batch 7 identified the countdown's purpose)
 
-**Callers.** GameSetUp_2, sub_F7B20, sub_F87EA
+**Callers.** GameSetUp_2, ai_TickSetupPhotoRotation, sub_F7B20
 **Callees.** none
 
 ```
@@ -314,8 +314,8 @@ XML (or the proposals file and re-apply).
 
 **Evidence.** prints the pre-game team comparison: the category labels from word_FCFFA (Shooting, Skating, Passing, Defense, Checking, Fighting, Goalkeeping, Power Play Adv., Home Team Adv., Overall), the home ($C6CE) and away ($CA32) team names via sub_FCFB8 with the overall values kept in $D5A0/$D5A2; when $D598 is non-zero it prints the per-position comparison (center, left forward, right forward, ...) instead; callers loc_FCC76, sub_FCF86
 
-**Callers.** loc_FCC76, sub_FCF86
-**Callees.** AttribAdjust, CalcAttrib, DeterStrLength?, loc_FD252, loc_FD2E4, locret_FD3FE, print2, printz, printz2, sub_FCFB8, sub_FCFDC, sub_FD89A
+**Callers.** ai_MatchupsScreen, sub_FCF86
+**Callees.** AttribAdjust, CalcAttrib, DeterStrLength?, ai_PrintRatingsSpacer, loc_FD252, loc_FD2E4, locret_FD3FE, print2, printz, printz2, sub_FCFB8, sub_FD89A
 **Strings.**  |  | center | left forward | right forward | left defenseman
 **RAM.** printx, printy
 
