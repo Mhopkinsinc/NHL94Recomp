@@ -9166,8 +9166,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] sets printx = 5, or 9 when disflags bit 1 (rink screen) is set; callers ai_PrintScrollingMenu and loc_7E46 (pause menu refresh)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7E72</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x7E88">
+        <FUNCTION ENTRY_POINT="0x7E88" NAME="ai_PauseMenuInput">
             <ADDRESS_RANGE START="0x7E88" END="0x7EF1" />
+            <REGULAR_CMT>[AI 0.7] PauseMode: d1 = new pad bits; Start (bit 7) returns with the carry flag toggled (exit), Down/Up (bits 1/0) move the cursor $CF20 and redraw via ai_PrintScrollingMenu, C (bit 5) resolves the controlling team (ai_GetControllingTeam), walks the item list $CF24 to entry $CF20 and calls its handler, then redraws the menu unless $C2F6 bit 1 was set; returns Z from the cursor value; caller PauseMode</REGULAR_CMT>
             <TYPEINFO_CMT>sub_7E88</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x7EF2" NAME="ai_PrintScrollingMenu">
@@ -9368,8 +9369,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] loc_945C helper: after sub_10F32, resets the plane scroll (VDP address $B002 and 0 written as zero, registers $8C81/$8D00, $B00E = 6), loads the frame tiles (unk_55B86 at $B01E with nibble map $9123...) and the font (ai_LoadFontTiles), then draws the background bitmap off_54E24 with dobitmap; caller loc_945C (edit lines / stats screens)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9BD8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9CDC">
+        <FUNCTION ENTRY_POINT="0x9CDC" NAME="ai_LoadRinkGraphics">
             <ADDRESS_RANGE START="0x9CDC" END="0x9D79" />
+            <REGULAR_CMT>[AI 0.6] sub_A528 helper (game start): programs the scroll registers from VSCRLPM ($8D/$8C, $B00E = 5), loads the crowd tiles (unk_56062, or unk_B5188 when $C2F4 bit 4 is set) at rinkvrcset, the home centre-ice logo (ai_LoadHomeCenterIceLogo), the font, the frame tiles, the rink tiles and palette (ai_LoadRinkTiles, sub_16CC4, sub_16CD2, ai_LoadRinkPalette) and finishes in sub_1720C; caller sub_A528</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9CDC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9F40" NAME="ai_CountRatingNibbles">
@@ -9427,8 +9429,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0xA600" END="0xA615" />
             <TYPEINFO_CMT>sub_A600</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xA616">
+        <FUNCTION ENTRY_POINT="0xA616" NAME="ai_CenterCameraOnObject">
             <ADDRESS_RANGE START="0xA616" END="0xA67B" />
+            <REGULAR_CMT>[AI 0.7] SetRCords helper: copies object a3's x/y (negated when the rink is flipped, $C2F4 bit 7) into the camera target a5, then sets Hpos = x clamped to -$3C..$3C and Vpos = y clamped to -$C8..$100; caller SetRCords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_A616</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xA67C" NAME="RevReplayAdj">
@@ -9782,8 +9785,9 @@ d3 = goalline of goalie</REGULAR_CMT>
             <ADDRESS_RANGE START="0xDF18" END="0xE1CB" />
             <TYPEINFO_CMT>asspuckc</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xE1F4">
+        <FUNCTION ENTRY_POINT="0xE1F4" NAME="ai_CpuLineChangeCheck">
             <ADDRESS_RANGE START="0xE1F4" END="0xE263" />
+            <REGULAR_CMT>[AI 0.6] asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter &amp; 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via compshoot?; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc</REGULAR_CMT>
             <TYPEINFO_CMT>sub_E1F4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xE264" NAME="chkpk">
@@ -9857,8 +9861,9 @@ a3 = player</REGULAR_CMT>
             <TYPEINFO_CMT>puckpenshot</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" REGISTER_SAVE_SIZE="0x0" RETURN_ADDR_SIZE="0x4" BYTES_PURGED="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF2F4">
+        <FUNCTION ENTRY_POINT="0xF2F4" NAME="ai_GoalieFreezePuck">
             <ADDRESS_RANGE START="0xF2F4" END="0xF37B" />
+            <REGULAR_CMT>[AI 0.5] pucknorm helper: when puckc is the goalie (BA_Goalie_SCnum) and $C2F2 bit 5 allows it, counts $C31C down and then sets $C2F2 bit 4 (stoppage), also set when $D454 is 0; the first time (bit 6 latch) posts event $A through sub_11F62 (the message/sound dispatcher used by checkgoal and clockcont); caller pucknorm</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F2F4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF37C">
@@ -11010,8 +11015,9 @@ d6 = link counter</REGULAR_CMT>
             <REGULAR_CMT>Update ffo locations</REGULAR_CMT>
             <TYPEINFO_CMT>uppads</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x166E6">
+        <FUNCTION ENTRY_POINT="0x166E6" NAME="ai_BuildPlayerLabelSprites">
             <ADDRESS_RANGE START="0x166E6" END="0x16749" />
+            <REGULAR_CMT>[AI 0.6] uppads helper: from the packed value d1 (tens digit in bits 4..7, units in bits 0..3, position code in bits 8..10) emits three sprite-tile entries at a5 via sub_1674A (tile pointer into Art_BoardText, size $10, x from $12(a0)): the two jersey digits (blank when the tens digit is 0 or the units are $F, narrowing 2(a0)) and the position letter from unk_1677A (' ', 'D', 'D', 'L', ...; suppressed by $C2FC bit 7); caller uppads (the jersey number / position labels over the players)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_166E6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1674A">
@@ -11152,8 +11158,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17542" END="0x17571" />
             <TYPEINFO_CMT>sub_17542</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17572">
+        <FUNCTION ENTRY_POINT="0x17572" NAME="ai_ScrollPlayoffBracket">
             <ADDRESS_RANGE START="0x17572" END="0x175D3" />
+            <REGULAR_CMT>[AI 0.6] PlayoffScreen: applies the scroll velocity PlayerScrollCtr ($D5B0) to the bracket offset $D5AC, clamped to +-$70 per round (gamelevel, at most 3 rounds), publishes the shifted offset in $B8AE when within $40..$200, and stops the velocity once the offset is a multiple of $70 (a round column); caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17572</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x175D8">
@@ -11194,8 +11201,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x17AC8" END="0x17AF3" />
             <TYPEINFO_CMT>sub_17AC8</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17AF4">
+        <FUNCTION ENTRY_POINT="0x17AF4" NAME="ai_RefreshSetupTeamLogos">
             <ADDRESS_RANGE START="0x17AF4" END="0x17B77" />
+            <REGULAR_CMT>[AI 0.5] sub_F7B20 helper: in playoff state 0 or 4 copies Opt1Team/Opt2Team into HomeTeam/VisTeam, then for the away and home teams loads the logo palette from word_F8BF4 (64 bytes per team: +$26 away, +2 home) into $BD4E/$BD4A, draws the logo bitmap from off_AFE12 with sub_17B78 at tile bases $D43A and 2, calls sub_17190 and starts a palette fade ($BD26 = $64); caller sub_F7B20</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17AF4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17B78">
@@ -11627,8 +11635,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF72FA" END="0xF7317" />
             <TYPEINFO_CMT>sub_F72FA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF7318">
+        <FUNCTION ENTRY_POINT="0xF7318" NAME="ai_ComputeTeamAdvantage">
             <ADDRESS_RANGE START="0xF7318" END="0xF737D" />
+            <REGULAR_CMT>[AI 0.7] sums the starting-six ratings of the home and away teams (ai_SumStartingSixRatings) into $BF12/$BF14, sets $BF50 = 1 when the away side is stronger, and returns d0 = -1 (even), $22 (difference at least $5E) or $23 (at least $BD), the message id printed after 'ADVANTAGE:' on the matchups screen; caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F7318</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF737E" NAME="ai_SumStartingSixRatings">
@@ -11661,8 +11670,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF7864" END="0xF78A1" />
             <TYPEINFO_CMT>sub_F7864</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF78A2">
+        <FUNCTION ENTRY_POINT="0xF78A2" NAME="ai_RefreshSetupOptions">
             <ADDRESS_RANGE START="0xF78A2" END="0xF791D" />
+            <REGULAR_CMT>[AI 0.5] GameSetUp helper: forces OptUserRec on in playoff state 4 or outside playoffs ($D04A = 0), resets the OptGoalie/$D05A/$D05C options to 1 outside playoffs, reprints the row labels (ai_PrintSetupMenuLabels) when the scroll offset $D422 changed, then redraws the option values with sub_F7B20 under $C2F8 bit 3; caller GameSetUp</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F78A2</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF7942" NAME="GameSetUp_3">
@@ -11792,8 +11802,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF9AE4" END="0xF9B29" />
             <TYPEINFO_CMT>sub_F9AE4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9B2A">
+        <FUNCTION ENTRY_POINT="0xF9B2A" NAME="ai_AppendRecordHolderText">
             <ADDRESS_RANGE START="0xF9B2A" END="0xF9B8F" />
+            <REGULAR_CMT>[AI 0.6] given a record (a0, or fetched with ReadRecordField when a0 is null): appends the holder's user name (byte 3, ai_BuildUserNameString with trimming), the separator word_F9B90 and the opponent team name (byte 2, ai_AppendTeamName) to the string at a1; caller sub_F9AAC (records text)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9B2A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9B94" NAME="ai_ReadRecordField">
@@ -12362,8 +12373,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFEE60" END="0xFEE9F" />
             <TYPEINFO_CMT>sub_FEE60</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFEEC8">
+        <FUNCTION ENTRY_POINT="0xFEEC8" NAME="ai_BuildPlayedByString">
             <ADDRESS_RANGE START="0xFEEC8" END="0xFEF59" />
+            <REGULAR_CMT>[AI 0.7] builds '(played by &lt;user name&gt;)' in $BF20 for controller 1's user $D042 (ai_CopyUserNameDashed into $D4DC, length in $D4DA, then appstring and the inline ')' via sub_11D96); returns a1 = the empty string word_FEF50 when no user is set; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FEEC8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFEF5A">

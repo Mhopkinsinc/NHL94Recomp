@@ -1,0 +1,82 @@
+# Names batch 10 - see docs/names/names-batch-10.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-10.toml
+
+# ---- menus / setup ---------------------------------------------------------------
+
+[[name]]
+addr = 0x007E88
+name = "PauseMenuInput"
+confidence = 0.7
+evidence = "PauseMode: d1 = new pad bits; Start (bit 7) returns with the carry flag toggled (exit), Down/Up (bits 1/0) move the cursor $CF20 and redraw via ai_PrintScrollingMenu, C (bit 5) resolves the controlling team (ai_GetControllingTeam), walks the item list $CF24 to entry $CF20 and calls its handler, then redraws the menu unless $C2F6 bit 1 was set; returns Z from the cursor value; caller PauseMode"
+
+[[name]]
+addr = 0x0F78A2
+name = "RefreshSetupOptions"
+confidence = 0.5
+evidence = "GameSetUp helper: forces OptUserRec on in playoff state 4 or outside playoffs ($D04A = 0), resets the OptGoalie/$D05A/$D05C options to 1 outside playoffs, reprints the row labels (ai_PrintSetupMenuLabels) when the scroll offset $D422 changed, then redraws the option values with sub_F7B20 under $C2F8 bit 3; caller GameSetUp"
+
+[[name]]
+addr = 0x017AF4
+name = "RefreshSetupTeamLogos"
+confidence = 0.5
+evidence = "sub_F7B20 helper: in playoff state 0 or 4 copies Opt1Team/Opt2Team into HomeTeam/VisTeam, then for the away and home teams loads the logo palette from word_F8BF4 (64 bytes per team: +$26 away, +2 home) into $BD4E/$BD4A, draws the logo bitmap from off_AFE12 with sub_17B78 at tile bases $D43A and 2, calls sub_17190 and starts a palette fade ($BD26 = $64); caller sub_F7B20"
+
+[[name]]
+addr = 0x0F7318
+name = "ComputeTeamAdvantage"
+confidence = 0.7
+evidence = "sums the starting-six ratings of the home and away teams (ai_SumStartingSixRatings) into $BF12/$BF14, sets $BF50 = 1 when the away side is stronger, and returns d0 = -1 (even), $22 (difference at least $5E) or $23 (at least $BD), the message id printed after 'ADVANTAGE:' on the matchups screen; caller ai_MatchupsScreen"
+
+[[name]]
+addr = 0x017572
+name = "ScrollPlayoffBracket"
+confidence = 0.6
+evidence = "PlayoffScreen: applies the scroll velocity PlayerScrollCtr ($D5B0) to the bracket offset $D5AC, clamped to +-$70 per round (gamelevel, at most 3 rounds), publishes the shifted offset in $B8AE when within $40..$200, and stops the velocity once the offset is a multiple of $70 (a round column); caller PlayoffScreen"
+
+# ---- rink / camera ------------------------------------------------------------------
+
+[[name]]
+addr = 0x009CDC
+name = "LoadRinkGraphics"
+confidence = 0.6
+evidence = "sub_A528 helper (game start): programs the scroll registers from VSCRLPM ($8D/$8C, $B00E = 5), loads the crowd tiles (unk_56062, or unk_B5188 when $C2F4 bit 4 is set) at rinkvrcset, the home centre-ice logo (ai_LoadHomeCenterIceLogo), the font, the frame tiles, the rink tiles and palette (ai_LoadRinkTiles, sub_16CC4, sub_16CD2, ai_LoadRinkPalette) and finishes in sub_1720C; caller sub_A528"
+
+[[name]]
+addr = 0x00A616
+name = "CenterCameraOnObject"
+confidence = 0.7
+evidence = "SetRCords helper: copies object a3's x/y (negated when the rink is flipped, $C2F4 bit 7) into the camera target a5, then sets Hpos = x clamped to -$3C..$3C and Vpos = y clamped to -$C8..$100; caller SetRCords"
+
+[[name]]
+addr = 0x0166E6
+name = "BuildPlayerLabelSprites"
+confidence = 0.6
+evidence = "uppads helper: from the packed value d1 (tens digit in bits 4..7, units in bits 0..3, position code in bits 8..10) emits three sprite-tile entries at a5 via sub_1674A (tile pointer into Art_BoardText, size $10, x from $12(a0)): the two jersey digits (blank when the tens digit is 0 or the units are $F, narrowing 2(a0)) and the position letter from unk_1677A (' ', 'D', 'D', 'L', ...; suppressed by $C2FC bit 7); caller uppads (the jersey number / position labels over the players)"
+
+# ---- gameplay AI ------------------------------------------------------------------------
+
+[[name]]
+addr = 0x00E1F4
+name = "CpuLineChangeCheck"
+confidence = 0.6
+evidence = "asspuckc helper for a CPU puck carrier: unless $C2FC bit 4, when the puck is 0..$58 ahead of the carrier, one time in four (HV counter & 3), the carrier is not flagged $63 bit 3 and the on-ice energy sum (sub_12EF6) is at most $C00, picks the fresher line with CompLine, applies it with SetPersonel, refreshes the HUD (PrintScores1) and dumps the puck via compshoot?; the listing shows the 'exg a2,a1' at $E246 as dc.w $C549 (data), the recompiler translated it; caller asspuckc"
+
+[[name]]
+addr = 0x00F2F4
+name = "GoalieFreezePuck"
+confidence = 0.5
+evidence = "pucknorm helper: when puckc is the goalie (BA_Goalie_SCnum) and $C2F2 bit 5 allows it, counts $C31C down and then sets $C2F2 bit 4 (stoppage), also set when $D454 is 0; the first time (bit 6 latch) posts event $A through sub_11F62 (the message/sound dispatcher used by checkgoal and clockcont); caller pucknorm"
+
+# ---- strings -------------------------------------------------------------------------------
+
+[[name]]
+addr = 0x0FEEC8
+name = "BuildPlayedByString"
+confidence = 0.7
+evidence = "builds '(played by <user name>)' in $BF20 for controller 1's user $D042 (ai_CopyUserNameDashed into $D4DC, length in $D4DA, then appstring and the inline ')' via sub_11D96); returns a1 = the empty string word_FEF50 when no user is set; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x0F9B2A
+name = "AppendRecordHolderText"
+confidence = 0.6
+evidence = "given a record (a0, or fetched with ReadRecordField when a0 is null): appends the holder's user name (byte 3, ai_BuildUserNameString with trimming), the separator word_F9B90 and the opponent team name (byte 2, ai_AppendTeamName) to the string at a1; caller sub_F9AAC (records text)"

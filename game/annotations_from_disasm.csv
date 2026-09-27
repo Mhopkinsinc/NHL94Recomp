@@ -30,6 +30,7 @@
 007CF8,PauseMode,
 007E0E,ai_GetControllingTeam,
 007E72,ai_SetPauseMenuColumn,
+007E88,ai_PauseMenuInput,
 007EF2,ai_PrintScrollingMenu,
 008078,ai_DrawTeamBannerTiles,
 0080BA,vcountwait,
@@ -45,9 +46,11 @@
 009872,ai_GetPlayerAttributeChecked,
 0099C6,ai_PrintScrollArrows,
 009BD8,ai_SetupStatsScreenVideo,
+009CDC,ai_LoadRinkGraphics,
 009F40,ai_CountRatingNibbles,
 009F9A,ai_CountRosterPlayers,
 00A41E,getpzjoy,
+00A616,ai_CenterCameraOnObject,
 00A67C,RevReplayAdj,"check if reverse angle replay"
 00A68C,SetRCords,
 00A8CA,updatereplay,"check if highlight"
@@ -112,6 +115,7 @@
 00DE2A,BreakawayOffsidesFlagSet,"check for new assignment"
 00DEEE,chkpuckc,
 00DF18,asspuckc,
+00E1F4,ai_CpuLineChangeCheck,
 00E264,chkpk,"#sf2pwrplay - check if power play in progress"
 00E274,chkpk2,
 00E292,chk4shot,
@@ -125,6 +129,7 @@
 00EB84,asspassrec,"pfalock - animation lock"
 00EC82,assshoot,"pfalock - animation locked"
 00EF92,puckpenshot,
+00F2F4,ai_GoalieFreezePuck,
 00F3E4,puckfaceoff,
 00F6AA,ChkGoalies,"check if clock running"
 00F712,ReturnGoalies,
@@ -302,6 +307,7 @@
 0165FC,setsortcords,"move OOlist into a4"
 01661A,setffo,
 016648,uppads,
+0166E6,ai_BuildPlayerLabelSprites,
 016782,addframe,
 0167AA,addframe2,"push attribute to stack"
 016920,find3d,
@@ -318,9 +324,11 @@
 01720C,SetTeamColors,
 017236,PeriodOver,
 017336,PlayoffScreen,
+017572,ai_ScrollPlayoffBracket,
 017730,ai_RunTickerMessage,
 0179D2,ai_ScrollTickerRows,
 017A18,EASportsScreen,
+017AF4,ai_RefreshSetupTeamLogos,
 017C72,LoadDefMenuOptions,
 017CA0,ai_ApplyPlayoffPassword,
 017D16,NewPO,"20 = 32 decimal"
@@ -388,10 +396,12 @@
 0F70E4,AttributeCalc,
 0F71A2,ai_BuildRatingsStartingSix,
 0F71F0,ai_RateStartingSix,
+0F7318,ai_ComputeTeamAdvantage,
 0F737E,ai_SumStartingSixRatings,
 0F739E,GameSetUp,
 0F76C8,j_NewPO,
 0F76D4,ai_MoveSetupCursor,
+0F78A2,ai_RefreshSetupOptions,
 0F7942,GameSetUp_3,
 0F7B66,GameSetUp_4,
 0F8070,ai_PrintSetupMenuLabels,
@@ -411,6 +421,7 @@
 0F997A,ai_CopyLenString,
 0F998E,ai_NumberToDecimalText,
 0F99F2,ai_ReadPlayerRecordValue,
+0F9B2A,ai_AppendRecordHolderText,
 0F9B94,ai_ReadRecordField,
 0F9BDA,ai_WriteRecordField,
 0F9BE2,ReadTeamRecord,
@@ -464,6 +475,7 @@
 0FEC98,getFgtbyte,"clear d0"
 0FECA2,chkFgtBit1,
 0FED70,HiScoreScreen,
+0FEEC8,ai_BuildPlayedByString,
 0FEF66,set_bit1_C2FE,
 0FEF7C,AttribAdjust,"compare $32 to d0"
 0FEFCC,ReadGoaliePulled,
