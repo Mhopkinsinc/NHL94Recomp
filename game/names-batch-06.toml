@@ -1,0 +1,94 @@
+# Names batch 6 - see docs/names/names-batch-06.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-06.toml
+
+# ---- SRAM records ------------------------------------------------------------
+
+[[name]]
+addr = 0x0FE660
+name = "LoadPlayoffPassword"
+confidence = 0.7
+evidence = "ReadSRAM of $100 bytes from SRAM offset $1EF6 into $D076 (the buffer whose $D088 part ai_ApplyPlayoffPassword decodes), then the same lastsfx/recbpr resets as ai_SavePlayoffPassword, of which it is the read twin; callers Begin and GameSetUp"
+
+[[name]]
+addr = 0x0F9C68
+name = "ReadUserNames"
+confidence = 0.7
+evidence = "clears $C2F8 bit 6 (the SRAM write flag) and transfers $80 bytes between SRAM offset $DA0 and the user-name table $D45A; because the flag was just cleared the test picks ReadSRAM, the WriteSRAM path exists for a twin that sets the flag and jumps past the bclr (the bset at $F9C5E/$F9C56); callers GameSetUp and loc_FCC76"
+
+# ---- team helpers ------------------------------------------------------------
+
+[[name]]
+addr = 0x0FE172
+name = "GetTeamOverallRating"
+confidence = 0.8
+evidence = "returns d0 = byte unk_FE18E[$28(a2)] where +$28 is the team id in the team record; the table starts $33, $4C, $49, $4B, $4E, $43 (51, 76, 73, 75, 78, 67), the overall team ratings printed as a number by sub_FABDC ('Team Rating') and by sub_FCFB8 on the ratings screen"
+
+[[name]]
+addr = 0x0FABDC
+name = "PrintTeamRatingBox"
+confidence = 0.7
+evidence = "at (d0,d1) prints 'Team' and 'Rating' then the overall rating of the home or away team (ai_GetRecordsTeam logic on $D4F6) from ai_GetTeamOverallRating as a 2-digit number; caller loc_FA550 (records screen)"
+
+[[name]]
+addr = 0x0FAF50
+name = "GetRecordsTeam"
+confidence = 0.7
+evidence = "returns a0 = home team record $C6CE, or the away record $CA32 when the records-screen side toggle $D4F6 is non-zero; callers loc_FACF0 and sub_FAD84 (Saves / Save % printer)"
+
+[[name]]
+addr = 0x007E0E
+name = "GetControllingTeam"
+confidence = 0.6
+evidence = "returns a2 = home team record $C6CE when the pausing controller's team selection (cont2team when sflags bit 1, else cont1team) equals 1, otherwise the away record (+$364); callers PauseMode and loc_7E88 (pause menu)"
+
+[[name]]
+addr = 0x0130BE
+name = "ResetLineEnergy"
+confidence = 0.6
+evidence = "a2 = team record: for the 26 player slots sets the energy word at +$32+2i to $1000 (full) unless the status word at +$66+2i is -4, and demotes a -3 status to -2; callers sub_13068 (period/line reset, which then picks line 3 or 5 for $16(a3)) and sub_137FC"
+
+# ---- ratings screen ----------------------------------------------------------
+
+[[name]]
+addr = 0x0FD46C
+name = "SelectRatingsPlayers"
+confidence = 0.6
+evidence = "for the home and away records calls ai_GetLineupPlayerForPosition and stores the resulting player indexes in $D59C/$D59E, which ai_DrawRatingsPictures and ai_PrintTeamRatingsScreen use for the per-position comparison; callers loc_FCC76 and sub_FCF86"
+
+[[name]]
+addr = 0x0FD492
+name = "GetLineupPlayerForPosition"
+confidence = 0.6
+evidence = "a0 = team record: maps the ratings-screen position $D598 through byte_FD4B8 to a lineup slot (kept in $D5AA), reads that slot from the six-player list at team data offset +6 and returns the player index minus 1; only caller ai_SelectRatingsPlayers"
+
+[[name]]
+addr = 0x0FCFDC
+name = "PrintRatingsSpacer"
+confidence = 0.6
+evidence = "prints the 4-byte control string word_FCFF6 with print2 while preserving printx and a1; callers ai_PrintTeamRatingsScreen and sub_FCFB8"
+
+[[name]]
+addr = 0x009872
+name = "GetPlayerAttributeChecked"
+confidence = 0.5
+evidence = "d0 = player, d1 = attribute column: returns d2 = 0 when the column is not below ai_CountRatingNibbles for the team, otherwise tail-calls sub_988E to fetch the value; callers ai_PrintPlayerStatRow and loc_961A"
+
+# ---- HUD / screen furniture --------------------------------------------------
+
+[[name]]
+addr = 0x012D70
+name = "DrawHudPanel"
+confidence = 0.5
+evidence = "unless sflags2 bit 5 is set, positions at column 1 row $19 (inline attribute string) and draws the second bitmap of asset unk_B3530 with dobitmap at tile base $B020 (the rink tile base), a2 = the team table $30A; callers PrintScores1 and updatepwrplay, i.e. the in-game scoreboard panel"
+
+[[name]]
+addr = 0x0134E4
+name = "TickerAreaSetup"
+confidence = 0.5
+evidence = "sets the print position for the intermission ticker (column 3 row $17, a second attribute string unless sflags bit 0) and returns the erase size d0 = $1A, d1 = 5 that its callers pass to eraser; callers NewTicker3pt2 and sub_134D8 (Intermission)"
+
+[[name]]
+addr = 0x007E72
+name = "SetPauseMenuColumn"
+confidence = 0.5
+evidence = "sets printx = 5, or 9 when disflags bit 1 (rink screen) is set; callers ai_PrintScrollingMenu and loc_7E46 (pause menu refresh)"
