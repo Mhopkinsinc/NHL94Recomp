@@ -9361,8 +9361,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x9BB4" END="0x9BD7" />
             <TYPEINFO_CMT>sub_9BB4</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9BD8">
+        <FUNCTION ENTRY_POINT="0x9BD8" NAME="ai_SetupStatsScreenVideo">
             <ADDRESS_RANGE START="0x9BD8" END="0x9CD7" />
+            <REGULAR_CMT>[AI 0.5] loc_945C helper: after sub_10F32, resets the plane scroll (VDP address $B002 and 0 written as zero, registers $8C81/$8D00, $B00E = 6), loads the frame tiles (unk_55B86 at $B01E with nibble map $9123...) and the font (ai_LoadFontTiles), then draws the background bitmap off_54E24 with dobitmap; caller loc_945C (edit lines / stats screens)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9BD8</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x9CDC">
@@ -10681,8 +10682,9 @@ d0 = iterator</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1351C" END="0x1354B" />
             <TYPEINFO_CMT>sub_1351C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1354C">
+        <FUNCTION ENTRY_POINT="0x1354C" NAME="ai_PlayHighlightFromGame">
             <ADDRESS_RANGE START="0x1354C" END="0x13611" />
+            <REGULAR_CMT>[AI 0.6] sets up a stored playoff game as a highlight: after sub_13848/sub_13396/sub_133B2, draws a 24x3 box and prints 'Highlight from game:', waits $B4 frames (abort on button bit 7), then loads HomeTeam/VisTeam, the period gsp, HmGoals/AwGoals and a random clock (gameclock = $3C + random 0..$77) from the series record a0, clears the controller teams and reinitialises the teams (sub_17102, sub_77F4); caller sub_1351C, which runs it for every finished series flagged in $CE66..$CED6 bit 1 of +$E</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1354C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x137FC">
@@ -10983,8 +10985,9 @@ d6 = link counter</REGULAR_CMT>
             <ADDRESS_RANGE START="0x16480" END="0x164D5" />
             <TYPEINFO_CMT>checksso</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x164D6">
+        <FUNCTION ENTRY_POINT="0x164D6" NAME="ai_PlaceOffscreenIndicator">
             <ADDRESS_RANGE START="0x164D6" END="0x165BB" />
+            <REGULAR_CMT>[AI 0.5] checksso helper for the player-indicator sprites (tiles $180/$183): a0 = indicator record, a3 = its sprite slot; when the tracked object is on-screen returns, otherwise classifies which edges of the camera window ($74/-$74 by $64/-$64 around Hpos/Vpos, or fixed bounds on the menu screen) the object lies beyond, converts that to a direction with unk_113C0 and places the sprite at the edge position from word_165BC (+$100/+$F0 screen offsets) before tail-calling sub_167AA; caller checksso</REGULAR_CMT>
             <TYPEINFO_CMT>sub_164D6</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x165FC" NAME="setsortcords">
@@ -11287,8 +11290,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] after a playoff game: stores the home and away scores ($C6DA, $CA3E) into the current series record at $CE66 + $CEE6*$10 (+$A/+$C), then credits the win to the side at +4 or +6 chosen by the score difference and the home/away bit 0 of +$E unless a side already has 4 wins; when bosgames is 7 it takes the loc_184D0 path; only caller sub_180FC (from PeriodOver)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_18380</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1850A">
+        <FUNCTION ENTRY_POINT="0x1850A" NAME="ai_StarsOfTheGameScreen">
             <ADDRESS_RANGE START="0x1850A" END="0x185DF" />
+            <REGULAR_CMT>[AI 0.8] post-game 'Stars of the Game' panel: once RefCnt is above $40 and $C2EA bit 7 was clear, waits a frame, draws a 28x9 box, prints the title, draws the star bitmap from off_5605A at tile base $B018, scores every player with sub_18620 / ai_ScorePlayerForStars and prints the three stars with sub_185E0; caller UpdatePA</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1850A</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x185E0">
@@ -11299,8 +11303,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <ADDRESS_RANGE START="0x18620" END="0x1867D" />
             <TYPEINFO_CMT>sub_18620</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1867E">
+        <FUNCTION ENTRY_POINT="0x1867E" NAME="ai_ScorePlayerForStars">
             <ADDRESS_RANGE START="0x1867E" END="0x1871B" />
+            <REGULAR_CMT>[AI 0.6] computes a player's star-of-the-game value into (a4): base = team score difference (d3), then for skaters goals (+$B4 column) * $2AF8, assists (+$CE) * $2774, shots (+$E8) * 10 (* 100 more for a losing side) plus the +$136 rating; for the goalie slot (index above the attribute count) awards $7D00 when the save percentage is high and $124F8 more for a shutout; caller sub_18620 (from ai_StarsOfTheGameScreen)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1867E</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x187B8">
@@ -11798,12 +11803,14 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xF9BE2" END="0xF9C17" />
             <TYPEINFO_CMT>clrCrowdRAM?</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9C18">
+        <FUNCTION ENTRY_POINT="0xF9C18" NAME="ai_WriteTeamRecord">
             <ADDRESS_RANGE START="0xF9C18" END="0xF9C1F" />
+            <REGULAR_CMT>[AI 0.8] sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of clrCrowdRAM? (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C18</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9C20">
+        <FUNCTION ENTRY_POINT="0xF9C20" NAME="ai_ReadUserRecord">
             <ADDRESS_RANGE START="0xF9C20" END="0xF9C55" />
+            <REGULAR_CMT>[AI 0.7] clears the write flag and transfers 16 bytes between SRAM $D20 + d1*16 and a0 (always ReadSRAM from this entry; sub_F9C56 is the writing twin that sets the flag first); caller ai_UpdateUserWinLoss</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C20</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9C56">
@@ -11819,16 +11826,19 @@ d3 = attribute value</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] clears $C2F8 bit 6 (the SRAM write flag) and transfers $80 bytes between SRAM offset $DA0 and the user-name table $D45A; because the flag was just cleared the test picks ReadSRAM, the WriteSRAM path exists for a twin that sets the flag and jumps past the bclr (the bset at $F9C5E/$F9C56); callers GameSetUp and loc_FCC76</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9C68</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9CDE">
+        <FUNCTION ENTRY_POINT="0xF9CDE" NAME="ai_UpdateGameRecords">
             <ADDRESS_RANGE START="0xF9CDE" END="0xF9DD9" />
+            <REGULAR_CMT>[AI 0.7] Intermission hook, skipped unless ValidSRAM and OptUserRec is off: caches both rosters' attribute counts and sizes (sub_F9FC0/sub_F9FEA), then for the home and away sides updates the per-team records (sub_F9F50 for the scorer fields, ai_UpdateTeamRecords), the user records for the two controllers ($D042/$D044) via ai_UpdateUserWinLoss, and finally sub_1A206; all record I/O goes through the SRAM record helpers with $CF36 as the 16-byte scratch record</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9CDE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9DDA">
+        <FUNCTION ENTRY_POINT="0xF9DDA" NAME="ai_UpdateUserWinLoss">
             <ADDRESS_RANGE START="0xF9DDA" END="0xF9EA9" />
+            <REGULAR_CMT>[AI 0.6] reads the user's 16-byte record from SRAM $D20 + user*16 (sub_F9C20) into a0: increments games played (+$A/+$B, capped at 9000) and, from the goal totals $C(a1) vs $C(a2), wins (+8/+9) or ties (+$C/+$D); then refreshes the best-goals (bytes 0..3) and best-margin (bytes 4..7) entries with the opponent team/user ids and writes the record back with sub_F9C56; caller ai_UpdateGameRecords for each side</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9DDA</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xF9EAA">
+        <FUNCTION ENTRY_POINT="0xF9EAA" NAME="ai_UpdateTeamRecords">
             <ADDRESS_RANGE START="0xF9EAA" END="0xF9F4F" />
+            <REGULAR_CMT>[AI 0.5] reads team d1's 16-byte record from SRAM $B60 + team*16 (clrCrowdRAM?) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords</REGULAR_CMT>
             <TYPEINFO_CMT>sub_F9EAA</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xF9F50">
@@ -11856,8 +11866,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFA2C0" END="0xFA32F" />
             <TYPEINFO_CMT>sub_FA2C0</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA550">
+        <FUNCTION ENTRY_POINT="0xFA550" NAME="ai_PrintRecordsScreen">
             <ADDRESS_RANGE START="0xFA550" END="0xFA66D" />
+            <REGULAR_CMT>[AI 0.7] records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (clrCrowdRAM? with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA550</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA66E">
@@ -11872,8 +11883,9 @@ d3 = attribute value</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFA708" END="0xFA733" />
             <TYPEINFO_CMT>sub_FA708</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFA75C">
+        <FUNCTION ENTRY_POINT="0xFA75C" NAME="ai_PrintGoalRecordLine">
             <ADDRESS_RANGE START="0xFA75C" END="0xFA875" />
+            <REGULAR_CMT>[AI 0.6] prints one record entry: chooses ' Goals ' / ' Goal ' (d3 = 0) or ' Goals by' / ' Goal by' (d3 != 0, plural when d2 != 1), builds the number (NumberToDecimalText) + label + user name (ai_BuildUserNameString with $C2F8 bit 7 for trimming) + 'vs.' + team name in $BFA4 and prints it at (d0,d1); caller ai_PrintRecordsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FA75C</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFA880" NAME="ai_AppendTeamName">
@@ -12274,8 +12286,9 @@ returns calculated value in d0</REGULAR_CMT>
             <ADDRESS_RANGE START="0xFE864" END="0xFE8EB" />
             <TYPEINFO_CMT>sub_FE864</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFE8EC">
+        <FUNCTION ENTRY_POINT="0xFE8EC" NAME="ai_WaypointScriptActive">
             <ADDRESS_RANGE START="0xFE8EC" END="0xFE989" />
+            <REGULAR_CMT>[AI 0.4] asspuckc helper returning d0 = 0 (keep the script) or 1 (drop it): requires $C2FA bit 1, the player's $52(a3) state equal to puckc's $B7AA, $D454 above 3 and a live script ($DA16 != $80); with the end flag $C2FC bit 3 it checks the player is within $DA1C of the last point, otherwise it needs $B772/$B774 clear and $D454 &gt;= $F</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FE8EC</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFE98A" NAME="ai_UnpackPhotoTiles">
@@ -12406,8 +12419,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>clears Team Player destinations</REGULAR_CMT>
             <TYPEINFO_CMT>clrTmPdst</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFF8DE">
+        <FUNCTION ENTRY_POINT="0xFF8DE" NAME="ai_DrawBestWorstPlayerIcon">
             <ADDRESS_RANGE START="0xFF8DE" END="0xFF9A7" />
+            <REGULAR_CMT>[AI 0.6] if the player $DEE8 is the first (best) entry of the team's rating-sorted list $BF5C/$BF5E draws the bitmap unk_F5AF6 at tile base $DEE4, if he is the first of the reverse (worst) list $BF60/$BF62 draws unk_F5D1C at $DEE6, otherwise erases the 8x3 area; column 2 for the away record, $20 for home, row $19; caller sub_FD89A (per-position ratings)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FF8DE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFF9A8" NAME="chgplayer">

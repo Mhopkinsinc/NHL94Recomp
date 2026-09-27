@@ -42,6 +42,7 @@
 009744,ai_PrintPlayerStatRow,
 009872,ai_GetPlayerAttributeChecked,
 0099C6,ai_PrintScrollArrows,
+009BD8,ai_SetupStatsScreenVideo,
 009F40,ai_CountRatingNibbles,
 009F9A,ai_CountRosterPlayers,
 00A41E,getpzjoy,
@@ -245,6 +246,7 @@
 0134E4,ai_TickerAreaSetup,
 013508,ai_PrintNextString,
 013510,Adda1Offset,
+01354C,ai_PlayHighlightFromGame,
 01381E,VDP_ReadHVCounter,
 0138AC,checkcoll,
 0139A6,checkplcoll,"check if in line change mode"
@@ -293,6 +295,7 @@
 016246,ai_EmitCrowdSprites,
 0162FE,showclock,
 016480,checksso,
+0164D6,ai_PlaceOffscreenIndicator,
 0165FC,setsortcords,"move OOlist into a4"
 01661A,setffo,
 016648,uppads,
@@ -330,6 +333,8 @@
 0182A2,AddPOStats,
 01833A,ai_UnpackPlayoffStats,
 018380,ai_AdvancePlayoffSeries,
+01850A,ai_StarsOfTheGameScreen,
+01867E,ai_ScorePlayerForStars,
 018A56,box,
 018A90,getname,"push to stack"
 018AE8,ai_FormatPlayerInitialSurname,
@@ -402,8 +407,15 @@
 0F9B94,ai_ReadRecordField,
 0F9BDA,ai_WriteRecordField,
 0F9BE2,clrCrowdRAM?,
+0F9C18,ai_WriteTeamRecord,
+0F9C20,ai_ReadUserRecord,
 0F9C68,ai_ReadUserNames,
+0F9CDE,ai_UpdateGameRecords,
+0F9DDA,ai_UpdateUserWinLoss,
+0F9EAA,ai_UpdateTeamRecords,
 0FA014,ai_BuildUserNameString,
+0FA550,ai_PrintRecordsScreen,
+0FA75C,ai_PrintGoalRecordLine,
 0FA880,ai_AppendTeamName,
 0FA934,nullsub_6,
 0FA9F8,CalcAttrib,"push a6 to stack"
@@ -434,6 +446,7 @@
 0FE71C,PSandSOpassdir,
 0FE756,ai_StartWaypointScript,
 0FE7FC,ai_NextWaypoint,
+0FE8EC,ai_WaypointScriptActive,
 0FE98A,ai_UnpackPhotoTiles,
 0FEA52,ai_LoadHomeCenterIceLogo,
 0FEB54,ai_SlideToFaceoffSpot,
@@ -446,6 +459,7 @@
 0FEFF0,ai_ClearOneTimer,
 0FF042,newTitleScreen,
 0FF8C8,clrTmPdst,"19 = 25 decimal (max roster size)"
+0FF8DE,ai_DrawBestWorstPlayerIcon,
 0FF9A8,chgplayer,"Check bit 6. This is never set anywhere"
 0FFAC0,Calc_Checksum,
 0FFACA,SC_NextLong,

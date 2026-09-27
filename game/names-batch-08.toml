@@ -1,0 +1,98 @@
+# Names batch 8 - see docs/names/names-batch-08.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-08.toml
+
+# ---- user / team records (SRAM) ---------------------------------------------
+
+[[name]]
+addr = 0x0F9CDE
+name = "UpdateGameRecords"
+confidence = 0.7
+evidence = "Intermission hook, skipped unless ValidSRAM and OptUserRec is off: caches both rosters' attribute counts and sizes (sub_F9FC0/sub_F9FEA), then for the home and away sides updates the per-team records (sub_F9F50 for the scorer fields, ai_UpdateTeamRecords), the user records for the two controllers ($D042/$D044) via ai_UpdateUserWinLoss, and finally sub_1A206; all record I/O goes through the SRAM record helpers with $CF36 as the 16-byte scratch record"
+
+[[name]]
+addr = 0x0F9DDA
+name = "UpdateUserWinLoss"
+confidence = 0.6
+evidence = "reads the user's 16-byte record from SRAM $D20 + user*16 (sub_F9C20) into a0: increments games played (+$A/+$B, capped at 9000) and, from the goal totals $C(a1) vs $C(a2), wins (+8/+9) or ties (+$C/+$D); then refreshes the best-goals (bytes 0..3) and best-margin (bytes 4..7) entries with the opponent team/user ids and writes the record back with sub_F9C56; caller ai_UpdateGameRecords for each side"
+
+[[name]]
+addr = 0x0F9EAA
+name = "UpdateTeamRecords"
+confidence = 0.5
+evidence = "reads team d1's 16-byte record from SRAM $B60 + team*16 (clrCrowdRAM?) and updates three entries when beaten: most goals in a game (bytes 0..3 from $C(a1)), best single-player goals-minus-... margin computed over the roster from the +$E8 and +$B4 stat columns (bytes 4..7), and for the home team the loudest crowd CrowdPeak (bytes 8..$B); writes back with sub_F9C18 when anything changed; caller ai_UpdateGameRecords"
+
+[[name]]
+addr = 0x0F9C18
+name = "WriteTeamRecord"
+confidence = 0.8
+evidence = "sets the SRAM write flag $C2F8 bit 6 and jumps into the shared body of clrCrowdRAM? (which is really the team-record reader: SRAM $B60 + team*16, 16 bytes), so the flag selects WriteSRAM; caller ai_UpdateTeamRecords"
+
+[[name]]
+addr = 0x0F9C20
+name = "ReadUserRecord"
+confidence = 0.7
+evidence = "clears the write flag and transfers 16 bytes between SRAM $D20 + d1*16 and a0 (always ReadSRAM from this entry; sub_F9C56 is the writing twin that sets the flag first); caller ai_UpdateUserWinLoss"
+
+[[name]]
+addr = 0x0FA550
+name = "PrintRecordsScreen"
+confidence = 0.7
+evidence = "records screen: draws both team logos with sub_FA66E at columns $21 and 1, the team name box (sub_FAC3E), the records grid (loc_FA936), ai_PrintTeamRatingBox, the 'Records' / '-----------' heading at column $15, then reads the selected team's record (clrCrowdRAM? with $D4F6 choosing home or away) and prints its lines with ai_PrintGoalRecordLine; caller sub_FA2C0"
+
+[[name]]
+addr = 0x0FA75C
+name = "PrintGoalRecordLine"
+confidence = 0.6
+evidence = "prints one record entry: chooses ' Goals ' / ' Goal ' (d3 = 0) or ' Goals by' / ' Goal by' (d3 != 0, plural when d2 != 1), builds the number (NumberToDecimalText) + label + user name (ai_BuildUserNameString with $C2F8 bit 7 for trimming) + 'vs.' + team name in $BFA4 and prints it at (d0,d1); caller ai_PrintRecordsScreen"
+
+# ---- stars of the game -------------------------------------------------------
+
+[[name]]
+addr = 0x01850A
+name = "StarsOfTheGameScreen"
+confidence = 0.8
+evidence = "post-game 'Stars of the Game' panel: once RefCnt is above $40 and $C2EA bit 7 was clear, waits a frame, draws a 28x9 box, prints the title, draws the star bitmap from off_5605A at tile base $B018, scores every player with sub_18620 / ai_ScorePlayerForStars and prints the three stars with sub_185E0; caller UpdatePA"
+
+[[name]]
+addr = 0x01867E
+name = "ScorePlayerForStars"
+confidence = 0.6
+evidence = "computes a player's star-of-the-game value into (a4): base = team score difference (d3), then for skaters goals (+$B4 column) * $2AF8, assists (+$CE) * $2774, shots (+$E8) * 10 (* 100 more for a losing side) plus the +$136 rating; for the goalie slot (index above the attribute count) awards $7D00 when the save percentage is high and $124F8 more for a shutout; caller sub_18620 (from ai_StarsOfTheGameScreen)"
+
+# ---- ratings screen ----------------------------------------------------------
+
+[[name]]
+addr = 0x0FF8DE
+name = "DrawBestWorstPlayerIcon"
+confidence = 0.6
+evidence = "if the player $DEE8 is the first (best) entry of the team's rating-sorted list $BF5C/$BF5E draws the bitmap unk_F5AF6 at tile base $DEE4, if he is the first of the reverse (worst) list $BF60/$BF62 draws unk_F5D1C at $DEE6, otherwise erases the 8x3 area; column 2 for the away record, $20 for home, row $19; caller sub_FD89A (per-position ratings)"
+
+# ---- highlight replay --------------------------------------------------------
+
+[[name]]
+addr = 0x01354C
+name = "PlayHighlightFromGame"
+confidence = 0.6
+evidence = "sets up a stored playoff game as a highlight: after sub_13848/sub_13396/sub_133B2, draws a 24x3 box and prints 'Highlight from game:', waits $B4 frames (abort on button bit 7), then loads HomeTeam/VisTeam, the period gsp, HmGoals/AwGoals and a random clock (gameclock = $3C + random 0..$77) from the series record a0, clears the controller teams and reinitialises the teams (sub_17102, sub_77F4); caller sub_1351C, which runs it for every finished series flagged in $CE66..$CED6 bit 1 of +$E"
+
+# ---- gameplay ------------------------------------------------------------------
+
+[[name]]
+addr = 0x0164D6
+name = "PlaceOffscreenIndicator"
+confidence = 0.5
+evidence = "checksso helper for the player-indicator sprites (tiles $180/$183): a0 = indicator record, a3 = its sprite slot; when the tracked object is on-screen returns, otherwise classifies which edges of the camera window ($74/-$74 by $64/-$64 around Hpos/Vpos, or fixed bounds on the menu screen) the object lies beyond, converts that to a direction with unk_113C0 and places the sprite at the edge position from word_165BC (+$100/+$F0 screen offsets) before tail-calling sub_167AA; caller checksso"
+
+[[name]]
+addr = 0x0FE8EC
+name = "WaypointScriptActive"
+confidence = 0.4
+evidence = "asspuckc helper returning d0 = 0 (keep the script) or 1 (drop it): requires $C2FA bit 1, the player's $52(a3) state equal to puckc's $B7AA, $D454 above 3 and a live script ($DA16 != $80); with the end flag $C2FC bit 3 it checks the player is within $DA1C of the last point, otherwise it needs $B772/$B774 clear and $D454 >= $F"
+
+# ---- stats screen video ------------------------------------------------------
+
+[[name]]
+addr = 0x009BD8
+name = "SetupStatsScreenVideo"
+confidence = 0.5
+evidence = "loc_945C helper: after sub_10F32, resets the plane scroll (VDP address $B002 and 0 written as zero, registers $8C81/$8D00, $B00E = 6), loads the frame tiles (unk_55B86 at $B01E with nibble map $9123...) and the font (ai_LoadFontTiles), then draws the background bitmap off_54E24 with dobitmap; caller loc_945C (edit lines / stats screens)"
