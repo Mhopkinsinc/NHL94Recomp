@@ -25,9 +25,9 @@ XML (or the proposals file and re-apply).
 016244  rts
 ```
 
-## `$01A430` -> `ai_ReadPad2Hardware`  (confidence 0.7, 10 insns)
+## `$01A430` -> `ai_ReadFourWayPad4`  (confidence 0.7, 10 insns)
 
-**Evidence.** port-2 twin of ai_ReadPad1Hardware: requests the Z80 bus (with the reset retry), writes $3C to $A10005 (TH high) and joins the port-1 reader's body at loc_1A498 with a0 = $A10003 to pack and remap the buttons; caller ReadJoyData
+**Evidence.** EA 4-Way Play read of pad 4: requests the Z80 bus (with the reset retry), writes the select value $3C to port 2 ($A10005) and joins ai_ReadPad1Hardware's body at loc_1A498 to read the selected pad through port 1 ($A10003); ai_ReadFourWayPad1..3 write $0C/$1C/$2C the same way (batch 19 corrected this from 'ReadPad2Hardware'); caller ReadJoyData
 
 **Callers.** ReadJoyData
 **Callees.** ai_Z80_ResetAndRequestBus, loc_1A498

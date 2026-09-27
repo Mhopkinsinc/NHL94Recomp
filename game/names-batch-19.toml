@@ -1,0 +1,89 @@
+# Names batch 19 - see docs/names/names-batch-19.md.
+# Apply: python tools/nhl94_names.py apply game/names-batch-19.toml
+# Also corrected batch 18's $1A430 from ReadPad2Hardware to ReadFourWayPad4:
+# the four $1A3B2/$1A3DC/$1A406/$1A430 readers select EA 4-Way Play pads 1-4
+# by writing $0C/$1C/$2C/$3C to port 2 and then read through port 1.
+
+[[name]]
+addr = 0x01A3B2
+name = "ReadFourWayPad1"
+confidence = 0.7
+evidence = "EA 4-Way Play read of pad 1: requests the Z80 bus (reset retry via Z80_ResetAndRequestBus), writes the select value $0C to port 2 ($A10005) and joins the shared pad reader at loc_1A456 (ai_ReadPad1Hardware's body reading port 1); caller ReadJoyData"
+
+[[name]]
+addr = 0x01A3DC
+name = "ReadFourWayPad2"
+confidence = 0.7
+evidence = "EA 4-Way Play read of pad 2: same as ai_ReadFourWayPad1 with select value $1C; caller ReadJoyData"
+
+[[name]]
+addr = 0x01A406
+name = "ReadFourWayPad3"
+confidence = 0.7
+evidence = "EA 4-Way Play read of pad 3: same as ai_ReadFourWayPad1 with select value $2C; caller ReadJoyData"
+
+[[name]]
+addr = 0x0FD5F4
+name = "GetTeamNameString3"
+confidence = 0.4
+evidence = "ticker helper: returns a1 = the third length-prefixed string of team a2's name block (data +$1E, block offset +4, skipping two strings); the first string is the full name used elsewhere, so this is one of the short forms; caller ai_RunTickerMessage"
+
+[[name]]
+addr = 0x008B84
+name = "ShowEditLinesPage"
+confidence = 0.6
+evidence = "sets the edit-lines page $D5B2 from the high word of d0 and draws it with ai_DrawEditLinesHeader; caller sub_8B1C"
+
+[[name]]
+addr = 0x008B94
+name = "ShowEditLinesPageNext"
+confidence = 0.6
+evidence = "sets the edit-lines page $D5B2 to the high word of d0 plus one and draws it with ai_DrawEditLinesHeader; caller sub_8B1C"
+
+[[name]]
+addr = 0x013848
+name = "SnapshotGameState"
+confidence = 0.6
+evidence = "copies $5BE words of game state from $C2EA into the unused low RAM at $FF0000 followed by ScoreSumbytes, so the state can be restored after the highlight replay; caller ai_PlayHighlightFromGame"
+
+[[name]]
+addr = 0x014A94
+name = "ElapsedGameTime"
+confidence = 0.6
+evidence = "returns d0 = (period gsp << 14 | PerTimeTotal) - gameclock, the elapsed time code stored with goals; caller checkgoal"
+
+[[name]]
+addr = 0x015EA4
+name = "WritePlaneScroll"
+confidence = 0.7
+evidence = "writes Hscroll ($BD1E) to the horizontal scroll table (VSCRLPM + 2) and Vscroll ($BD20) to VSRAM entry 1 (command $40020010); caller sub_15E6E (the attract-mode V-blank routine)"
+
+[[name]]
+addr = 0x0FAC78
+name = "PrintCentredAtColumn20"
+confidence = 0.6
+evidence = "prints the length-prefixed string a0 centred on column $14 (printx = $14 - (length - 2) / 2); caller ai_PrintRecordsTeamName"
+
+[[name]]
+addr = 0x009112
+name = "PrintSummaryPlayerName"
+confidence = 0.7
+evidence = "scoring/penalty summary: when the player index d0 is not negative prints 'I. Surname' (ai_FormatPlayerInitialSurname) and moves to the next row; caller ai_PrintScoringSummaryRow (three times per row)"
+
+[[name]]
+addr = 0x0098CE
+name = "SumPlayoffStatColumn"
+confidence = 0.5
+evidence = "playoff stats: looks up column d1 in the pointer table at $98E6 and, when set, adds the entry for player d0 to d2; caller ai_GetPlayerStatValue"
+
+[[name]]
+addr = 0x017718
+name = "ResetTickerState"
+confidence = 0.7
+evidence = "resets the ticker: row counter $D5AE = -1, PlayerScrollCtr = -1, line index $D5B2 and delay $D5B4 = 0, returns a0 = the line offset table $D5B8; caller ai_MatchupsScreen"
+
+[[name]]
+addr = 0x0077E4
+name = "ClearPlayoffStatsBlock"
+confidence = 0.6
+evidence = "StartGame: zeroes the $E4-word packed playoff stats block at $D092 (the one ai_UnpackPlayoffStats reads); caller StartGame"

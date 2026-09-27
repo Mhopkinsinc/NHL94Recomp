@@ -17,6 +17,7 @@
 0076B2,VBjsr,
 0076B8,Begin,"Disable interrupts"
 007742,StartGame,
+0077E4,ai_ClearPlayoffStatsBlock,
 0077F4,restoreteams,"team 1"
 007814,ResetClock,
 00784E,ClockLength,
@@ -41,12 +42,15 @@
 008280,ai_PrintSelectPlayerArrows,
 0084CE,PrintAttribHeader,
 0085EE,ai_PrintLineRoster,
+008B84,ai_ShowEditLinesPage,
+008B94,ai_ShowEditLinesPageNext,
 008BA6,ai_DrawEditLinesHeader,
 008D4E,getNameandAttrib,
 008E40,DispAttribValue,"mult by 100 dec"
 009020,ai_PrintSummaryRowAbove,
 00904C,ai_PrintSummaryRowAt,
 00907C,ai_PrintScoringSummaryRow,
+009112,ai_PrintSummaryPlayerName,
 0093C4,ai_PrintSummaryScrollArrows,
 009428,ai_ShowPlayoffStats,
 00945C,ai_PrintStatsScreen,
@@ -54,6 +58,7 @@
 009744,ai_PrintPlayerStatRow,
 009872,ai_GetPlayerAttributeChecked,
 00988E,ai_GetPlayerStatValue,
+0098CE,ai_SumPlayoffStatColumn,
 0099C6,ai_PrintScrollArrows,
 009BB4,ai_PrintCrowdMeterValue,
 009BD8,ai_SetupStatsScreenVideo,
@@ -292,6 +297,7 @@
 01351C,ai_PlayFinishedSeriesHighlights,
 01354C,ai_PlayHighlightFromGame,
 01381E,VDP_ReadHVCounter,
+013848,ai_SnapshotGameState,
 0138AC,checkcoll,
 0139A6,checkplcoll,"check if in line change mode"
 013A1A,checkcx,
@@ -309,6 +315,7 @@
 01454C,checkwallcoll2,
 014620,checkgoal,"13 pix for zside = height of goal (puck only check)"
 014A54,setass,
+014A94,ai_ElapsedGameTime,
 014B38,CheckBump,
 014BC2,wallcollb2,"#puckSCnum"
 014C70,wallcoll,"wallcos"
@@ -330,6 +337,7 @@
 015D84,checkattriblimits,"test if d3 is zero or higher"
 015E6C,IRQ7,
 015E82,DoDMAlist,
+015EA4,ai_WritePlaneScroll,
 015EC0,setvideo,
 015F34,updatescroll,
 015FF0,showref,
@@ -374,6 +382,7 @@
 0175FC,ai_PrintSeriesScore,
 017626,ai_DrawPlayoffTreeBitmap,
 017652,ai_DrawPlayoffRoundLabel,
+017718,ai_ResetTickerState,
 017730,ai_RunTickerMessage,
 0179D2,ai_ScrollTickerRows,
 017A18,EASportsScreen,
@@ -427,7 +436,10 @@
 01A294,p_initfx,
 01A304,ai_StopSound30,
 01A370,ReadJoyData,
-01A430,ai_ReadPad2Hardware,
+01A3B2,ai_ReadFourWayPad1,
+01A3DC,ai_ReadFourWayPad2,
+01A406,ai_ReadFourWayPad3,
+01A430,ai_ReadFourWayPad4,
 01A470,ai_ReadPad1Hardware,
 01A4EE,ai_Z80_ResetAndRequestBus,
 01A50A,MusicVB,
@@ -517,6 +529,7 @@
 0FA9F8,CalcAttrib,"push a6 to stack"
 0FABDC,ai_PrintTeamRatingBox,
 0FAC3E,ai_PrintRecordsTeamName,
+0FAC78,ai_PrintCentredAtColumn20,
 0FAE26,ai_GetPlayerPhoto,
 0FAF50,ai_GetRecordsTeam,
 0FAF66,ai_TrimTrailingSpaces,
@@ -546,6 +559,7 @@
 0FD492,ai_GetLineupPlayerForPosition,
 0FD4CA,ai_AnimateAdvantageBar,
 0FD5AE,ai_GetTeamNameOrSide,
+0FD5F4,ai_GetTeamNameString3,
 0FD618,ai_ShootoutWinnersCelebrate,
 0FD73C,ai_ClearGameState,
 0FD78A,ai_EmitAnimationSprites,

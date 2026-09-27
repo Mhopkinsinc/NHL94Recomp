@@ -9078,8 +9078,9 @@ FFFF = none
             <ADDRESS_RANGE START="0x7742" END="0x77E3" />
             <TYPEINFO_CMT>StartGame</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x77E4">
+        <FUNCTION ENTRY_POINT="0x77E4" NAME="ai_ClearPlayoffStatsBlock">
             <ADDRESS_RANGE START="0x77E4" END="0x77F3" />
+            <REGULAR_CMT>[AI 0.6] StartGame: zeroes the $E4-word packed playoff stats block at $D092 (the one ai_UnpackPlayoffStats reads); caller StartGame</REGULAR_CMT>
             <TYPEINFO_CMT>sub_77E4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x77F4" NAME="restoreteams">
@@ -9256,12 +9257,14 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <ADDRESS_RANGE START="0x8B1C" END="0x8B7D" />
             <TYPEINFO_CMT>sub_8B1C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8B84">
+        <FUNCTION ENTRY_POINT="0x8B84" NAME="ai_ShowEditLinesPage">
             <ADDRESS_RANGE START="0x8B84" END="0x8B93" />
+            <REGULAR_CMT>[AI 0.6] sets the edit-lines page $D5B2 from the high word of d0 and draws it with ai_DrawEditLinesHeader; caller sub_8B1C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8B84</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x8B94">
+        <FUNCTION ENTRY_POINT="0x8B94" NAME="ai_ShowEditLinesPageNext">
             <ADDRESS_RANGE START="0x8B94" END="0x8BA5" />
+            <REGULAR_CMT>[AI 0.6] sets the edit-lines page $D5B2 to the high word of d0 plus one and draws it with ai_DrawEditLinesHeader; caller sub_8B1C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_8B94</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x8BA6" NAME="ai_DrawEditLinesHeader">
@@ -9302,8 +9305,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.7] row of the scoring summary: entry d3 of ScoreSum ($C474; word time, byte team flag bit 7 = away and goal type in the low bits, then scorer and two assist indexes): erases the 40x4 row, prints the time (sub_11C72), the team name from the team record ($C6CE or +$364), the goal-type tag from word_912A (SH2, SH, PP, PP2) and the three player names via sub_9112; callers sub_9020 (row 30) and sub_904C</REGULAR_CMT>
             <TYPEINFO_CMT>sub_907C</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x9112">
+        <FUNCTION ENTRY_POINT="0x9112" NAME="ai_PrintSummaryPlayerName">
             <ADDRESS_RANGE START="0x9112" END="0x9129" />
+            <REGULAR_CMT>[AI 0.7] scoring/penalty summary: when the player index d0 is not negative prints 'I. Surname' (ai_FormatPlayerInitialSurname) and moves to the next row; caller ai_PrintScoringSummaryRow (three times per row)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_9112</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x93C4" NAME="ai_PrintSummaryScrollArrows">
@@ -9353,8 +9357,9 @@ this will update the current frame of crowd animation</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] d0 = player index, d1 = stat column: for the regular stats (d7 = 0) reads the column's one or two byte offsets from unk_98FA and returns the sum of those roster bytes of team a2 in d2; for playoff stats (d7 != 0) sums two entries through sub_98CE and halves the result; caller ai_PrintPlayerStatRow</REGULAR_CMT>
             <TYPEINFO_CMT>sub_988E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x98CE">
+        <FUNCTION ENTRY_POINT="0x98CE" NAME="ai_SumPlayoffStatColumn">
             <ADDRESS_RANGE START="0x98CE" END="0x98E5" />
+            <REGULAR_CMT>[AI 0.5] playoff stats: looks up column d1 in the pointer table at $98E6 and, when set, adds the entry for player d0 to d2; caller ai_GetPlayerStatValue</REGULAR_CMT>
             <TYPEINFO_CMT>sub_98CE</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x99C6" NAME="ai_PrintScrollArrows">
@@ -10740,8 +10745,9 @@ d0 = iterator</REGULAR_CMT>
             <REGULAR_CMT>[listing] label from the 2016 listing; the IDA export has no name at this entry</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1381E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x13848">
+        <FUNCTION ENTRY_POINT="0x13848" NAME="ai_SnapshotGameState">
             <ADDRESS_RANGE START="0x13848" END="0x13861" />
+            <REGULAR_CMT>[AI 0.6] copies $5BE words of game state from $C2EA into the unused low RAM at $FF0000 followed by ScoreSumbytes, so the state can be restored after the highlight replay; caller ai_PlayHighlightFromGame</REGULAR_CMT>
             <TYPEINFO_CMT>sub_13848</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x13862">
@@ -10845,8 +10851,9 @@ a3 = player checking</REGULAR_CMT>
             <ADDRESS_RANGE START="0x14A54" END="0x14A93" />
             <TYPEINFO_CMT>setass</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x14A94">
+        <FUNCTION ENTRY_POINT="0x14A94" NAME="ai_ElapsedGameTime">
             <ADDRESS_RANGE START="0x14A94" END="0x14AA7" />
+            <REGULAR_CMT>[AI 0.6] returns d0 = (period gsp &lt;&lt; 14 | PerTimeTotal) - gameclock, the elapsed time code stored with goals; caller checkgoal</REGULAR_CMT>
             <TYPEINFO_CMT>sub_14A94</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x14B38" NAME="CheckBump">
@@ -10967,8 +10974,9 @@ a3 = sortcord of player</REGULAR_CMT>
             <ADDRESS_RANGE START="0x15E82" END="0x15EA3" />
             <TYPEINFO_CMT>DoDMAlist</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x15EA4">
+        <FUNCTION ENTRY_POINT="0x15EA4" NAME="ai_WritePlaneScroll">
             <ADDRESS_RANGE START="0x15EA4" END="0x15EBF" />
+            <REGULAR_CMT>[AI 0.7] writes Hscroll ($BD1E) to the horizontal scroll table (VSCRLPM + 2) and Vscroll ($BD20) to VSRAM entry 1 (command $40020010); caller sub_15E6E (the attract-mode V-blank routine)</REGULAR_CMT>
             <TYPEINFO_CMT>sub_15EA4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x15EC0" NAME="setvideo">
@@ -11228,8 +11236,9 @@ allocate vram and assign char area for graphic structures</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] PlayoffScreen: d1 = label index; when it equals twice the current-round byte $CEF4[potreeteam] the palette is switched to $6000 (highlight), then draws the 2-row label bitmap from off_ABA14's second block with dobitmap at tile base 2 (the 'Playoffs' / 'Quarterfinals' / 'Semifinals' / 'Finals' / 'Champions' strings sit next to it); caller PlayoffScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17652</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x17718">
+        <FUNCTION ENTRY_POINT="0x17718" NAME="ai_ResetTickerState">
             <ADDRESS_RANGE START="0x17718" END="0x1772F" />
+            <REGULAR_CMT>[AI 0.7] resets the ticker: row counter $D5AE = -1, PlayerScrollCtr = -1, line index $D5B2 and delay $D5B4 = 0, returns a0 = the line offset table $D5B8; caller ai_MatchupsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_17718</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x17730" NAME="ai_RunTickerMessage">
@@ -11507,21 +11516,24 @@ d0 = start of data</REGULAR_CMT>
             <ADDRESS_RANGE START="0x1A370" END="0x1A3B1" />
             <TYPEINFO_CMT>ReadJoyData</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A3B2">
+        <FUNCTION ENTRY_POINT="0x1A3B2" NAME="ai_ReadFourWayPad1">
             <ADDRESS_RANGE START="0x1A3B2" END="0x1A3DB" />
+            <REGULAR_CMT>[AI 0.7] EA 4-Way Play read of pad 1: requests the Z80 bus (reset retry via Z80_ResetAndRequestBus), writes the select value $0C to port 2 ($A10005) and joins the shared pad reader at loc_1A456 (ai_ReadPad1Hardware's body reading port 1); caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A3B2</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A3DC">
+        <FUNCTION ENTRY_POINT="0x1A3DC" NAME="ai_ReadFourWayPad2">
             <ADDRESS_RANGE START="0x1A3DC" END="0x1A405" />
+            <REGULAR_CMT>[AI 0.7] EA 4-Way Play read of pad 2: same as ai_ReadFourWayPad1 with select value $1C; caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A3DC</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A406">
+        <FUNCTION ENTRY_POINT="0x1A406" NAME="ai_ReadFourWayPad3">
             <ADDRESS_RANGE START="0x1A406" END="0x1A42F" />
+            <REGULAR_CMT>[AI 0.7] EA 4-Way Play read of pad 3: same as ai_ReadFourWayPad1 with select value $2C; caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A406</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0x1A430" NAME="ai_ReadPad2Hardware">
+        <FUNCTION ENTRY_POINT="0x1A430" NAME="ai_ReadFourWayPad4">
             <ADDRESS_RANGE START="0x1A430" END="0x1A463" />
-            <REGULAR_CMT>[AI 0.7] port-2 twin of ai_ReadPad1Hardware: requests the Z80 bus (with the reset retry), writes $3C to $A10005 (TH high) and joins the port-1 reader's body at loc_1A498 with a0 = $A10003 to pack and remap the buttons; caller ReadJoyData</REGULAR_CMT>
+            <REGULAR_CMT>[AI 0.7] EA 4-Way Play read of pad 4: requests the Z80 bus (with the reset retry), writes the select value $3C to port 2 ($A10005) and joins ai_ReadPad1Hardware's body at loc_1A498 to read the selected pad through port 1 ($A10003); ai_ReadFourWayPad1..3 write $0C/$1C/$2C the same way (batch 19 corrected this from 'ReadPad2Hardware'); caller ReadJoyData</REGULAR_CMT>
             <TYPEINFO_CMT>sub_1A430</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0x1A464">
@@ -12017,8 +12029,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.6] records screen: at row d1 prints the selected team's name (home, or away when $D4F6) through sub_FAC78; caller ai_PrintRecordsScreen</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAC3E</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFAC78">
+        <FUNCTION ENTRY_POINT="0xFAC78" NAME="ai_PrintCentredAtColumn20">
             <ADDRESS_RANGE START="0xFAC78" END="0xFAC8F" />
+            <REGULAR_CMT>[AI 0.6] prints the length-prefixed string a0 centred on column $14 (printx = $14 - (length - 2) / 2); caller ai_PrintRecordsTeamName</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FAC78</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFAC90">
@@ -12306,8 +12319,9 @@ returns calculated value in d0</REGULAR_CMT>
             <REGULAR_CMT>[AI 0.5] ticker helper: for team record a2 returns a1 = its name string unless the name entry is empty (length word 2), in which case it returns 'Home' (word_FD5E4) for the home record or 'Visitors' (word_FD5EA); caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD5AE</TYPEINFO_CMT>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="0xFD5F4">
+        <FUNCTION ENTRY_POINT="0xFD5F4" NAME="ai_GetTeamNameString3">
             <ADDRESS_RANGE START="0xFD5F4" END="0xFD60D" />
+            <REGULAR_CMT>[AI 0.4] ticker helper: returns a1 = the third length-prefixed string of team a2's name block (data +$1E, block offset +4, skipping two strings); the first string is the full name used elsewhere, so this is one of the short forms; caller ai_RunTickerMessage</REGULAR_CMT>
             <TYPEINFO_CMT>sub_FD5F4</TYPEINFO_CMT>
         </FUNCTION>
         <FUNCTION ENTRY_POINT="0xFD618" NAME="ai_ShootoutWinnersCelebrate">
