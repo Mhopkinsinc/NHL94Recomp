@@ -48,14 +48,54 @@ an attempt starts and down when it ends. Two refinements: it is per
 just as much the in-game penalty-shot flag, which is what the IDA name
 `BA_PS_flags` (breakaway / penalty shot) records.
 
-Related words seen on the same paths, not yet worked through bit by bit:
+Related: `$D454` is the attempt clock, loaded with `$19` by `assshoot` and
+counted down in `ai_GameVBlankRoutine` while `$C2FA` bit 1 is set; `$C31A`
+is the announcement timer; team record +`$360` is incremented when an
+attempt concludes (`assshoot` `$ED08`), most likely penalty shots /
+shootout attempts.
 
-- `$C2FA`: bit 0 shootout mode (IDA "set when shootout?"), bit 1 set by
-  `assshoot` when an attempt is armed, bit 2 cleared when the shooter enters
-  pass/shot mode, bit 3 shootout decided (`ai_AdvanceShootoutRound`), bit 4
-  breakaway (IDA).
-- `$C2EA` gmode: bit 0 clock stopped, bit 2 penalty called (IDA).
-- `$D454`: the attempt clock, loaded with `$19` by `assshoot` and counted
-  down in `ai_GameVBlankRoutine`; `$C31A`: the announcement timer.
-- Team record +`$360`: counter incremented when an attempt concludes
-  (`assshoot` `$ED08`), most likely penalty shots / shootout attempts.
+---
+
+## `$C2FA`: shootout session, breakaway, attempt clock
+
+No IDA name. Cleared as a whole by `ai_ClearGameState` (`$FD778`). Where
+`$C2F2` describes one attempt, this word holds the longer-lived shootout
+state and a few shot-related events.
+
+| bit | meaning | set | cleared | tested by |
+|---|---|---|---|---|
+| 0 | **shootout mode** for the whole session | `GameSetUp_2` `$F8490`, when the play mode `OptPlayMode` (`$D048`) is 4 (Shootout): the mode is reset to 0, the bit set and `ai_InitShootout` run | only `ai_ClearGameState` | about 35 readers, from `StartGame` and `ClockLength` (no periods) through the shot, goalie and puck AI (`doshot` "check if shootout", `assgoaliebreakwait`, `asspuckc`), `puckfaceoff`, `checkgoal` (no short-handed stats), `PrintScores1`, `showclock`, `Intermission`, `PeriodOver`, `ai_ShowGoalBanner` (jumps to the shootout banner) and `ai_PrintShootoutWinner` |
+| 1 | **attempt clock in use**: the one-on-one is armed and `$D454` counts instead of the game clock | `assshoot` `$ED90`, right after the game clock is stopped (`$C2EA` bit 0) and before bit 2 of `$C2F2` | `puckfaceoff` `$F46C` | `ai_GameVBlankRoutine` `$15DD8`: with the bit set the routine decrements the attempt clock `$D454` (fraction `$D456`) rather than `gameclock`; `PrintScores1` `$12C4E` prints the label from `word_191F8` entry 4 instead of the period label; `updatepwrplay` and `ai_StartPowerPlaySong` return early; `ai_PrintClockLabel`; `ai_WaypointScriptActive` requires it |
+| 2 | **shooter skating in**: the penalty-shot taker has the puck and the attempt clock runs even though the game clock is stopped | `puckpenshot` `$F2A8`, when the shooter is given assignment `$18` (`pucknorm`) | `setpassmode` `$BC1C` and `SetShotMode` `$C1C2` (the shot or pass is released), `ai_EndShootoutAttempt` `$F39E` | `ai_GameVBlankRoutine` `$15DC4`: bypasses the clock-stopped test so the attempt clock keeps counting |
+| 3 | **shootout decided** | `ai_AdvanceShootoutRound` `$FC53A`, once five rounds are done and the scores differ | `ai_InitShootout` `$FC496` | `ai_StartShootoutAttempt` `$FC4C0` (jumps to the end sequence), `SetPA`/`setPA2` `$12664`/`$126D4` (post-attempt presentation) |
+| 4 | **shot taken on a breakaway** (the shot in flight) | `doshot` `$C306` when the shooter has the breakaway bit (object `$64` bit 1) | `doshot` `$C2F6` at the start of every shot, `updateplayers` `$AA6C` when the breakaway ends, `checkgoal` `$14898` after the goal is credited | `checkgoal` `$1489E` (breakaway goal statistics, team record +`$35A`) |
+| 5 | **puck loose after the attempt shot** | `ai_GoalieFreezePuck` `$F324`, once the shooter has committed (`$C2F2` bit 5) and `puckc` is negative (nobody has the puck) | `setpassmode` `$BC2C`, `SetShotMode` `$C1D2` | `ai_GoalieFreezePuck` `$F312`: skips re-detection once set |
+| 6 | unused: no instruction references it | | | |
+| 7 | **a banner is on screen** (GOAL! / PENALTY SHOT!) | `ai_ShowGoalBanner` `$187B8`, first instruction | `assshoot` `$ECD2` when an attempt is (re)started, `chkprogress` `$12030` when the message is retired | `doinput` `$B140` (input is treated differently while the banner shows), `ai_GameVBlankRoutine` `$15E3E` (the attempt clock is frozen while it is up) |
+
+---
+
+## `$C2EA` gmode: game-mode byte
+
+IDA named this word `gmode` and most of its bits (`gmclock`, `gmdir`,
+`gmpen`, `gmpendel`, `gmoffs`). Only the low byte is used: `StartGame`
+clears it (`$776A`) and `ai_PlayHighlightFromGame` writes `$10` to it
+(`$13612`).
+
+| bit | IDA name | meaning | set | cleared | tested by |
+|---|---|---|---|---|---|
+| 0 | gmclock | **clock stopped** (1 = play is stopped, whistle) | `ResetClock` `$7846`, `clockcont` `$7C22` ("stop clock", when the period clock runs out), `Stop4Pen` `$124A6` (penalty), `assshoot` `$ED8A` (attempt armed), `ai_EndShootoutAttempt` `$F398` | `Endfaceoff` `$FE40` (the puck is dropped) | roughly 30 readers: every AI assignment routine (`assdefo`, `assdefd`, `asswingd`, `asswingo`, `asscenterd`, `asscentero`, `assnearest`, `asspassrec`, `assgoaliectrl`, `assgoaliecpu`, `assgoalietopuck`, `assonetimer`) returns or idles while it is set; `pucknorm` ("check for play stoppage"), `AddPenalty` (no penalty without a whistle), `updatepentime`, `ChkShotStat`, `checkint`, `CCStart`, `FallDown`, `CheckBump`, `wallcollb2`, `checkgoal`, `ai_GameVBlankRoutine` (the game clock only counts while clear) |
+| 1 | gmdir | **direction of play**: 0 = the home team shoots up | `bchg` in `PeriodOver` `$1723A` every period change (teams switch ends) | same `bchg` | `setupice` `$16B02` and `ai_InitRinkScreen` `$16BE2` (flip every player's facing bit), `puckfaceoff2` `$FBD8`/`$FC84`, `ChkOffsides` `$10028`/`$10072`, `chkatop`, `checkgoal` `$14870`, `setlccords`; `ai_PlayHighlightFromGame` sets it (`$13622`) when restoring a recorded game |
+| 2 | gmpen | **penalty called** | `Stop4Pen` `$12562` | `getBAplayerInfo` tail `$123B2` (a breakaway foul becomes a penalty shot instead) | `chkprogress` `$12074` ("check if penalty called"), `checkfornewpen` `$1242C` |
+| 3 | gmpendel | **delayed penalty** pending (the offending team has not touched the puck yet) | `checkfornewpen` `$12494` | `chkprogress` `$1208E` ("clear del pen bit") | `assshoot` `$ED2C`, `puckfaceoff` `$F49A`, `ChkGoalies` `$F6E8` (the goalie may be pulled for the extra attacker) |
+| 4 | (highlight) | **highlight playback**: the game is replaying a recorded highlight, not being played | `ai_PlayHighlightFromGame` (`move.b #$10`) | `StartGame` (`clr.b`) | `updatereplay` "check if highlight", `doshot` "always perfect" shots, `ChkShotStat`, `checkint`, `CCStart`, `holdcheck`, `FallDown`, `puckstick`, `puckgoalie`, `a2offsides`, `ChooseSong` (no songs), `ai_TriggerPeriodSong` |
+| 5 | gmoffs | **offside rule active** | `StartGame` `$7778` when `OptPen` (`$D056`) is exactly 1 ("On"; 2 is "On, no offsides") | `StartGame` `clr.b` | `ChkOffsides` `$FFEA`, `a2offsides` `$100E6`, `AddPenalty` `$11F50`, `chk4pass`, `EvadePC` ("check if offsides is on"), `checkob` |
+| 6 | **?** | **period ended, waiting for the stoppage to finish** | `clockcont` `$7C28`, immediately after stopping the clock when the period time expires (IDA: "set bit 6 gmode (?)") | not cleared explicitly; `StartGame` clears the byte | `puckfaceoff` `$F47A`: at the next faceoff, if set, control goes to the period-over path (`loc_17236`, which advances `gsp` and flips gmdir) |
+| 7 | | **stars of the game shown** (once-only latch) | `ai_StarsOfTheGameScreen` `$18514` (`bset`, returns if already set) | `StartGame` `clr.b` | itself |
+
+**How they fit together on a whistle:** something stops play, and whichever
+routine blew the whistle sets `gmclock` (bit 0): a penalty, the period
+ending, or an attempt starting. The AI idles and the clock freezes. At the
+next faceoff `puckfaceoff` decides what comes next from bits 2, 3 and 6
+(penalty, delayed penalty, period over), and `Endfaceoff` clears bit 0 when
+the puck is dropped.

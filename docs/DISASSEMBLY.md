@@ -109,8 +109,8 @@ The data structures the code works on (on-ice object, team record, ROM
 team block and roster record, photos and logos, playoff series, summaries,
 sound tables, SRAM) are written up in `docs/STRUCTURES.md`, each field with
 its source. The game's flag words are worked through bit by bit in
-`docs/GAMEFLAGS.md` (so far `$C2F2`, the penalty-shot / shootout attempt
-flags).
+`docs/GAMEFLAGS.md` (`$C2F2` attempt flags, `$C2FA` shootout/breakaway,
+`$C2EA` gmode).
 
 Status (2026-09-27): the first pass is complete. All 703 functions in the
 IDA export carry a name: 329 human, 4 imported from the 2016 listing
