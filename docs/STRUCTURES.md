@@ -104,6 +104,7 @@ Away = home + `$364`; code that handles "the other team" adds or subtracts
 |---|---|---|---|---|
 | +0 | w | shots (`HmShots` = `$C6CE`) | team shots on goal | IDA symbol |
 | +2 | w | power-play goals **?** | incremented on a goal that ends a penalty | b11 EndPenaltyOnGoal |
+| +4 | w | tmpwrplays | power plays (rising edge of the power-play flag) | IDA, GAMEFLAGS `$C2EE` bit 5 |
 | +`$C` | w | tmscore (`HmGoals` = `$C6DA`) | goals | IDA |
 | +`$E` | w | faceoffs won | | IDA |
 | +`$10` | w | team checks | | IDA |
@@ -138,6 +139,8 @@ Away = home + `$364`; code that handles "the other team" adds or subtracts
 | +`$358` | w | breakaway attempts | | IDA |
 | +`$35A` | w | breakaway goals | | IDA |
 | +`$35C` | w | one-timer attempts | | IDA |
+| +`$35E` | w | one-timer goals | | GAMEFLAGS `$C2FE` bit 7 |
+| +`$360` | w | penalty-shot / shootout attempts | | GAMEFLAGS `$C2F2` bit 2 |
 | +`$362` | w | short-handed goals | | IDA |
 
 ---

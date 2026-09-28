@@ -99,3 +99,148 @@ ending, or an attempt starting. The AI idles and the clock freezes. At the
 next faceoff `puckfaceoff` decides what comes next from bits 2, 3 and 6
 (penalty, delayed penalty, period over), and `Endfaceoff` clears bit 0 when
 the puck is dropped.
+
+---
+
+## `$C2EC` sflags: status flags
+
+IDA documents every bit of this one; the code agrees. `PauseMode` saves and
+restores the whole word; `ai_PlayHighlightFromGame` clears the low byte.
+
+| bit | IDA | meaning | set | cleared | tested by |
+|---|---|---|---|---|---|
+| 0 | paused | **game paused / a menu is up** | `demoread` `$7CD4` (pause request), `Intermission` `$1314C` (menu) | `PauseMode` `$7DA8` on exit, `puckpenshot` `$EFD8`, `puckfaceoff2` `$F90E` ("no pause"), `setupice` `$16A3A`, `ai_InitRinkScreen` `$16BB4` | `GameLoop`, `ClrHor`, `SetHor`, `ai_TickerAreaSetup`, `ai_GameVBlankRoutine` (no clock while paused), `checkfo` |
+| 1 | controller pause | **which controller paused**: 0 = controller 1, 1 = controller 2 | `demoread` and `waitxsr` set or clear it from the pad that pressed Start (`$7CC0`..`$7CF0`, `$111F8`..`$1124E`) | `PeriodOver` `$172D4` | `ai_GetControllingTeam`, `ai_PrintPauseMenuItem`, `getpzjoy`, `ai_ToggleGoalieControl`, `ai_BuildUserNameString` |
+| 2 | sfspdir | **pass-direction mode**: B is held, the D-pad aims the pass | `setpassmode` `$BC38` | `passmode` `$BC68` when the pass is released, `puckstick`/`puckgoalie` when the puck changes hands, `SetLCmode` `$B91C` | `ai_ClampChaseDelta` `$B744` (goalie input) |
+| 3 | sfssdir | **shot-direction mode**: C is held, the D-pad aims the shot | `SetShotMode` `$C1E4` | `doshot` `$C31A` when the shot leaves, `holdcheck` `$13F2C` (checked while winding up), `puckstick`, `puckgoalie`, `SetLCmode` | `doinput`, `ai_ClampChaseDelta`, `assgoaliecpu` `$D97C`/`$D9AE` (the goalie reads the wind-up), `assshoot` |
+| 4 | replay wrapped | **the replay ring has wrapped** (older frames overwritten) | `updatereplay` `$A90A` when `recbpr` reaches `$AF54` and restarts at `$FF0000` | `ClockLength` `$78D6` (reset replay), `ai_LoadPlayoffPassword`, `ai_SavePlayoffPassword` | `ai_StepReplayBack` `$A500` (may step past `$FF0000` only if wrapped) |
+| 5 | manual scroll | **replay camera under manual control** | `ai_InstantReplay` `$A104`, `$A1DA` (D-pad moves the camera) | `ai_InstantReplay` `$A016`, `$A2D0`, `$A3B2` | `ai_ReinitRinkAndReplay` `$A5BA`, `SetRCords` `$A832` |
+| 6 | sfslock | **camera locked to `$BF8E`/`$BF90`** (xc1/yc1) instead of following the puck | `freezewindow` `$AFC2`, `puckfaceoff` `$F540` (horizontal mode), `setInjuryType` `$144D2` (lock on the injured player), `CheckBump` `$14BA8` (fight), `wallcollb2` `$14C2C`, `ai_TileAnimationStep` `$FE4FC` (script end centres on `$160`) | `puckpenshot` `$F064`, `puckfaceoff2` `$F9BE` (then scrolls to the faceoff spot) | `checkwindow` `$AFD2` |
+| 7 | sfhor | **screen in horizontal (menu/board) mode** rather than the rink | `SetHor` `$12B98` | `ClrHor` `$12B44` | 34 readers: everything that draws or moves on the rink checks it first (`updateplayers`, `updateanim`, `doinput`, `puckshadow`, `showref`, `showcrowd`, `showclock`, `SprSort`, `updatescroll`, `UpdateCrowdMeter`, ...) |
+
+---
+
+## `$C2EE` sflags2
+
+IDA documents every bit. `ai_PlayHighlightFromGame` writes `4` to the low
+byte (record disabled); `ai_StartPowerPlaySong` saves and restores the word.
+
+| bit | IDA | meaning | set | cleared | tested by |
+|---|---|---|---|---|---|
+| 0 | sf2faceoff | **faceoff in progress** | `puckfaceoff2` `$F934` | `Endfaceoff` `$FE20` (the puck is dropped) | `updateplayers`, `doinput`, `assfaceoff`, `assfaceoffpl` |
+| 1 | sf2refref | **referee sprite needs a refresh** | `PushRef` `$12746`/`$12768` | `puckpenshot` `$EFF0`, `puckfaceoff2` `$F92E` | no `btst`; read through the whole-word paths |
+| 2 | record disabled | **instant-replay recording is off** | `ClockLength` `$78D0` ("dont record"), `puckfaceoff2` `$F93A` ("dont record yet"), `assscore` `$CCAA` (after the goal celebration timer `$DED0`), `puckpenshot` `$F27A`, `ai_EndShootoutAttempt` `$F392`, `chkprogress` `$120B6`, `ai_ShowGoalBanner` `$188A8` (during an attempt), `ai_ShootoutWinnersCelebrate` `$FD61C` | `Endfaceoff` `$FE3A`, `chkprogress` `$1202A` | `updatereplay` `$A8D4`, `ai_ReinitRinkAndReplay` `$A5D6` |
+| 3 | replay in progress | **instant replay is being shown** | `ai_InstantReplay` `$9FDE` | `ai_InstantReplay` `$A3CC` on exit | `ai_PrintClockLabel`, `ai_PlaceOffscreenIndicator`, `ai_EmitAnimationSprites` (suppressed during replay) |
+| 4 | sf2shot | **a shot was taken** and has not yet been resolved | `doshot` `$C340` (by the puck carrier, not a whiff) | `a2touchpuck` `$101A4` (somebody touched it), `ChkShotStat` `$12F44` (counted as a shot on goal), `wallcoll` `$14CAC` (hit the boards) | `puckstick` `$1522A` |
+| 5 | sf2pwrplay | **power play in progress** | `updatepwrplay` `$12ACC` (counts `tmpwrplays` at +4 of the team record on the rising edge), `ai_StartPowerPlaySong` `$FF83A` | `updatepwrplay` `$12B32` (the penalty expired; the HUD panel is redrawn), `ai_ClearPowerPlaySongLatch` | `chkpk`, `assnearest`, `ai_DrawHudPanel`, `ChkShotStat`, `checkgoal` (power-play goal), `setplayer`, `updatePPTeamTime` |
+| 6 | sf2pwrtm | **which team has the power play**: 0 home, 1 away | `updatepwrplay` `$12AAC`, `ai_StartPowerPlaySong` `$FF81A` | the same routines when the other side is up | `chkpk2`, `updatepwrplay`, `ChkShotStat`, `checkgoal`, `updatePPTeamTime`, `ai_StartPowerPlaySong` |
+| 7 | sf2offsig | **the linesman's offside signal is showing** | `checkob` `$E69C` | `checkob` `$E68A` | `asspuckc` `$E0C2`, `chk4shot` `$E408` (the carrier dumps it instead of carrying in) |
+
+---
+
+## `$C2F0` sflags3
+
+`ai_PlayHighlightFromGame` clears the low byte.
+
+| bit | IDA | meaning | set | cleared | tested by |
+|---|---|---|---|---|---|
+| 0 | lower line change | **the line-change box was drawn in the lower half** of the screen (row `$F` or below) | `ai_PrintLineChangeMenu` `$B93C` | `lcfound2` `$BB4E`, `puckpenshot` `$EFDE`, `puckfaceoff2` `$F914` ("no line changes") | `PrintScores1` `$12C6A`, `UpdateCrowdMeter` `$F6ED2` |
+| 1 | replay play mode | **replay is playing** (as opposed to paused / frame stepping) | toggled by `ai_InstantReplay` `$A274` on the play/pause button | `ai_InstantReplay` `$A03E`, `$A2AA`, `$A300`, `$A344` | `ai_InstantReplay` `$A306` |
+| 2 | alt. tree | **alternate playoff tree**: the bracket was rebuilt after a game and the password re-encoded | `ai_AdvancePlayoffSeries` `$18484` | never (only the whole byte) | `ai_AdvancePlayoffsAfterGame` `$1814A` (decodes `$D176` again) |
+| 3 | start pressed | **Start pressed to skip** the intermission highlights | `Intermission` `$13196`, `ai_PlayHighlightFromGame` `$137E0` | `Intermission` `$131A0` | `ai_PlayHighlightFromGame` `$13550`, `$13568` |
+| 4 | end of faceoff | **faceoff just ended, nobody has touched the puck yet** | `Endfaceoff` `$FE50` | `puckstick` `$152B2` on the first touch, which then credits the faceoff win (team record +`$E`) | that `bclr` |
+| 5 | | **replay camera locked on a player** (a player was found near the puck to follow) | `ai_InstantReplay` `$A1A0` | `ai_InstantReplay` `$A01C`, `$A128`, `$A2CA` | `ai_InstantReplay` `$A0C8`, `$A1B0`, `SetRCords` `$A83E` |
+| 6 | penalty timer up | **one second of penalty time elapsed this frame** | `updatepentime` `$128D0` (every 24 jiffies) | `updatepentime` `$128B2` the next frame | `updateplayers` `$ABC2` |
+| 7 | period 1 or 2 | **not the last period yet** | `ClockLength` `$7932` when `gsp` < 2 | `puckfaceoff` `$F4BC` at the first faceoff with at least 60 s left, which gates a once-per-period event | that `bclr` |
+
+---
+
+## `$C2F4`: goalie AI, replay angle, goal banner
+
+No IDA name; only bits 4 and 7 are annotated. Cleared as a whole by
+`ai_ClearGameState`.
+
+| bit | meaning | set | cleared | tested by |
+|---|---|---|---|---|
+| 0 | **a goal was scored on this play** | `checkgoal` `$14828` | `puckfaceoff2` `$F8A4` | `assgoaliecpu` `$D52C`/`$D652`, `goalieacc` `$109A2`, `ChkShotStat` `$12F4E` (the shot counts as a goal) |
+| 1 | **CPU goalie lunging**: the puck came inside x = +-`$14` of the goalie | `assgoaliecpu` `$D5A0` | `puckfaceoff2` `$F8AA` | `assgoaliecpu` `$D540` |
+| 2 | **goalie deflection pending** (the puck was flipped off the goalie) | `puckgoalie` `$1558C` | `wallcoll` `$14D7A` (plays sound 5 if it was set), `checkpuckcoll` `$150C2`, `puckgoalie` `$154EE` (IDA: "not used anywhere, might have been a debug flag") | the `bclr` results |
+| 3 | **CPU goalie in the pad-stack animation** (frame `$2C8`, sound `$1C`) | `assgoaliecpu` `$D568` | `assgoaliecpu` `$D5A6` when it lunges instead | `assgoaliecpu` `$D54A` |
+| 4 | **reverse-angle replay** | toggled by `ai_ReinitRinkAndReplay` `$A536` (`bchg`) | `ai_InstantReplay` `$9FE4` on entry and `$A3BC` on exit | 13 readers: `SetRCords` (negated camera), `RevReplayAdj`, `updatescroll`, `showcrowd`, `setupice`, `ai_LoadRinkGraphics`, `ai_DrawRinkAuxBitmap`, `ai_EmitAnimationSprites` |
+| 5 | **goal banner text pending** (scorer and assists not yet printed) | `checkgoal` `$147F4` | `ai_ShowGoalBanner` `$189B0`, `$18A08` | `checkgoal` `$14880` |
+| 6 | **replay reinit requested** (the angle toggle button was pressed) | `ai_InstantReplay` `$A378` | `ai_ReinitRinkAndReplay` `$A528` (consumed) | that `bclr` |
+| 7 | **reverse-angle frame adjustment in progress** | `RevReplayAdj` `$A686` | `SetRCords` `$A880` after the camera was negated | `ai_CenterCameraOnObject` `$A61C`, `$A62E` (negates the object coordinates) |
+
+---
+
+## `$C2F6`: breakaway, shot setup, replay control
+
+No IDA name; bits 2 and 4 annotated. Note that bit 2 is reused by the
+setup-screen cursor code for an unrelated purpose.
+
+| bit | meaning | set | cleared | tested by |
+|---|---|---|---|---|
+| 0 | **replay: stop requested** (Start pressed during playback) **?** | `ai_InstantReplay` `$A34A` | `ai_InstantReplay` `$9FD0` on entry, `$A37E` | `ai_InstantReplay` `$A0AA`, `$A26A`, `$A282`, `$A2B0`, `$A32C` |
+| 1 | **pause menu: skip the redraw** after the handler ran | `ai_InstantReplay` `$A3A2` (returning to the pause menu) | `ai_PauseMenuInput` `$7ED8` (consumed) | that `bclr` |
+| 2 | **breakaway detected this frame** | `breakaway` `$DDC4` | `asspuckc` `$DF18`, `assnearest` `$E6F4` (consumed; the object's breakaway bit `$64` bit 1 is cleared with it). Also reused by `ai_MoveSetupCursor` as "the setup menu scrolled" (`$F76D6`, `$F76F6`, `$F7738`, tested `$F7768`) | the `bclr` results |
+| 3 | **pass requested by the auto-pass path** (line change or CPU shot logic decided to pass; goes through `dopass` at `loc_BC64`) | `ai_ClampChaseDelta` `$B7AC`/`$B7D2`/`$B7F2` (doinput continuation), `chk4shot` `$E2D4` | `passmode` `$BC7E` (IDA: "Not in NHL Hockey Source") | `SetLCmode` `$B912`, `lineinput` `$BA88`, `passmode` `$BC48` |
+| 4 | **in-close top-shelf shot**: shooting from within `$D8` of the goal with the goalie out or stacked | `prepshot` `$C2E8` | `prepshot` `$C274` at the start of the wind-up, `doshot` `$C51E` (consumed: raises `puckvz`) | that `bclr` |
+| 5 | **the breakaway foul is a five-minute major** | `getBAplayerInfo` `$12294` | `getBAplayerInfo` `$12278` | `getBAplayerInfo` `$12348` |
+| 6 | unused: never set | | | `doinput` `$B2A2`, `ai_ClampChaseDelta` `$B82E`, `getGoalieSCnum` `$B89E`, `chgplayer` `$FF9A8` (IDA: "never set anywhere") |
+| 7 | **crowd roar** (excitement above the quadratic threshold) | `UpdateCrowdMeter` `$F6F1C` | `UpdateCrowdMeter` `$F6F38`, `PrintScores1` `$12C12` (consumed: starts the `$78`-frame HUD timer `$C304`) | `UpdateCrowdMeter` `$F6EDC` |
+
+---
+
+## `$C2F8`: printer and puck-handling switches
+
+No IDA name; bits 4 and 5 annotated. Cleared as a whole by `ai_ClearGameState`.
+Bits 0, 3, 6 and 7 are parameters passed to helpers through the flag word
+rather than game state.
+
+| bit | meaning | set | cleared | tested by |
+|---|---|---|---|---|
+| 0 | **dobitmap: apply the attribute in `printa`** to the map it draws | bracketed around `dobitmap` calls in `puckfaceoff2` `$FBA6`, `ai_MoveSetupCursor` `$F77E4`, `ai_DrawSetupPhotoFrame` `$F87BE`, `ai_PrintRecordsScreen` `$FA56A`, `newTitleScreen` `$FF15A` | right after each call | `dobitmap` `$11710` |
+| 1 | **one-timer shot pending** | `onetimershot` `$F6D1A`, `assshoot` `$ED26` | `updateplayers` `$AA4E` once somebody carries the puck, `puckfaceoff` `$F466` | `checkpuckcoll` `$14FEC` |
+| 2 | **pass target from the deep-zone table** | `ai_ComputePassTarget` `$F6810` | `ai_ComputePassTarget` `$F67E8`, `$F682A` | `passmode` `$BC94` |
+| 3 | **print: use the setup-screen attribute** for the text | bracketed around `print`/`print2` calls in `ai_RefreshSetupOptions` `$F7908`, `ai_PrintSetupMenuLabels` `$F8074`, `ai_ShowNextSetupPhoto` (six sites) | right after each call | `print2` `$11A5A`/`$11AB4`, `print` `$11C24`/`$11C3C` |
+| 4 | **wall collision registered** (handshake) | `$14B22` around the `sub_14C70` call in the collision code | `$14B2C` after it, `wallcoll` `$14D06` (consumed: sets the object's wall-collision bit `$64` bit 4) | the `bclr` result |
+| 5 | **the puck carrier is in the slot** (x within +-`$47`) | `setSlotBit` `$F8BE8` | `setSlotBit` `$F8BA0` each call | `assnearest` (four sites), `check4check` `$EB5E`, `puckstick` `$1511E`/`$15176` |
+| 6 | **SRAM write** (selects `WriteSRAM` in the record helpers) | `ai_WriteRecordField`, `ai_WriteTeamRecord`, `ai_WriteUserRecord`, `ai_WriteUserNames`, `ai_SkipOwnUserEntry` `$FBCDA` | the read entries (`ai_ReadRecordField`, `ReadTeamRecord`, `ai_ReadUserRecord`, `ai_ReadUserNames`), `ai_SkipOwnUserEntry` `$FBCD0` | the shared bodies, `ai_RankUsersByRecordByte` |
+| 7 | **trim trailing spaces** in `ai_BuildUserNameString` | `ai_AppendRecordUserName`, `ai_AppendRecordHolderText`, `ai_PrintGoalRecordLine`, `ai_BuildCrowdRecordText` | `ai_PrintRankedUserName` `$FC174` | `ai_BuildUserNameString` `$FA04E` |
+
+---
+
+## `$C2FC`: overtime, injury, crowd record, options
+
+No IDA name; bits 5 and 6 annotated.
+
+| bit | meaning | set | cleared | tested by |
+|---|---|---|---|---|
+| 0 | **tile animation requested** (`$D6BE` holds the id) | `ai_RequestTileAnimation` `$FE53C` | `ai_StopTileAnimation` `$FE54E` | `puckfaceoff2` `$FB3C` |
+| 1 | **overtime** (period 3 reached with the game tied) | `ClockLength` `$7870` when `gsp` is 3 | `GameSetUp` `$F73BC` | `ai_PrintRatingsPlayerName` `$FDA24`, `ai_PrintPeriodStatColumns` `$FDBDC` (the OT column) |
+| 2 | unused: only cleared (`puckfaceoff` `$F438`) | | | nobody |
+| 3 | **waypoint script reached its end marker** | `ai_NextWaypoint` `$FE848` | `ai_StartWaypointScript` `$FE76E` | `ai_WaypointScriptActive` `$FE91A` |
+| 4 | **line changes forced automatic**: the line-change option was 2 | `GameSetUp_2` `$F8474` (`OptLine` 2 is reset to 0 and this bit set instead) | only `ai_ClearGameState` | `SetLCmode`, `burst`, `ai_CpuLineChangeCheck`, `puckfaceoff`, `ai_CpuLineChangeAtFaceoff`, `playeracc`, `makepde` |
+| 5 | **game injury**: a player was injured for the rest of the game (status -4) | `setInjuryType` `$1453A` | `setInjuryType` `$1450C`, `$14524` (period injury, status -3) | `FallDown` `$14454`, `ai_ScorePlayerForStars` `$18732` |
+| 6 | **crowd meter record broken** (current meter at or above the arena record) | `updateplayers` `$AA34` | `updateplayers` `$AA22` each frame before the test, `puckfaceoff` `$F432` | 16 readers, all AI: every skater and goalie assignment routine and `playeracc` give a speed boost while it is set |
+| 7 | **hide the position letters on the player labels** (during an attempt) | `assshoot` `$ECC0` | `puckfaceoff` `$F420` | `ai_BuildPlayerLabelSprites` `$1672A` |
+
+---
+
+## `$C2FE`: goal and song latches
+
+No IDA name; bit 1 annotated as "Crowd Meter Broken (bugged)".
+
+| bit | meaning | set | cleared | tested by |
+|---|---|---|---|---|
+| 0 | **shootout goal scored** on this attempt | `checkgoal` `$1480E` after bumping the side's round score (`$D574`/`$D576`) | `puckfaceoff` `$F40E` | nobody by `btst`; read by the faceoff flow |
+| 1 | **crowd-meter-broken mirror**, always set: `set_bit1_C2FE` (`$FEF66`) branches unconditionally to the `bset` at `$FEF74`, so the `bclr` at `$FEF6A` is unreachable and the bit is set on the first `updateplayers` frame and never cleared | `set_bit1_C2FE` from `updateplayers` `$AA3A` | unreachable | `assnearest` `$EA18`, `playeracc` `$10C02`/`$10C86`, `Bcheck` `$13FF6`, `checkpuckcoll` `$14F86` (IDA: "always is") |
+| 3 | **shot already counted for this goal** (handshake between the shot and goal statistics) | `ChkShotStat` `$12F62` | `ChkShotStat` `$12F58`, `checkgoal` `$1482E` | the `bclr` results |
+| 4 | **faceoff song started** | `puckfaceoff` `$F4EC` after `ChooseSong` | `puckfaceoff` `$F3E4`, `puckfaceoff2` `$FCB6`/`$FCC0` (stops the song via `sub_11156`) | the `bclr` results |
+| 5 | unused: only cleared (`assonetimer` `$F6958`) | | | nobody |
+| 6 | **power-play song started** | `ai_StartPowerPlaySong` `$FF85E` | `puckfaceoff2` `$FCAC`, `ChooseSong` `$FE56C` | `puckfaceoff` `$F4D0` |
+| 7 | **one-timer in flight** (a one-timer shot or touch is being resolved) | `a2touchpuck` `$10170` (touch by a one-timer shooter), `puckstick` `$15214`, `onetimershot` `$F6CF4` | `updateplayers` `$AA48` once somebody carries the puck, `puckfaceoff2` `$FA3E`, `ai_ResetLinesForFaceoff` `$1380E`, `assonetimer` `$F6A9E`, `checkgoal` `$148E8` (consumed: counts a one-timer goal, team record +`$35E`) | the `bclr` results |
+
+The team-record offsets these paths touch that were not in
+`docs/STRUCTURES.md`: +4 power plays (`tmpwrplays`), +`$35E` one-timer
+goals, +`$360` penalty-shot / shootout attempts.
