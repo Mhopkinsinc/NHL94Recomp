@@ -105,6 +105,11 @@ preceding named function (`vcountwait~loc_80D4`). The 27 functions the 2016
 listing delimits but the IDA export lacked were added to the XML with
 `add-functions` and named in batch 27.
 
+The data structures the code works on (on-ice object, team record, ROM
+team block and roster record, photos and logos, playoff series, summaries,
+sound tables, SRAM) are written up in `docs/STRUCTURES.md`, each field with
+its source.
+
 Status (2026-09-27): the first pass is complete. All 703 functions in the
 IDA export carry a name: 329 human, 4 imported from the 2016 listing
 (`[listing]` comments) and 399 `ai_` proposals across batches 1-27
